@@ -213,10 +213,10 @@ bash -x /etc/wireguard/wireguard-(server|client).sh >> /etc/wireguard/wireguard-
 ---
 ### ⛑️ Support
 
-Give, and ⭐️ if this project helped you!
+Give a ⭐️, and 🍴 if this project helped you!
 
-<a href="https://github.com/complexorganizations/wireguard-manager/fork">
-  <img alt="Fork" src="https://img.shields.io/github/forks/complexorganizations/wireguard-manager?style=social" />
+<a href="https://github.com/sponsors/Prajwal-Koirala">
+  <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
 </a>
 
 ---
