@@ -229,9 +229,14 @@ bash -x /etc/wireguard/wireguard-(server|client).sh >> /etc/wireguard/wireguard-
 
 Give a ⭐️ and 🍴 if this project helped you!
 
+<p align="center">
 <a href="https://github.com/sponsors/Prajwal-Koirala">
   <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
 </a>
+<a href="https://www.paypal.me/prajwalkoirala23">
+  <img alt="Paypal" src="https://img.shields.io/badge/Donate-PayPal-green.svg" target="_blank" />
+</a>
+</p>
 
 ---
 ### ❤️ Credits
