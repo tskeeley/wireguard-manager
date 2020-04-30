@@ -12,6 +12,12 @@
   <a href="https://github.com/sponsors/Prajwal-Koirala">
     <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
   </a>
+  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
+    <img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/wireguard-manager" target="_blank" />
+  </a>
+  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
+  </a>
 </p>
 
 ---
