@@ -1,7 +1,7 @@
 | Service                                | Description                            |
 |----------------------------------------|----------------------------------------|
 | Name                                   | Prajwal Koirala                        |
-| Email                                  | prajwalkoirala23 [at] protonmail.com   |
+| Email                                  | prajwalkoirala23[at]protonmail[dot]com |
 | Website                                | prajwalkoirala.com                     |
 | Github                                 | github.com/prajwal-koirala             |
 | LinkedIn                               | linkedin.com/in/prajwal-koirala        |
