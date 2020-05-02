@@ -83,14 +83,14 @@ check-system-requirements
 
 # Lets check the kernel version
 function kernel-check() {
-KERNEL_VERSION_LIMIT=3.1
-KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-if (( $(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" |bc -l) )); then
+  KERNEL_VERSION_LIMIT=3.1
+  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
     echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-else
+  else
     echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
     exit
-fi
+  fi
 }
 
 # Kernel Version
@@ -114,7 +114,7 @@ dist-check
 function usage-guide() {
   # shellcheck disable=SC2027,SC2046
   echo "usage: ./"$(basename "$0")" [options]"
-  echo "  --install     Install WireGuard Interfacee"
+  echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
   echo "  --stop        Stop WireGuard Interface"
   echo "  --restart     Restart WireGuard Interface"
@@ -541,9 +541,9 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "  7) FDN"
       echo "  8) DNS.WATCH"
       echo "  9) Custom (Advanced)"
-    until [[ "$CLIENT_DNS_SETTINGS" =~ ^[1-9]$ ]]; do
-      read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
-    done
+      until [[ "$CLIENT_DNS_SETTINGS" =~ ^[1-9]$ ]]; do
+        read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
+      done
       case $CLIENT_DNS_SETTINGS in
       1)
         CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
@@ -677,46 +677,46 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install WireGuard Server
   install-wireguard-server
 
-# Lets check the kernel version and check if headers are required
-function install-kernel-headers() {
-KERNEL_VERSION_LIMIT=5.6
-KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-if (( $(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" |bc -l) )); then
-    if [ "$DISTRO" == "debian" ]; then
-      apt-get update
-      apt-get install linux-headers-"$(uname -r)" -y
+  # Lets check the kernel version and check if headers are required
+  function install-kernel-headers() {
+    KERNEL_VERSION_LIMIT=5.6
+    KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
+      if [ "$DISTRO" == "debian" ]; then
+        apt-get update
+        apt-get install linux-headers-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "ubuntu" ]; then
+        apt-get update
+        apt-get install linux-headers-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "raspbian" ]; then
+        apt-get update
+        apt-get install raspberrypi-kernel-headers -y
+      fi
+      if [ "$DISTRO" == "arch" ]; then
+        pacman -Syu
+        pacman -Syu --noconfirm linux-headers
+      fi
+      if [ "$DISTRO" == "fedora" ]; then
+        dnf update -y
+        dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "centos" ]; then
+        yum update -y
+        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "rhel" ]; then
+        yum update -y
+        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+    else
+      echo "Correct: You do not need kernel headers." >/dev/null 2>&1
     fi
-    if [ "$DISTRO" == "ubuntu" ]; then
-      apt-get update
-      apt-get install linux-headers-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "raspbian" ]; then
-      apt-get update
-      apt-get install raspberrypi-kernel-headers -y
-    fi
-    if [ "$DISTRO" == "arch" ]; then
-      pacman -Syu
-      pacman -Syu --noconfirm linux-headers
-    fi
-    if [ "$DISTRO" == "fedora" ]; then
-      dnf update -y
-      dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "centos" ]; then
-      yum update -y
-      yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "rhel" ]; then
-      yum update -y
-      yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-else
-    echo "Correct: You do not need kernel headers." >/dev/null 2>&1
-fi
-}
+  }
 
-# Kernel Version
-install-kernel-headers
+  # Kernel Version
+  install-kernel-headers
 
   # Function to install unbound
   function install-unbound() {
@@ -917,10 +917,10 @@ else
       fi
       ;;
     5)
-    if [ "$NEW_CLIENT_NAME" == "" ]; then
-      echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
-      read -rp "New client name: " -e NEW_CLIENT_NAME
-    fi
+      if [ "$NEW_CLIENT_NAME" == "" ]; then
+        echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
+        read -rp "New client name: " -e NEW_CLIENT_NAME
+      fi
       CLIENT_PRIVKEY=$(wg genkey)
       CLIENT_PUBKEY=$(echo "$CLIENT_PRIVKEY" | wg pubkey)
       PRESHARED_KEY=$(wg genpsk)
