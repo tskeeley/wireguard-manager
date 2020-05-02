@@ -1,31 +1,29 @@
-<h1 align="center">WireGuard Manager 👋</h1>
+<h1 align="center">shadowsocks Manager 👋</h1>
 <p align="center">
-  <a href="https://github.com/complexorganizations/wireguard-manager/releases">
-    <img alt="Release" src="https://img.shields.io/github/v/release/complexorganizations/wireguard-manager" target="_blank" />
+  <a href="https://github.com/complexorganizations/shadowsocks-manager/releases">
+    <img alt="Release" src="https://img.shields.io/github/v/release/complexorganizations/shadowsocks-manager" target="_blank" />
   </a>
-  <a href="https://github.com/complexorganizations/wireguard-manager/actions">
-    <img alt="ShellCheck" src="https://github.com/complexorganizations/wireguard-manager/workflows/ShellCheck/badge.svg" target="_blank" />
+  <a href="https://github.com/complexorganizations/shadowsocks-manager/actions">
+    <img alt="ShellCheck" src="https://github.com/complexorganizations/shadowsocks-manager/workflows/ShellCheck/badge.svg" target="_blank" />
   </a>
-  <a href="https://github.com/complexorganizations/wireguard-manager/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/complexorganizations/wireguard-manager" target="_blank" />
+  <a href="https://github.com/complexorganizations/shadowsocks-manager/issues">
+    <img alt="Issues" src="https://img.shields.io/github/issues/complexorganizations/shadowsocks-manager" target="_blank" />
   </a>
   <a href="https://github.com/sponsors/Prajwal-Koirala">
     <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
   </a>
-  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
-    <img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/wireguard-manager" target="_blank" />
+  <a href="https://raw.githubusercontent.com/complexorganizations/shadowsocks-manager/master/.github/LICENSE">
+    <img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/shadowsocks-manager" target="_blank" />
   </a>
-  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
+  <a href="https://raw.githubusercontent.com/complexorganizations/shadowsocks-manager/master/.github/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/complexorganizations/shadowsocks-manager" target="_blank" />
   </a>
 </p>
 
 ---
-### 🤷 What is VPN ?
-A Virtual Private Network (VPN) allows users to send and receive data through shared or public networks as if their computing devices were directly connected to the private network. Thus, applications running on an end-system (PC, smartphone, etc.) over a VPN may benefit from private network features, protection, and management. Encryption is a standard aspect of a VPN connection but not an intrinsic one.
+### 🤷 What is proxy ?
 
-### 📶 What is WireGuard❓
-WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-the-art cryptography. It aims to be faster, simpler, leaner, and more useful than IPsec while avoiding the massive headache. It intends to be considerably more performant than OpenVPN. WireGuard is designed as a general-purpose VPN for running on embedded interfaces and super computers alike, fit for many different circumstances. Initially released for the Linux kernel, it is now cross-platform (Windows, macOS, BSD, iOS, Android) and widely deployable. It is currently under a massive development, but it already might be regarded as the most secure, most comfortable to use, and the simplest VPN solution in the industry.
+### 📶 What is shadowsocks
 
 ### ⛳ Goals
  - robust and modern security by default
@@ -36,60 +34,56 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 🌲 Prerequisite
-- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian
-- Linux `Kernel 3.1` or newer
-- You will need superuser access or a user account with `sudo` privilege.
 
 ---
 ### 📲 Installation
-Lets first use `curl` and save the file in `/etc/wireguard/`
+Lets first use `curl` and save the file in `/etc/shadowsocks/`
 ```
-curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/wireguard-server.sh --create-dirs -o /etc/wireguard/wireguard-server.sh
+curl https://raw.githubusercontent.com/complexorganizations/shadowsocks-manager/master/shadowsocks-server.sh --create-dirs -o /etc/shadowsocks-libev/shadowsocks-server.sh
 ```
 Then let's make the script user executable (Optional)
 ```
-chmod +x /etc/wireguard/wireguard-server.sh
+chmod +x /etc/shadowsocks-libev/shadowsocks-server.sh
 ```
 It's finally time to execute the script
 ```
-bash /etc/wireguard/wireguard-server.sh
+bash /etc/shadowsocks-libev/shadowsocks-server.sh
 ```
-In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the client configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
 ---
 ### 💣 After Installation
-- Show WireGuard Interface
-- Start WireGuard Interface
-- Stop WireGuard Interface
-- Restart WireGuard Interface
-- Add WireGuard Peer
-- Remove WireGuard Peer
-- Uninstall WireGuard Interface
+- Show shadowsocks Interface
+- Start shadowsocks Interface
+- Stop shadowsocks Interface
+- Restart shadowsocks Interface
+- Add shadowsocks Peer
+- Remove shadowsocks Peer
+- Uninstall shadowsocks Interface
 - Update this script
 
 ---
 ### 🔑 Usage
 ```
-usage: ./wireguard-server.sh [options]
-  --install     Install WireGuard Interface
-  --start       Start WireGuard Interface
-  --stop        Stop WireGuard Interface
-  --restart     Restart WireGuard Interface
-  --list        Show WireGuard Peers
-  --add         Add WireGuard Peer
-  --remove      Remove WireGuard Peer
-  --reinstall   Reinstall WireGuard Interface
-  --uninstall   Uninstall WireGuard Interface
-  --update      Update WireGuard Script
+usage: ./shadowsocks-server.sh [options]
+  --install     Install shadowsocks Interface
+  --start       Start shadowsocks Interface
+  --stop        Stop shadowsocks Interface
+  --restart     Restart shadowsocks Interface
+  --list        Show shadowsocks Peers
+  --add         Add shadowsocks Peer
+  --remove      Remove shadowsocks Peer
+  --reinstall   Reinstall shadowsocks Interface
+  --uninstall   Uninstall shadowsocks Interface
+  --update      Update shadowsocks Script
   --help        Show Usage Guide
 ```
 
 ---
 ### 🥰 Features
-- Installs and configures a ready-to-use WireGuard Interface
+- Installs and configures a ready-to-use shadowsocks Interface
 - (IPv4|IPv6) Supported, (IPv4|IPv6) Leak Protection
 - Iptables rules and forwarding managed in a seamless way
-- If needed, the script can cleanly remove WireGuard, including configuration and iptables rules
+- If needed, the script can cleanly remove shadowsocks, including configuration and iptables rules
 - Variety of DNS resolvers to be pushed to the clients
 - The choice to use a self-hosted resolver with Unbound.
 - Preshared-key for an extra layer of security.
@@ -104,7 +98,7 @@ usage: ./wireguard-server.sh [options]
 * `SERVER_HOST_V4` - public IPv4 address, detected by default using `curl`
 * `SERVER_HOST_V6` - public IPv6 address, detected by default using `curl`
 * `SERVER_PUB_NIC` - public nig address, detected by default
-* `SERVER_PORT` - public port for wireguard server, default is `51820`
+* `SERVER_PORT` - public port for shadowsocks server, default is `51820`
 * `DISABLE_HOST` - Disable or enable ipv4 and ipv6, default disabled
 * `CLIENT_ALLOWED_IP` - private or public IP range allowed in the tunnel
 * `NAT_CHOICE` - Keep sending packets to keep the tunnel alive `25`
@@ -156,7 +150,7 @@ usage: ./wireguard-server.sh [options]
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
 | KVM             |:white_check_mark:  |
-| LXC             |:x:                 |
+| LXC             |:white_check_mark:  |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
 ### 💻 Compatibility with Linux Kernel
@@ -178,24 +172,20 @@ Which hosting provider do you recommend?
 - [Digital Ocean](https://m.do.co/c/fb46acb2b3b1): Worldwide locations, IPv6 support, starting at $5/month
 - [Linode](https://www.linode.com/?r=63227744138ea4f9d2dff402cfe5b8ad19e45dae): Worldwide locations, IPv6 support, starting at $5/month
 
-Which WireGuard client do you recommend?
-- Windows: [WireGuard](https://www.wireguard.com/install/).
-- Android: [WireGuard](https://play.google.com/store/apps/details?id=com.wireguard.android).
-- macOS: [WireGuard](https://apps.apple.com/us/app/wireguard/id1451685025).
-- iOS: [WireGuard](https://itunes.apple.com/us/app/wireguard/id1441195209).
+Which shadowsocks client do you recommend?
+- Windows: [shadowsocks](https://www.shadowsocks.com/install/).
+- Android: [shadowsocks](https://play.google.com/store/apps/details?id=com.shadowsocks.android).
+- macOS: [shadowsocks](https://apps.apple.com/us/app/shadowsocks/id1451685025).
+- iOS: [shadowsocks](https://itunes.apple.com/us/app/shadowsocks/id1441195209).
 
-Is there WireGuard documentation?
-- Yes, please head to the [WireGuard Manual](https://www.wireguard.com), which references all the options.
+Is there shadowsocks documentation?
+- Yes, please head to the [shadowsocks Manual](https://www.shadowsocks.com), which references all the options.
 
-How do I install a wireguard without the questions? (Headless Install) ***Server Only***
-- ```HEADLESS_INSTALL=y /etc/wireguard/wireguard-server.sh```
+How do I install a shadowsocks without the questions? (Headless Install) ***Server Only***
+- ```HEADLESS_INSTALL=y /etc/shadowsocks/shadowsocks-server.sh```
 
 Official Links
-- Homepage: https://www.wireguard.com
-- Install: https://www.wireguard.com/install/
-- QuickStart: https://www.wireguard.com/quickstart/
-- Compiling: https://www.wireguard.com/compilation/
-- Whitepaper: https://www.wireguard.com/papers/wireguard.pdf
+- Homepage: https://www.shadowsocks.org
 
 ---
 ### 📐 Architecture
@@ -205,12 +195,12 @@ Official Links
 ### 🤝 Developing
 Using a browser based development environment:
 
-[![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/complexorganizations/wireguard-manager)
+[![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/complexorganizations/shadowsocks-manager)
 
 ### 🐛 Debugging
 ```
-git clone https://github.com/complexorganizations/wireguard-manager /etc/wireguard/
-bash -x /etc/wireguard/wireguard-(server|client).sh >> /etc/wireguard/wireguard-(server|client).log
+git clone https://github.com/complexorganizations/shadowsocks-manager /etc/shadowsocks-libev/
+bash -x /etc/shadowsocks-libev/shadowsocks-(server|client).sh >> /etc/shadowsocks/shadowsocks-(server|client).log
 ```
 
 ---
@@ -246,10 +236,8 @@ Give a ⭐️ and 🍴 if this project helped you!
 
 ---
 ### ❤️ Credits
-[Angristan](https://raw.githubusercontent.com/angristan/wireguard-install/master/LICENSE)
-[l-n-s](https://raw.githubusercontent.com/l-n-s/wireguard-install/master/LICENSE)
 
 ---
 ### 📝 License
 Copyright © 2020 [Prajwal](https://github.com/prajwal-koirala).<br />
-This project is [MIT](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE) licensed.
+This project is [MIT](https://raw.githubusercontent.com/complexorganizations/shadowsocks-manager/master/.github/LICENSE) licensed.
