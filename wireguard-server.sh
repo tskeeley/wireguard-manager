@@ -1066,7 +1066,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         chattr +i /etc/resolv.conf
       fi
       ;;
-    9) ## Update the script
+    9) # Update the script
       curl -o /etc/wireguard/wireguard-server.sh https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/wireguard-server.sh
       chmod +x /etc/wireguard/wireguard-server.sh || exit
       ;;
