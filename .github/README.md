@@ -118,56 +118,56 @@ usage: ./wireguard-server.sh [options]
 | OS              | Supported          | i386               | amd64              | armhf              | arm64              |
 | --------------  | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Ubuntu 16       |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Ubuntu 18       |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Ubuntu 19 ≥     |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
+| Ubuntu 16       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Ubuntu 18       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Ubuntu 19 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Debian 8        |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Debian 9        |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Debian 10 ≥     |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
+| Debian 8        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 9        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 10 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| CentOS 7        |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| CentOS 8 ≥      |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
+| CentOS 7        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| CentOS 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Fedora 30       |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Fedora 31       |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Fedora 32 ≥     |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
+| Fedora 30       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Fedora 31       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Fedora 32 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| RedHat 7        |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| RedHat 8 ≥      |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Arch            |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
-| Raspbian        |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |:white_check_mark:  |
+| RedHat 7        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| RedHat 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
 | --------------  | ------------------ |
-| AWS             |:white_check_mark:  |
-| Google Cloud    |:white_check_mark:  |
-| Linode          |:white_check_mark:  |
-| Digital Ocean   |:white_check_mark:  |
-| Vultr           |:white_check_mark:  |
-| Microsoft Azure |:white_check_mark:  |
-| OpenStack       |:white_check_mark:  |
-| Rackspace       |:white_check_mark:  |
-| Scaleway        |:white_check_mark:  |
-| EuroVPS         |:white_check_mark:  |
+| AWS             |:heavy_check_mark:  |
+| Google Cloud    |:heavy_check_mark:  |
+| Linode          |:heavy_check_mark:  |
+| Digital Ocean   |:heavy_check_mark:  |
+| Vultr           |:heavy_check_mark:  |
+| Microsoft Azure |:heavy_check_mark:  |
+| OpenStack       |:heavy_check_mark:  |
+| Rackspace       |:heavy_check_mark:  |
+| Scaleway        |:heavy_check_mark:  |
+| EuroVPS         |:heavy_check_mark:  |
 | Hetzner Cloud   |:x:                 |
 | Strato          |:x:                 |
 ### 🛡️ Compatibility with Virtualization
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
-| KVM             |:white_check_mark:  |
+| KVM             |:heavy_check_mark:  |
 | LXC             |:x:                 |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
 ### 💻 Compatibility with Linux Kernel
 | Kernel          | Supported          |
 | --------------  | ------------------ |
-| Kernel 5.4 ≥    |:white_check_mark:  |
-| Kernel 4.19     |:white_check_mark:  |
-| Kernel 4.14     |:white_check_mark:  |
-| Kernel 4.9      |:white_check_mark:  |
-| Kernel 4.4      |:white_check_mark:  |
-| Kernel 3.16     |:white_check_mark:  |
+| Kernel 5.4 ≥    |:heavy_check_mark:  |
+| Kernel 4.19     |:heavy_check_mark:  |
+| Kernel 4.14     |:heavy_check_mark:  |
+| Kernel 4.9      |:heavy_check_mark:  |
+| Kernel 4.4      |:heavy_check_mark:  |
+| Kernel 3.16     |:heavy_check_mark:  |
 | Kernel 3.1 ≤    |:x:                 |
 
 ---
