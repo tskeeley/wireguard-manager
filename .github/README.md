@@ -181,7 +181,7 @@ Which hosting provider do you recommend?
 Which WireGuard client do you recommend?
 - Windows: [WireGuard](https://www.wireguard.com/install/).
 - Android: [WireGuard](https://play.google.com/store/apps/details?id=com.wireguard.android).
-- macOS: [WireGuard](https://apps.apple.com/us/app/wireguard/id1451685025).
+- macOS: [WireGuard](https://itunes.apple.com/us/app/wireguard/id1451685025).
 - iOS: [WireGuard](https://itunes.apple.com/us/app/wireguard/id1441195209).
 
 Is there WireGuard documentation?
