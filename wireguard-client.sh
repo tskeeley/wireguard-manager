@@ -216,3 +216,13 @@ fi
 
 # Kernel Version
 install-kernel-headers
+
+echo "Move the files to /etc/wireguard/wg0.conf"
+
+echo "if pgrep systemd-journal; then
+      systemctl enable wg-quick@$WIREGUARD_PUB_NIC
+      systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+    else
+      service wg-quick@$WIREGUARD_PUB_NIC enable
+      service wg-quick@$WIREGUARD_PUB_NIC restart
+    fi"
