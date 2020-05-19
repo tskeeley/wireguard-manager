@@ -217,7 +217,7 @@ fi
 # Kernel Version
 install-kernel-headers
 
-echo "Move the files to /etc/wireguard/"$WIREGUARD_PUB_NIC".conf"
+echo "Move the files to /etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 
 echo "if pgrep systemd-journal; then
       systemctl enable wg-quick@$WIREGUARD_PUB_NIC
