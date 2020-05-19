@@ -1035,6 +1035,13 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -f /etc/apt/preferences.d/limit-unstable
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
+        if pgrep systemd-journal; then
+          systemctl enable systemd-resolved
+          systemctl restart systemd-resolved
+        else
+          service systemd-resolved enable
+          service systemd-resolved restart
+        fi
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
