@@ -76,6 +76,11 @@ function check-system-requirements() {
     echo "Error: sed  is not installed, please install sed." >&2
     exit
   fi
+  # System requirements (chattr)
+  if ! [ -x "$(command -v chattr)" ]; then
+    echo "Error: chattr  is not installed, please install chattr." >&2
+    exit
+  fi
 }
 
 # Run the function and check for requirements
