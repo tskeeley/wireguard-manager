@@ -791,8 +791,8 @@ if [ ! -f "$WG_CONFIG" ]; then
       # Allow the modification of the file
       chattr -i /etc/resolv.conf
       # Disable previous DNS servers
-      sed -i "s|nameserver|# nameserver|" /etc/resolv.conf
-      sed -i "s|search|# search|" /etc/resolv.conf
+      sed -i "s|nameserver|#- nameserver|" /etc/resolv.conf
+      sed -i "s|search|#- search|" /etc/resolv.conf
       # Set localhost as the DNS resolver
       echo "nameserver 127.0.0.1" >>/etc/resolv.conf
       # Diable the modification of the file
@@ -1058,10 +1058,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         # Allow the modification of the file
         chattr -i /etc/resolv.conf
         # Remove localhost as the resolver
-        sed -i "s|nameserver 127.0.0.1|# nameserver 127.0.0.1|" /etc/resolv.conf
+        sed -i "s|nameserver 127.0.0.1|#+ nameserver 127.0.0.1|" /etc/resolv.conf
         # Remove the old resolv.conf file
-        sed -i "s|# nameserver|nameserver|" /etc/resolv.conf
-        sed -i "s|# search|search|" /etc/resolv.conf
+        sed -i "s|#- nameserver|nameserver|" /etc/resolv.conf
+        sed -i "s|#- search|search|" /etc/resolv.conf
         # Diable the modification of the file
         chattr +i /etc/resolv.conf
       fi
