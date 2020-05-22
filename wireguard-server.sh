@@ -374,8 +374,8 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_PORT="51820"
       ;;
     2)
-      until [[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && [ "$SERVER_PORT" -ge 1 ] && [ "$SERVER_PORT" -le 65535 ]; do
-        read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT
+      until [[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && [ "$SERVER_PORT" -ge 1024 ] && [ "$SERVER_PORT" -le 65535 ]; do
+        read -rp "Custom port [1024-65535]: " -e -i 51820 SERVER_PORT
       done
       ;;
     3)
@@ -433,8 +433,8 @@ if [ ! -f "$WG_CONFIG" ]; then
       MTU_CHOICE="1420"
       ;;
     3)
-      until [[ "$MTU_CHOICE" =~ ^[0-9]+$ ]] && [ "$MTU_CHOICE" -ge 1 ] && [ "$MTU_CHOICE" -le 1500 ]; do
-        read -rp "Custom MTU [1-1500]: " -e -i 1280 MTU_CHOICE
+      until [[ "$MTU_CHOICE" =~ ^[0-9]+$ ]] && [ "$MTU_CHOICE" -ge 0 ] && [ "$MTU_CHOICE" -le 1500 ]; do
+        read -rp "Custom MTU [0-1500]: " -e -i 1280 MTU_CHOICE
       done
       ;;
     esac
@@ -482,20 +482,20 @@ if [ ! -f "$WG_CONFIG" ]; then
       DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl --system
+        sysctl -p
       )"
       ;;
     2)
       DISABLE_HOST="$(
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl --system
+        sysctl -p
       )"
       ;;
     3)
       # shellcheck disable=SC2034
       DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl --system
+        sysctl -p
       )"
       ;;
     esac
@@ -1033,13 +1033,13 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -f /etc/apt/preferences.d/limit-unstable
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
-        if pgrep systemd-journal; then
-          systemctl enable systemd-resolved
-          systemctl restart systemd-resolved
-        else
-          service systemd-resolved enable
-          service systemd-resolved restart
-        fi
+          if pgrep systemd-journal; then
+            systemctl enable systemd-resolved
+            systemctl restart systemd-resolved
+          else
+            service systemd-resolved enable
+            service systemd-resolved restart
+          fi
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
