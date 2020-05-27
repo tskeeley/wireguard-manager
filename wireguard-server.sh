@@ -1,7 +1,7 @@
 #!/bin/bash
 # https://github.com/complexorganizations/wireguard-manager
 
-# Require script to be run as root (or with sudo)
+# Require script to be run as root
 function super-user-check() {
   if [ "$EUID" -ne 0 ]; then
     echo "You need to run this script as super user."
@@ -760,6 +760,8 @@ Endpoint = $SERVER_HOST:$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
 PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+    # Clear
+    clear
     # Generate QR Code
     qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
     # Echo the file
