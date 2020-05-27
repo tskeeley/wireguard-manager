@@ -531,11 +531,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Would you like to install Unbound.
   function ask-install-dns() {
-    if [ "$INSTALL_UNBOUND" == "" ]; then
-      # shellcheck disable=SC2034
-      read -rp "Do You Want To Install Unbound (y/n): " -e -i y INSTALL_UNBOUND
-    fi
-    if [ "$INSTALL_UNBOUND" == "n" ]; then
       echo "Which DNS do you want to use with the VPN?"
       echo "  1) IPengine (Recommended)"
       echo "  2) AdGuard"
@@ -578,7 +573,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         read -rp "Custom DNS (IPv4 IPv6):" -e -i "167.172.156.151,161.35.62.143,2604:a880:400:d0::97:9001,2604:a880:400:d0::177d:8001" CLIENT_DNS
         ;;
       esac
-    fi
   }
 
   # Ask To Install DNS
@@ -722,97 +716,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Kernel Version
   install-kernel-headers
-
-  # Function to install unbound
-  function install-unbound() {
-    if [ "$INSTALL_UNBOUND" = "y" ]; then
-      # Installation Begins Here
-      if [ "$DISTRO" == "ubuntu" ]; then
-        # Install Unbound
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-        if pgrep systemd-journal; then
-          systemctl stop systemd-resolved
-          systemctl disable systemd-resolved
-        else
-          service systemd-resolved stop
-          service systemd-resolved disable
-        fi
-      fi
-      if [ "$DISTRO" == "debian" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      fi
-      if [ "$DISTRO" == "raspbian" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      fi
-      if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
-        yum install unbound unbound-libs -y
-      fi
-      if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
-        yum install unbound unbound-libs resolvconf -y
-      fi
-      if [ "$DISTRO" == "rhel" ]; then
-        yum install unbound unbound-libs -y
-      fi
-      if [ "$DISTRO" == "fedora" ]; then
-        dnf install unbound -y
-      fi
-      if [ "$DISTRO" == "arch" ]; then
-        pacman -Syu --noconfirm unbound resolvconf
-      fi
-      # Remove Unbound Config
-      rm -f /etc/unbound/unbound.conf
-      # Set Config for unbound
-      echo "server:
-    num-threads: 4
-    verbosity: 1
-    root-hints: /etc/unbound/root.hints
-    # auto-trust-anchor-file: /var/lib/unbound/root.key
-    interface: 0.0.0.0
-    interface: ::0
-    max-udp-size: 3072
-    access-control: 0.0.0.0/0                 refuse
-    access-control: ::0                       refuse
-    access-control: $PRIVATE_SUBNET_V4               allow
-    access-control: $PRIVATE_SUBNET_V6          allow
-    access-control: 127.0.0.1                 allow
-    private-address: $PRIVATE_SUBNET_V4
-    private-address: $PRIVATE_SUBNET_V6
-    hide-identity: yes
-    hide-version: yes
-    harden-glue: yes
-    harden-dnssec-stripped: yes
-    harden-referral-path: yes
-    unwanted-reply-threshold: 10000000
-    val-log-level: 1
-    cache-min-ttl: 1800
-    cache-max-ttl: 14400
-    prefetch: yes
-    qname-minimisation: yes
-    prefetch-key: yes" >>/etc/unbound/unbound.conf
-      # Set DNS Root Servers
-      curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-      # Setting Client DNS For Unbound On WireGuard
-      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
-      # Allow the modification of the file
-      chattr -i /etc/resolv.conf
-      mv /etc/resolv.conf /etc/resolv.conf.old
-      # Set localhost as the DNS resolver
-      echo "nameserver 127.0.0.1" >>/etc/resolv.conf
-      echo "nameserver ::1" >>/etc/resolv.conf
-      # Stop the modification of the file
-      chattr +i /etc/resolv.conf
-    fi
-    if pgrep systemd-journal; then
-      systemctl enable unbound
-      systemctl restart unbound
-    else
-      service unbound enable
-      service unbound restart
-    fi
-  }
-
-  # Running Install Unbound
-  install-unbound
 
   # WireGuard Set Config
   function wireguard-setconf() {
@@ -1014,44 +917,31 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           # Disable WireGuard
           systemctl disable wg-quick@$WIREGUARD_PUB_NIC
           wg-quick down $WIREGUARD_PUB_NIC
-          # Disable Unbound
-          systemctl disable unbound
-          systemctl stop unbound
         else
           # Disable WireGuard
           service wg-quick@$WIREGUARD_PUB_NIC disable
           wg-quick down $WIREGUARD_PUB_NIC
-          # Disable Unbound
-          service unbound disable
-          service unbound stop
         fi
         if [ "$DISTRO" == "centos" ]; then
-          yum remove wireguard qrencode haveged unbound unbound-host -y
+          yum remove wireguard qrencode haveged -y
         elif [ "$DISTRO" == "debian" ]; then
-          apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
+          apt-get remove --purge wireguard qrencode haveged -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
         elif [ "$DISTRO" == "ubuntu" ]; then
-          apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
-          if pgrep systemd-journal; then
-            systemctl enable systemd-resolved
-            systemctl restart systemd-resolved
-          else
-            service systemd-resolved enable
-            service systemd-resolved restart
-          fi
+          apt-get remove --purge wireguard qrencode haveged -y
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
-          apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
+          apt-get remove --purge wireguard qrencode haveged dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
         elif [ "$DISTRO" == "arch" ]; then
-          pacman -Rs wireguard qrencode haveged unbound unbound-host -y
+          pacman -Rs wireguard qrencode haveged -y
         elif [ "$DISTRO" == "fedora" ]; then
-          dnf remove wireguard qrencode haveged unbound -y
+          dnf remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         elif [ "$DISTRO" == "rhel" ]; then
-          yum remove wireguard qrencode haveged unbound unbound-host -y
+          yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
         # Removing Wireguard User Config Files
@@ -1062,18 +952,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         rm -f /etc/sysctl.d/wireguard.conf
         # Removing wireguard config
         rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
-        # Removing Unbound Config
-        rm -f /etc/unbound/unbound.conf
-        # Removing Unbound Files
-        rm -rf /etc/unbound
-        # Allow the modification of the file
-        chattr -i /etc/resolv.conf
-        # remove resolv.conf
-        rm -f /etc/resolv.conf
-        # Moving to resolv.conf
-        mv /etc/resolv.conf.old /etc/resolv.conf
-        # Stop the modification of the file
-        chattr +i /etc/resolv.conf
       fi
       ;;
     9) # Update the script
