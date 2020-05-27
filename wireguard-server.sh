@@ -537,45 +537,45 @@ if [ ! -f "$WG_CONFIG" ]; then
     fi
     if [ "$INSTALL_UNBOUND" == "n" ]; then
       echo "Which DNS do you want to use with the VPN?"
-      echo "  1) AdGuard (Recommended)"
-      echo "  2) Google"
-      echo "  3) OpenDNS"
-      echo "  4) Cloudflare"
-      echo "  5) Verisign"
-      echo "  6) Quad9"
-      echo "  7) FDN"
-      echo "  8) DNS.WATCH"
+      echo "  1) IPengine (Recommended)"
+      echo "  2) AdGuard"
+      echo "  3) Google"
+      echo "  4) OpenDNS"
+      echo "  5) Cloudflare"
+      echo "  6) Verisign"
+      echo "  7) Quad9"
+      echo "  8) FDN"
       echo "  9) Custom (Advanced)"
       until [[ "$CLIENT_DNS_SETTINGS" =~ ^[1-9]$ ]]; do
         read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
       done
       case $CLIENT_DNS_SETTINGS in
       1)
-        CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
+        CLIENT_DNS="167.172.156.151,161.35.62.143,2604:a880:400:d0::97:9001,2604:a880:400:d0::177d:8001"
         ;;
       2)
-        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+        CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
         ;;
       3)
-        CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
+        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
         ;;
       4)
-        CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+        CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
         ;;
       5)
-        CLIENT_DNS="64.6.64.6,64.6.65.6,2620:74:1b::1:1,2620:74:1c::2:2"
+        CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
         ;;
       6)
-        CLIENT_DNS="9.9.9.9,149.112.112.112,2620:fe::fe,2620:fe::9"
+        CLIENT_DNS="64.6.64.6,64.6.65.6,2620:74:1b::1:1,2620:74:1c::2:2"
         ;;
       7)
-        CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
+        CLIENT_DNS="9.9.9.9,149.112.112.112,2620:fe::fe,2620:fe::9"
         ;;
       8)
-        CLIENT_DNS="84.200.69.80,84.200.70.40,2001:1608:10:25::1c04:b12f,2001:1608:10:25::9249:d69b"
+        CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
         ;;
       9)
-        read -rp "Custom DNS (IPv4 IPv6):" -e -i "176.103.130.130,2a00:5a60::ad1:0ff" CLIENT_DNS
+        read -rp "Custom DNS (IPv4 IPv6):" -e -i "167.172.156.151,161.35.62.143,2604:a880:400:d0::97:9001,2604:a880:400:d0::177d:8001" CLIENT_DNS
         ;;
       esac
     fi
