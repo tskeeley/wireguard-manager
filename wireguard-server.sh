@@ -857,12 +857,7 @@ Endpoint = $SERVER_HOST:$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
 PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-    # Clear
-    clear
-    # Generate QR Code
-    qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-    # Echo the file
-    echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+    # Service Restart
     if pgrep systemd-journal; then
       systemctl enable wg-quick@$WIREGUARD_PUB_NIC
       systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -870,6 +865,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       service wg-quick@$WIREGUARD_PUB_NIC enable
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi
+    # Generate QR Code
+    qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+    # Echo the file
+    echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
   }
 
   # Setting Up Wireguard Config
