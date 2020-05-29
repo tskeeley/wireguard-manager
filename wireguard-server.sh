@@ -58,27 +58,27 @@ function check-system-requirements() {
   fi
   # System requirements (bc)
   if ! [ -x "$(command -v bc)" ]; then
-    echo "Error: bc  is not installed, please install bc." >&2
+    echo "Error: bc is not installed, please install bc." >&2
     exit
   fi
   # System requirements (uname)
   if ! [ -x "$(command -v uname)" ]; then
-    echo "Error: uname  is not installed, please install uname." >&2
+    echo "Error: uname is not installed, please install uname." >&2
     exit
   fi
   # System requirements (jq)
   if ! [ -x "$(command -v jq)" ]; then
-    echo "Error: jq  is not installed, please install jq." >&2
+    echo "Error: jq is not installed, please install jq." >&2
     exit
   fi
   # System requirements (sed)
   if ! [ -x "$(command -v sed)" ]; then
-    echo "Error: sed  is not installed, please install sed." >&2
+    echo "Error: sed is not installed, please install sed." >&2
     exit
   fi
   # System requirements (chattr)
   if ! [ -x "$(command -v chattr)" ]; then
-    echo "Error: chattr  is not installed, please install chattr." >&2
+    echo "Error: chattr is not installed, please install chattr." >&2
     exit
   fi
 }
