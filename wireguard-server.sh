@@ -645,7 +645,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       dnf copr enable jdoss/wireguard -y
       dnf install qrencode wireguard-dkms wireguard-tools haveged -y
     fi
-    if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
+    if [ "$DISTRO" == "centos" ] && ([ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]); then
       yum update -y
       yum install epel-release -y
       yum update -y
