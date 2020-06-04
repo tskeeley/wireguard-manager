@@ -789,13 +789,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     cache-max-ttl: 14400
     prefetch: yes
     qname-minimisation: yes
-    prefetch-key: yes
-forward-zone:
-   name: "."
-forward-addr: 161.35.127.110@53
-forward-addr: 198.199.81.45@53
-forward-addr: 2604:a880:400:d0::19c9:3001@53
-forward-addr: 2604:a880:400:d0::19ce:c001@53" >>/etc/unbound/unbound.conf
+    prefetch-key: yes" >>/etc/unbound/unbound.conf
       # Set DNS Root Servers
       curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
       # Setting Client DNS For Unbound On WireGuard
