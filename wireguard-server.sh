@@ -551,7 +551,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       done
       case $CLIENT_DNS_SETTINGS in
       1)
-        CLIENT_DNS="167.99.144.34,206.189.238.27,2604:a880:400:d0::1549:d001,2604:a880:400:d0::1714:b001"
+        CLIENT_DNS=""
         ;;
       2)
         CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
