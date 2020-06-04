@@ -551,7 +551,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       done
       case $CLIENT_DNS_SETTINGS in
       1)
-        CLIENT_DNS=""
+        CLIENT_DNS="161.35.127.110,198.199.81.45,2604:a880:400:d0::19c9:3001,2604:a880:400:d0::19ce:c001"
         ;;
       2)
         CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
@@ -575,7 +575,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
         ;;
       9)
-        read -rp "Custom DNS (IPv4 IPv6):" -e -i "167.99.144.34,206.189.238.27,2604:a880:400:d0::1549:d001,2604:a880:400:d0::1714:b001" CLIENT_DNS
+        read -rp "Custom DNS (IPv4 IPv6):" -e -i "161.35.127.110,198.199.81.45,2604:a880:400:d0::19c9:3001,2604:a880:400:d0::19ce:c001" CLIENT_DNS
         ;;
       esac
     fi
