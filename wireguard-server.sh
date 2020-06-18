@@ -297,13 +297,13 @@ if [ ! -f "$WG_CONFIG" ]; then
     # Apply port response
     case $SERVER_HOST_V4_SETTINGS in
     1)
-      SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.ip')"
+      SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       ;;
     2)
       SERVER_HOST_V4=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
       ;;
     3)
-      read -rp "Custom IPV4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.ip')" SERVER_HOST_V4
+      read -rp "Custom IPV4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
       ;;
     esac
   }
@@ -323,13 +323,13 @@ if [ ! -f "$WG_CONFIG" ]; then
     # Apply port response
     case $SERVER_HOST_V6_SETTINGS in
     1)
-      SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.ip')"
+      SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       ;;
     2)
       SERVER_HOST_V6=$(ip r get to 2001:4860:4860::8888 | perl -ne '/src ([\w:]+)/ && print "$1\n"')
       ;;
     3)
-      read -rp "Custom IPV6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.ip')" SERVER_HOST_V6
+      read -rp "Custom IPV6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
       ;;
     esac
   }
@@ -460,7 +460,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST="[$SERVER_HOST_V6]"
       ;;
     3)
-      read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.hostname')" SERVER_HOST
+      read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname')" SERVER_HOST
       ;;
     esac
   }
