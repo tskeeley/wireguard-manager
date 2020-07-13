@@ -482,20 +482,20 @@ if [ ! -f "$WG_CONFIG" ]; then
       DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p
+        sysctl -p /etc/sysctl.d/wireguard.conf
       )"
       ;;
     2)
       DISABLE_HOST="$(
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p
+        sysctl -p /etc/sysctl.d/wireguard.conf
       )"
       ;;
     3)
       # shellcheck disable=SC2034
       DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p
+        sysctl -p /etc/sysctl.d/wireguard.conf
       )"
       ;;
     esac
@@ -633,7 +633,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     if [ "$DISTRO" == "arch" ]; then
       pacman -Syu
       pacman -Syu --noconfirm haveged qrencode iptables
-      pacman -Syu --noconfirm wireguard-tools wireguard-arch
+      pacman -Syu --noconfirm wireguard-tools wireguard
     fi
     if [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
       dnf update -y
