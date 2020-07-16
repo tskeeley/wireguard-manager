@@ -633,7 +633,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     if [ "$DISTRO" == "arch" ]; then
       pacman -Syu
       pacman -Syu --noconfirm haveged qrencode iptables
-      pacman -Syu --noconfirm wireguard-tools wireguard
+      pacman -Syu --noconfirm wireguard-tools
     fi
     if [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
       dnf update -y
