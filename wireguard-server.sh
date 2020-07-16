@@ -802,13 +802,14 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "nameserver ::1" >>/etc/resolv.conf
       # Stop the modification of the file
       chattr +i /etc/resolv.conf
-    fi
+    # restart unbound
     if pgrep systemd-journal; then
       systemctl enable unbound
       systemctl restart unbound
     else
       service unbound enable
       service unbound restart
+    fi
     fi
   }
 
