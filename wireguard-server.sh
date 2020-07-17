@@ -762,9 +762,11 @@ if [ ! -f "$WG_CONFIG" ]; then
       fi
       # Remove Unbound Config
       rm -f /etc/unbound/unbound.conf
+      # Cpu
+      NPROC=$(nproc)
       # Set Config for unbound
       echo "server:
-    num-threads: 4
+    num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
     # auto-trust-anchor-file: /var/lib/unbound/root.key
