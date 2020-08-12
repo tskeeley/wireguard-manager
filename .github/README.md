@@ -158,7 +158,7 @@ usage: ./wireguard-server.sh [options]
 | KVM             |:heavy_check_mark:  |
 | LXC             |:x:                 |
 | OpenVZ          |:x:                 |
-| Docker          |:x:                 |
+| Docker          |:heavy_check_mark:  |
 ### 💻 Compatibility with Linux Kernel
 | Kernel          | Supported          |
 | --------------  | ------------------ |
