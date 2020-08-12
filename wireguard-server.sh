@@ -88,7 +88,7 @@ function docker-check() {
   if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
     echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
   else
-    echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
+    echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
     exit
   fi
 }
