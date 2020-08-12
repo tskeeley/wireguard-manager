@@ -83,6 +83,7 @@ check-system-requirements
 
 # Check for docker stuff
 function docker-check() {
+if [ -f /.dockerenv ]; then
   DOCKER_KERNEL_VERSION_LIMIT=5.6
   DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
   if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
@@ -91,6 +92,7 @@ function docker-check() {
     echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
     exit
   fi
+fi
 }
 
 # Docker Check
