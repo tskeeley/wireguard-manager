@@ -997,7 +997,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
       if [[ $REPLY =~ ^[Yy]$ ]]; then
         # shellcheck disable=SC1117
-        echo sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WG_CONFIG
+        sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WG_CONFIG
         rm /etc/wireguard/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
         echo "Client named $REMOVECLIENT has been removed."
       fi
