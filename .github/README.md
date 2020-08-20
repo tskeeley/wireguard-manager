@@ -42,17 +42,17 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 📲 Installation
-Lets first use `curl` and save the file in `/etc/wireguard/`
+Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
-curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/wireguard-server.sh --create-dirs -o /etc/wireguard/wireguard-server.sh
+curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/wireguard-server.sh --create-dirs -o /usr/local/bin/wireguard-server.sh
 ```
 Then let's make the script user executable (Optional)
 ```
-chmod +x /etc/wireguard/wireguard-server.sh
+chmod +x /usr/local/bin/wireguard-server.sh
 ```
 It's finally time to execute the script
 ```
-bash /etc/wireguard/wireguard-server.sh
+bash /usr/local/bin/wireguard-server.sh
 ```
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the client configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
@@ -209,8 +209,8 @@ Using a browser based development environment:
 
 ### 🐛 Debugging
 ```
-git clone https://github.com/complexorganizations/wireguard-manager /etc/wireguard/
-bash -x /etc/wireguard/wireguard-(server|client).sh >> /etc/wireguard/wireguard-(server|client).log
+git clone https://github.com/complexorganizations/wireguard-manager /usr/local/bin/
+bash -x /usr/local/bin/wireguard-(server|client).sh >> /usr/local/bin/wireguard-(server|client).log
 ```
 
 ---
