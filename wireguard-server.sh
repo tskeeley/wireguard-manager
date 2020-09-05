@@ -29,21 +29,6 @@ function virt-check() {
 # Virtualization Check
 virt-check
 
-# Pre-Checks
-function installing-system-requirements() {
-  # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
-    apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
-  fi
-  # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
-    yum install iptables curl coreutils bc jq sed e2fsprogs -y
-  fi
-}
-
-# Run the function and check for requirements
-installing-system-requirements
-
 # Check for docker stuff
 function docker-check() {
 if [ -f /.dockerenv ]; then
@@ -90,6 +75,21 @@ function dist-check() {
 
 # Check Operating System
 dist-check
+
+# Pre-Checks
+function installing-system-requirements() {
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+    apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
+  fi
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
+    yum install iptables curl coreutils bc jq sed e2fsprogs -y
+  fi
+}
+
+# Run the function and check for requirements
+installing-system-requirements
 
 function usage-guide() {
   # shellcheck disable=SC2027,SC2046
