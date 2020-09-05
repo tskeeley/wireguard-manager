@@ -80,11 +80,11 @@ dist-check
 function installing-system-requirements() {
   # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
-    apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
+    apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
   # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
-    yum install iptables curl coreutils bc jq sed e2fsprogs -y
+    yum update && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
   if [ "$DISTRO" == "arch" ]; then
     pacman -Syu --noconfirm iptables curl bc jq sed
