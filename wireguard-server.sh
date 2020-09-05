@@ -30,56 +30,19 @@ function virt-check() {
 virt-check
 
 # Pre-Checks
-function check-system-requirements() {
-  # System requirements (iptables)
-  if ! [ -x "$(command -v iptables)" ]; then
-    echo "Error: iptables is not installed, please install iptables." >&2
-    exit
+function installing-system-requirements() {
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+    apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
-  # System requirements (curl)
-  if ! [ -x "$(command -v curl)" ]; then
-    echo "Error: curl is not installed, please install curl." >&2
-    exit
-  fi
-  # System requirements (ip)
-  if ! [ -x "$(command -v ip)" ]; then
-    echo "Error: ip is not installed, please install ip." >&2
-    exit
-  fi
-  # System requirements (shuf)
-  if ! [ -x "$(command -v shuf)" ]; then
-    echo "Error: shuf is not installed, please install shuf." >&2
-    exit
-  fi
-  # System requirements (bc)
-  if ! [ -x "$(command -v bc)" ]; then
-    echo "Error: bc is not installed, please install bc." >&2
-    exit
-  fi
-  # System requirements (uname)
-  if ! [ -x "$(command -v uname)" ]; then
-    echo "Error: uname is not installed, please install uname." >&2
-    exit
-  fi
-  # System requirements (jq)
-  if ! [ -x "$(command -v jq)" ]; then
-    echo "Error: jq is not installed, please install jq." >&2
-    exit
-  fi
-  # System requirements (sed)
-  if ! [ -x "$(command -v sed)" ]; then
-    echo "Error: sed is not installed, please install sed." >&2
-    exit
-  fi
-  # System requirements (chattr)
-  if ! [ -x "$(command -v chattr)" ]; then
-    echo "Error: chattr is not installed, please install chattr." >&2
-    exit
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
+    yum install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
 }
 
 # Run the function and check for requirements
-check-system-requirements
+installing-system-requirements
 
 # Check for docker stuff
 function docker-check() {
