@@ -86,6 +86,9 @@ function installing-system-requirements() {
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
     yum install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
+  if [ "$DISTRO" == "arch" ]; then
+    pacman -Syu --noconfirm iptables curl bc jq sed
+  fi
 }
 
 # Run the function and check for requirements
