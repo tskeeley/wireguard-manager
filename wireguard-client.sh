@@ -29,33 +29,6 @@ function virt-check() {
 # Virtualization Check
 virt-check
 
-# Pre-Checks
-function check-system-requirements() {
-  # System requirements (iptables)
-  if ! [ -x "$(command -v iptables)" ]; then
-    echo "Error: iptables is not installed, please install iptables." >&2
-    exit
-  fi
-  # System requirements (curl)
-  if ! [ -x "$(command -v curl)" ]; then
-    echo "Error: curl is not installed, please install curl." >&2
-    exit
-  fi
-  # System requirements (bc)
-  if ! [ -x "$(command -v bc)" ]; then
-    echo "Error: bc  is not installed, please install bc." >&2
-    exit
-  fi
-  # System requirements (uname)
-  if ! [ -x "$(command -v uname)" ]; then
-    echo "Error: uname  is not installed, please install uname." >&2
-    exit
-  fi
-}
-
-# Run the function and check for requirements
-check-system-requirements
-
 # Check for docker stuff
 function docker-check() {
 if [ -f /.dockerenv ]; then
@@ -102,6 +75,24 @@ function dist-check() {
 
 # Check Operating System
 dist-check
+
+# Pre-Checks
+function installing-system-requirements() {
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+    apt-get update && apt-get install iptables curl bc -y
+  fi
+  # shellcheck disable=SC2233,SC2050
+  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
+    yum update && yum install epel-release install iptables curl bc -y
+  fi
+  if [ "$DISTRO" == "arch" ]; then
+    pacman -Syu --noconfirm iptables curl bc
+  fi
+}
+
+# Run the function and check for requirements
+installing-system-requirements
 
 # Install WireGuard Client
 function install-wireguard-client() {
