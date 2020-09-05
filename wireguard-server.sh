@@ -31,16 +31,16 @@ virt-check
 
 # Check for docker stuff
 function docker-check() {
-if [ -f /.dockerenv ]; then
-  DOCKER_KERNEL_VERSION_LIMIT=5.6
-  DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-    echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-  else
-    echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
-    exit
+  if [ -f /.dockerenv ]; then
+    DOCKER_KERNEL_VERSION_LIMIT=5.6
+    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
+      echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+    else
+      echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
+      exit
+    fi
   fi
-fi
 }
 
 # Docker Check
@@ -84,7 +84,7 @@ function installing-system-requirements() {
   fi
   # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
-    yum update && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
+    yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
   if [ "$DISTRO" == "arch" ]; then
     pacman -Syu --noconfirm iptables curl bc jq sed
@@ -626,8 +626,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     # shellcheck disable=SC2235
     if [ "$DISTRO" == "centos" ] && ([ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]); then
       yum update -y
-      yum install epel-release -y
-      yum update -y
       yum config-manager --set-enabled PowerTools
       yum copr enable jdoss/wireguard -y
       yum install wireguard-dkms wireguard-tools qrencode haveged -y
@@ -635,8 +633,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
       yum update -y
       curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-      yum update -y
-      yum install epel-release -y
       yum update -y
       yum install wireguard-dkms wireguard-tools qrencode haveged -y
     fi
@@ -653,7 +649,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       yum update -y
       curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
       yum update -y
-      yum install epel-release -y
       yum install wireguard-dkms wireguard-tools qrencode haveged -y
     fi
   }
@@ -782,14 +777,14 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "nameserver ::1" >>/etc/resolv.conf
       # Stop the modification of the file
       chattr +i /etc/resolv.conf
-    # restart unbound
-    if pgrep systemd-journal; then
-      systemctl enable unbound
-      systemctl restart unbound
-    else
-      service unbound enable
-      service unbound restart
-    fi
+      # restart unbound
+      if pgrep systemd-journal; then
+        systemctl enable unbound
+        systemctl restart unbound
+      else
+        service unbound enable
+        service unbound restart
+      fi
     fi
   }
 

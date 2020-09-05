@@ -31,16 +31,16 @@ virt-check
 
 # Check for docker stuff
 function docker-check() {
-if [ -f /.dockerenv ]; then
-  DOCKER_KERNEL_VERSION_LIMIT=5.6
-  DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-    echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-  else
-    echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
-    exit
+  if [ -f /.dockerenv ]; then
+    DOCKER_KERNEL_VERSION_LIMIT=5.6
+    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
+      echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+    else
+      echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
+      exit
+    fi
   fi
-fi
 }
 
 # Docker Check
@@ -48,14 +48,14 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-KERNEL_VERSION_LIMIT=3.1
-KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-if (( $(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" |bc -l) )); then
+  KERNEL_VERSION_LIMIT=3.1
+  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
     echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-else
+  else
     echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
     exit
-fi
+  fi
 }
 
 # Kernel Version
@@ -84,7 +84,7 @@ function installing-system-requirements() {
   fi
   # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
-    yum update && yum install epel-release install iptables curl bc -y
+    yum update -y && yum install epel-release iptables curl bc -y
   fi
   if [ "$DISTRO" == "arch" ]; then
     pacman -Syu --noconfirm iptables curl bc
@@ -97,7 +97,7 @@ installing-system-requirements
 # Install WireGuard Client
 function install-wireguard-client() {
   # Installation begins here.
-    # shellcheck disable=SC2235
+  # shellcheck disable=SC2235
   if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]); then
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
@@ -143,8 +143,6 @@ function install-wireguard-client() {
   fi
   if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
     yum update -y
-    yum install epel-release -y
-    yum update -y
     yum install resolvconf -y
     yum config-manager --set-enabled PowerTools
     yum copr enable jdoss/wireguard -y
@@ -153,8 +151,6 @@ function install-wireguard-client() {
   if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
     yum update -y
     curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-    yum update -y
-    yum install epel-release -y
     yum update -y
     yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
   fi
@@ -171,7 +167,6 @@ function install-wireguard-client() {
     yum update -y
     curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
     yum update -y
-    yum install epel-release -y
     yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
   fi
 }
@@ -181,9 +176,9 @@ install-wireguard-client
 
 # Lets check the kernel version and check if headers are required
 function install-kernel-headers() {
-KERNEL_VERSION_LIMIT=5.6
-KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-if (( $(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" |bc -l) )); then
+  KERNEL_VERSION_LIMIT=5.6
+  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+  if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
     if [ "$DISTRO" == "debian" ]; then
       apt-get update
       apt-get install linux-headers-"$(uname -r)" -y
@@ -212,9 +207,9 @@ if (( $(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" |bc -l) )); then
       yum update -y
       yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
     fi
-else
+  else
     echo "Correct: You do not need kernel headers." >/dev/null 2>&1
-fi
+  fi
 }
 
 # Kernel Version
