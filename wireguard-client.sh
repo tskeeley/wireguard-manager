@@ -174,46 +174,36 @@ function install-wireguard-client() {
 # WireGuard Client
 install-wireguard-client
 
-# Lets check the kernel version and check if headers are required
-function install-kernel-headers() {
-  KERNEL_VERSION_LIMIT=5.6
-  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-  if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-    if [ "$DISTRO" == "debian" ]; then
-      apt-get update
-      apt-get install linux-headers-"$(uname -r)" -y
+  # Lets check the kernel version and check if headers are required
+  function install-kernel-headers() {
+    KERNEL_VERSION_LIMIT=5.6
+    KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+        apt-get update
+        apt-get install linux-headers-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "arch" ]; then
+        pacman -Syu
+        pacman -Syu --noconfirm linux-headers
+      fi
+      if [ "$DISTRO" == "fedora" ]; then
+        dnf update -y
+        dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
+        yum update -y
+        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+    else
+      echo "Correct: You do not need kernel headers." >/dev/null 2>&1
     fi
-    if [ "$DISTRO" == "ubuntu" ]; then
-      apt-get update
-      apt-get install linux-headers-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "raspbian" ]; then
-      apt-get update
-      apt-get install raspberrypi-kernel-headers -y
-    fi
-    if [ "$DISTRO" == "arch" ]; then
-      pacman -Syu
-      pacman -Syu --noconfirm linux-headers
-    fi
-    if [ "$DISTRO" == "fedora" ]; then
-      dnf update -y
-      dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "centos" ]; then
-      yum update -y
-      yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-    if [ "$DISTRO" == "rhel" ]; then
-      yum update -y
-      yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-    fi
-  else
-    echo "Correct: You do not need kernel headers." >/dev/null 2>&1
-  fi
-}
+  }
 
-# Kernel Version
-install-kernel-headers
+  # Kernel Version
+  install-kernel-headers
 
 echo "Move the files to /etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 

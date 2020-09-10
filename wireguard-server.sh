@@ -661,17 +661,10 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if [ "$DISTRO" == "debian" ]; then
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
-      fi
-      if [ "$DISTRO" == "ubuntu" ]; then
-        apt-get update
-        apt-get install linux-headers-"$(uname -r)" -y
-      fi
-      if [ "$DISTRO" == "raspbian" ]; then
-        apt-get update
-        apt-get install raspberrypi-kernel-headers -y
       fi
       if [ "$DISTRO" == "arch" ]; then
         pacman -Syu
@@ -681,11 +674,8 @@ if [ ! -f "$WG_CONFIG" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-      if [ "$DISTRO" == "centos" ]; then
-        yum update -y
-        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-      fi
-      if [ "$DISTRO" == "rhel" ]; then
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
