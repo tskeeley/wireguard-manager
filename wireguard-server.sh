@@ -662,9 +662,13 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
       # shellcheck disable=SC2233,SC2050
-      if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+      if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]); then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
+      fi
+      if [ "$DISTRO" == "raspbian" ]; then
+        apt-get update
+        apt-get install raspberrypi-kernel-headers -y
       fi
       if [ "$DISTRO" == "arch" ]; then
         pacman -Syu
