@@ -977,7 +977,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      # add arch
+      if [ "$DISTRO" == "arch" ]; then
+        pacman -Rs --noconfirm wireguard-tools
+        service wg-quick@$WIREGUARD_PUB_NIC restart
+      fi
       ;;
     8)
       # Uninstall Wireguard and purging files
