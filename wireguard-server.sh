@@ -605,7 +605,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       # shellcheck disable=SC1117
       printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
       apt-get update
-      apt-get install raspberrypi-kernel-headers -y
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
     if [ "$DISTRO" == "arch" ]; then
