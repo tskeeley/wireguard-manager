@@ -29,38 +29,6 @@ function virt-check() {
 # Virtualization Check
 virt-check
 
-# Check for docker stuff
-function docker-check() {
-  if [ -f /.dockerenv ]; then
-    DOCKER_KERNEL_VERSION_LIMIT=5.6
-    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-    if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-    else
-      echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
-      exit
-    fi
-  fi
-}
-
-# Docker Check
-docker-check
-
-# Lets check the kernel version
-function kernel-check() {
-  KERNEL_VERSION_LIMIT=3.1
-  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-    echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
-  else
-    echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
-    exit
-  fi
-}
-
-# Kernel Version
-kernel-check
-
 # Detect Operating System
 function dist-check() {
   # shellcheck disable=SC1090
@@ -93,6 +61,38 @@ function installing-system-requirements() {
 
 # Run the function and check for requirements
 installing-system-requirements
+
+# Check for docker stuff
+function docker-check() {
+  if [ -f /.dockerenv ]; then
+    DOCKER_KERNEL_VERSION_LIMIT=5.6
+    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
+      echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+    else
+      echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
+      exit
+    fi
+  fi
+}
+
+# Docker Check
+docker-check
+
+# Lets check the kernel version
+function kernel-check() {
+  KERNEL_VERSION_LIMIT=3.1
+  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+  if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
+    echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+  else
+    echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
+    exit
+  fi
+}
+
+# Kernel Version
+kernel-check
 
 function usage-guide() {
   # shellcheck disable=SC2027,SC2046
