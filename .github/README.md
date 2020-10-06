@@ -12,10 +12,10 @@
   <a href="https://github.com/sponsors/Prajwal-Koirala">
     <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
   </a>
-  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
+  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE">
     <img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/wireguard-manager" target="_blank" />
   </a>
-  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE">
+  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
   </a>
 </p>
@@ -44,7 +44,7 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 ### 📲 Installation
 Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
-curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/wireguard-server.sh --create-dirs -o /usr/local/bin/wireguard-server.sh
+curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh --create-dirs -o /usr/local/bin/wireguard-server.sh
 ```
 Then let's make the script user executable (Optional)
 ```
@@ -253,4 +253,4 @@ Give a ⭐️ and 🍴 if this project helped you!
 ### 📝 License
 Copyright © 2020 [Prajwal](https://github.com/prajwal-koirala)
 
-This project is [MIT](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/master/.github/LICENSE) licensed.
+This project is [MIT](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE) licensed.
