@@ -864,11 +864,7 @@ else
     done
     case $WIREGUARD_OPTIONS in
     1)
-      if pgrep systemd-journal; then
         wg show
-      else
-        wg show
-      fi
       ;;
     2)
       if pgrep systemd-journal; then
