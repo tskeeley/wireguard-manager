@@ -1050,6 +1050,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     9) # Update the script
+      # shellcheck disable=SC2086
       CURRENT_FILE_PATH=$(realpath $0)
       curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
       chmod +x $CURRENT_FILE_PATH || exit
