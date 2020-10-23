@@ -217,7 +217,7 @@ bash -x /usr/local/bin/wireguard-(server|client).sh >> /usr/local/bin/wireguard-
 ### 👤 Author
 
 * Name: Prajwal Koirala
-* Website: https://www.prajwalkoirala.com
+* Website: [prajwalkoirala.com](https://www.prajwalkoirala.com)
 * Github: [@prajwal-koirala](https://github.com/prajwal-koirala)
 * LinkedIn: [@prajwal-koirala](https://www.linkedin.com/in/prajwal-koirala)
 * Twitter: [@Prajwal_K23](https://twitter.com/Prajwal_K23)
