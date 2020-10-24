@@ -94,7 +94,11 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
-if [ ! -f "/etc/wireguard/wg0.conf" ]; then
+# Wireguard Public Network Interface
+WIREGUARD_PUB_NIC="wg0"
+# Location For WG_CONFIG
+WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
+if [ ! -f "$WG_CONFIG" ]; then
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
