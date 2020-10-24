@@ -868,15 +868,19 @@ else
       ;;
     2)
       if pgrep systemd-journal; then
+        systemctl enable wg-quick@$WIREGUARD_PUB_NIC
         systemctl start wg-quick@$WIREGUARD_PUB_NIC
       else
+        service wg-quick@$WIREGUARD_PUB_NIC enable
         service wg-quick@$WIREGUARD_PUB_NIC start
       fi
       ;;
     3)
       if pgrep systemd-journal; then
+        systemctl disable wg-quick@$WIREGUARD_PUB_NIC
         systemctl stop wg-quick@$WIREGUARD_PUB_NIC
       else
+        service wg-quick@$WIREGUARD_PUB_NIC disable
         service wg-quick@$WIREGUARD_PUB_NIC stop
       fi
       ;;
