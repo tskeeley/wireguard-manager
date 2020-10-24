@@ -94,6 +94,8 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
+if [ ! -f "/etc/wireguard/wg0.conf" ]; then
+
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     KERNEL_VERSION_LIMIT=5.6
@@ -218,3 +220,132 @@ echo "if pgrep systemd-journal; then
       service wg-quick@$WIREGUARD_PUB_NIC enable
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi"
+
+else
+
+# take user input
+function take-user-input() {
+    echo "What do you want to do?"
+    echo "   1) Show WireGuard Interface"
+    echo "   2) Start WireGuard Interface"
+    echo "   3) Stop WireGuard Interface"
+    echo "   4) Restart WireGuard Interface"
+    echo "   5) Reinstall WireGuard Interface"
+    echo "   6) Uninstall WireGuard Interface"
+    echo "   7) Update this script"
+    until [[ "$USER_OPTIONS" =~ ^[1-7]$ ]]; do
+      read -rp "Select an Option [1-7]: " -e -i 1 USER_OPTIONS
+    done
+    case $USER_OPTIONS in
+    1)
+        wg show
+      ;;
+    2)
+      if pgrep systemd-journal; then
+        systemctl start wg-quick@$WIREGUARD_PUB_NIC
+      else
+        service wg-quick@$WIREGUARD_PUB_NIC start
+      fi
+      ;;
+    3)
+      if pgrep systemd-journal; then
+        systemctl stop wg-quick@$WIREGUARD_PUB_NIC
+      else
+        service wg-quick@$WIREGUARD_PUB_NIC stop
+      fi
+      ;;
+    4)
+      if pgrep systemd-journal; then
+        systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+      else
+        service wg-quick@$WIREGUARD_PUB_NIC restart
+      fi
+      ;;
+    5)
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+        dpkg-reconfigure wireguard-dkms
+        modprobe wireguard
+        systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+      fi
+      # shellcheck disable=SC2233,SC2050
+      if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
+        yum reinstall wireguard-dkms -y
+        service wg-quick@$WIREGUARD_PUB_NIC restart
+      fi
+      if [ "$DISTRO" == "arch" ]; then
+        pacman -Rs --noconfirm wireguard-tools
+        service wg-quick@$WIREGUARD_PUB_NIC restart
+      fi
+      ;;
+    6)
+      # Uninstall Wireguard and purging files
+      # shellcheck disable=SC2034
+      read -rp "Do you really want to remove Wireguard? [y/n]: " -e -i n REMOVE_WIREGUARD
+      if [ "$REMOVE_WIREGUARD" = "y" ]; then
+        # Stop WireGuard
+        if pgrep systemd-journal; then
+          # Disable WireGuard
+          systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+          wg-quick down $WIREGUARD_PUB_NIC
+          # Disable Unbound
+          systemctl disable unbound
+          systemctl stop unbound
+        else
+          # Disable WireGuard
+          service wg-quick@$WIREGUARD_PUB_NIC disable
+          wg-quick down $WIREGUARD_PUB_NIC
+          # Disable Unbound
+          service unbound disable
+          service unbound stop
+        fi
+        if [ "$DISTRO" == "centos" ]; then
+          yum remove wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "debian" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif [ "$DISTRO" == "ubuntu" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
+          if pgrep systemd-journal; then
+            systemctl enable systemd-resolved
+            systemctl restart systemd-resolved
+          else
+            service systemd-resolved enable
+            service systemd-resolved restart
+          fi
+        elif [ "$DISTRO" == "raspbian" ]; then
+          apt-key del 04EE7237B7D453EC
+          apt-get remove --purge wireguard qrencode haveged dirmngr -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif [ "$DISTRO" == "arch" ]; then
+          pacman -Rs wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "fedora" ]; then
+          dnf remove wireguard qrencode haveged unbound -y
+          rm -f /etc/yum.repos.d/wireguard.repo
+        elif [ "$DISTRO" == "rhel" ]; then
+          yum remove wireguard qrencode haveged -y
+          rm -f /etc/yum.repos.d/wireguard.repo
+        fi
+        # Removing Wireguard Files
+        rm -rf /etc/wireguard
+        # Removing wireguard config
+        rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+      fi
+      ;;
+    7) # Update the script
+      # shellcheck disable=SC2086
+      CURRENT_FILE_PATH=$(realpath $0)
+      # shellcheck disable=SC2086
+      curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
+      # shellcheck disable=SC2086
+      chmod +x $CURRENT_FILE_PATH || exit
+      ;;
+    esac
+}
+
+# run the function
+take-user-input
+
+fi
