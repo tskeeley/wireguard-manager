@@ -47,11 +47,11 @@ dist-check
 # Pre-Checks
 function installing-system-requirements() {
   # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ]); then
     apt-get update && apt-get install iptables curl bc -y
   fi
   # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
+  if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl bc -y
   fi
   if [ "$DISTRO" == "arch" ]; then
