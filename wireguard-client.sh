@@ -139,7 +139,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 function install-wireguard-client() {
   # Installation begins here.
   # shellcheck disable=SC2235
-  if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]); then
+  if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]); then
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
