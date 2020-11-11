@@ -216,7 +216,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       IPV4_SUBNET="10.0.0.0/24"
       ;;
     3)
-      read -rp "Custom Subnet: " -e -i "" IPV4_SUBNET
+      read -rp "Custom Subnet: " -e -i "10.8.0.0/24" IPV4_SUBNET
       ;;
     esac
   }
@@ -242,7 +242,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       IPV6_SUBNET="fd86:ea04:1115::0/64"
       ;;
     3)
-      read -rp "Custom Subnet: " -e -i "" IPV6_SUBNET
+      read -rp "Custom Subnet: " -e -i "fd42:42:42::0/64" IPV6_SUBNET
       ;;
     esac
   }
@@ -281,7 +281,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST_V4=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
       ;;
     3)
-      read -rp "Custom IPV4: " -e -i "" SERVER_HOST_V4
+      read -rp "Custom IPV4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
       ;;
     esac
   }
@@ -307,7 +307,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST_V6=$(ip r get to 2001:4860:4860::8888 | perl -ne '/src ([\w:]+)/ && print "$1\n"')
       ;;
     3)
-      read -rp "Custom IPV6: " -e -i "" SERVER_HOST_V6
+      read -rp "Custom IPV6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
       ;;
     esac
   }
@@ -329,7 +329,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
       ;;
     2)
-      read -rp "Custom NAT: " -e -i "" SERVER_PUB_NIC
+      read -rp "Custom NAT: " -e -i "$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)" SERVER_PUB_NIC
       ;;
     esac
   }
@@ -438,7 +438,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST="[$SERVER_HOST_V6]"
       ;;
     3)
-      read -rp "Custom Domain: " -e -i "" SERVER_HOST
+      read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname')" SERVER_HOST
       ;;
     esac
   }
@@ -499,7 +499,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       CLIENT_ALLOWED_IP="0.0.0.0/5,8.0.0.0/7,11.0.0.0/8,12.0.0.0/6,16.0.0.0/4,32.0.0.0/3,64.0.0.0/2,128.0.0.0/3,160.0.0.0/5,168.0.0.0/6,172.0.0.0/12,172.32.0.0/11,172.64.0.0/10,172.128.0.0/9,173.0.0.0/8,174.0.0.0/7,176.0.0.0/4,192.0.0.0/9,192.128.0.0/11,192.160.0.0/13,192.169.0.0/16,192.170.0.0/15,192.172.0.0/14,192.176.0.0/12,192.192.0.0/10,193.0.0.0/8,194.0.0.0/7,196.0.0.0/6,200.0.0.0/5,208.0.0.0/4"
       ;;
     3)
-      read -rp "Custom IPs: " -e -i "" CLIENT_ALLOWED_IP
+      read -rp "Custom IPs: " -e -i "0.0.0.0/0,::/0" CLIENT_ALLOWED_IP
       ;;
     esac
   }
@@ -553,7 +553,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
         ;;
       9)
-        read -rp "Custom DNS (IPv4 IPv6):" -e -i "" CLIENT_DNS
+        read -rp "Custom DNS (IPv4 IPv6):" -e -i "45.90.28.167,45.90.30.167,2a07:a8c0::12:cf53,2a07:a8c1::12:cf53" CLIENT_DNS
         ;;
       esac
     fi
