@@ -47,7 +47,7 @@ dist-check
 # Pre-Checks
 function installing-system-requirements() {
   # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ]); then
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]); then
     apt-get update && apt-get install iptables curl bc -y
   fi
   # shellcheck disable=SC2233,SC2050
@@ -157,6 +157,10 @@ function install-wireguard-client() {
     printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' >/etc/apt/preferences.d/limit-unstable
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
+  fi
+  if [ "$DISTRO" == "pop" ]; then
+    apt-get update
+    apt-get install wireguard qrencode haveged ifupdown -y
   fi
   if [ "$DISTRO" == "raspbian" ]; then
     apt-get update

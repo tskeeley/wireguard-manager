@@ -47,7 +47,7 @@ dist-check
 # Pre-Checks
 function installing-system-requirements() {
   # shellcheck disable=SC2233,SC2050
-  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ]); then
+  if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]); then
     apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
   # shellcheck disable=SC2233,SC2050
@@ -624,6 +624,10 @@ if [ ! -f "$WG_CONFIG" ]; then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
+    if [ "$DISTRO" == "pop" ]; then
+      apt-get update
+      apt-get install wireguard qrencode haveged ifupdown -y
+    fi
     if [ "$DISTRO" == "debian" ]; then
       apt-get update
       echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
@@ -709,6 +713,9 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get install unbound unbound-host e2fsprogs resolvconf -y
       fi
       if [ "$DISTRO" == "raspbian" ]; then
+        apt-get install unbound unbound-host e2fsprogs resolvconf -y
+      fi
+      if [ "$DISTRO" == "pop" ]; then
         apt-get install unbound unbound-host e2fsprogs resolvconf -y
       fi
       if [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
@@ -1008,6 +1015,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
+        elif [ "$DISTRO" == "pop" ]; then
+          apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host -y
           if pgrep systemd-journal; then
