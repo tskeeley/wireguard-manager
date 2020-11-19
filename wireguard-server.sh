@@ -735,6 +735,8 @@ if [ ! -f "$WG_CONFIG" ]; then
       fi
       # Remove Unbound Config
       rm -f /etc/unbound/unbound.conf
+      # Make a unbound folder
+      mkdir -p /etc/unbound/
       # Cpu
       NPROC=$(nproc)
       # Set Config for unbound
