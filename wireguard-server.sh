@@ -587,6 +587,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
+      # shellcheck disable=SC1009,SC1073,SC1072,SC1020
       if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
