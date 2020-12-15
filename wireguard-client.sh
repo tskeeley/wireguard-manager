@@ -322,6 +322,7 @@ function take-user-input() {
           apt-get remove --purge wireguard qrencode haveged -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
+        # shellcheck disable=SC1073
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged -y
           if pgrep systemd-journal; then
@@ -331,7 +332,7 @@ function take-user-input() {
             service systemd-resolved enable
             service systemd-resolved restart
           fi
-        # shellcheck disable=SC1073
+        # shellcheck disable=SC1073,SC1123,SC1072
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
           apt-get remove --purge wireguard qrencode haveged dirmngr -y
