@@ -54,7 +54,7 @@ function installing-system-requirements() {
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
-  if [ "$DISTRO" == "arch" ]; then
+  if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu --noconfirm iptables curl bc jq sed
   fi
 }
@@ -587,7 +587,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      if [ "$DISTRO" == "arch" ]; then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
       fi
@@ -646,7 +646,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
-    if [ "$DISTRO" == "arch" ]; then
+    if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
       pacman -Syu
       pacman -Syu --noconfirm haveged qrencode iptables
       pacman -Syu --noconfirm wireguard-tools
@@ -730,7 +730,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       if [ "$DISTRO" == "fedora" ]; then
         dnf install unbound -y
       fi
-      if [ "$DISTRO" == "arch" ]; then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
         pacman -Syu --noconfirm unbound resolvconf
       fi
       # Remove Unbound Config
@@ -983,7 +983,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      if [ "$DISTRO" == "arch" ]; then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
@@ -1031,7 +1031,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        elif [ "$DISTRO" == "arch" ]; then
+        elif ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
           pacman -Rs wireguard qrencode haveged unbound unbound-host -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf remove wireguard qrencode haveged unbound -y
