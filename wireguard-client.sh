@@ -318,6 +318,7 @@ function take-user-input() {
         # shellcheck disable=SC1009
         if [ "$DISTRO" == "centos" ]; then
           yum remove wireguard qrencode haveged -y
+        # shellcheck disable=SC1073,SC1123
         elif [ "$DISTRO" == "debian" ]; then
           apt-get remove --purge wireguard qrencode haveged -y
           rm -f /etc/apt/sources.list.d/unstable.list
