@@ -54,7 +54,7 @@ function installing-system-requirements() {
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl bc -y
   fi
-  if [ "$DISTRO" == "arch" ]; then
+  if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu --noconfirm iptables curl bc
   fi
 }
@@ -114,7 +114,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      if [ "$DISTRO" == "arch" ]; then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
       fi
@@ -171,7 +171,7 @@ function install-wireguard-client() {
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  if [ "$DISTRO" == "arch" ]; then
+  if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu
     pacman -Syu --noconfirm haveged qrencode iptables
     pacman -Syu --noconfirm wireguard-tools wireguard-arch resolvconf
@@ -285,7 +285,7 @@ function take-user-input() {
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      if [ "$DISTRO" == "arch" ]; then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
@@ -331,7 +331,7 @@ function take-user-input() {
           apt-get remove --purge wireguard qrencode haveged dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        elif [ "$DISTRO" == "arch" ]; then
+        elif ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
           pacman -Rs wireguard qrencode haveged -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf remove wireguard qrencode haveged unbound -y
