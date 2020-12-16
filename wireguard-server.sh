@@ -637,7 +637,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       pacman -Syu --noconfirm haveged qrencode iptables
       pacman -Syu --noconfirm wireguard-tools
     fi
-    fi
     if [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
       dnf update -y
       dnf install qrencode wireguard-tools haveged -y
