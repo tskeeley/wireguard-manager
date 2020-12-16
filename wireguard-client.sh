@@ -334,7 +334,7 @@ function take-user-input() {
       ;;
     7) # Update the script
       CURRENT_FILE_PATH=$(realpath $0)
-      curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
+      curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
     esac
