@@ -578,7 +578,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
       fi
