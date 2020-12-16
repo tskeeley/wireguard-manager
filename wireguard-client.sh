@@ -162,10 +162,15 @@ function install-wireguard-client() {
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
+  if [ "$DISTRO" == "arch" ]; then
     pacman -Syu
     pacman -Syu --noconfirm haveged qrencode iptables
     pacman -Syu --noconfirm wireguard-tools wireguard-arch resolvconf
+  fi
+  if [ "$DISTRO" == "manjaro"]; then
+    pacman -Syu
+    pacman -Syu --noconfirm haveged qrencode iptables
+    pacman -Syu --noconfirm wireguard-tools
   fi
   if [ "$DISTRO" = 'fedora' ] && [ "$DISTRO_VERSION" == "32" ]; then
     dnf update -y
