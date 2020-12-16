@@ -31,12 +31,9 @@ virt-check
 
 # Detect Operating System
 function dist-check() {
-  # shellcheck disable=SC1090
   if [ -e /etc/os-release ]; then
-    # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
-    # shellcheck disable=SC2034
     DISTRO_VERSION=$VERSION_ID
   fi
 }
@@ -46,11 +43,9 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]); then
     apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
-  # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
@@ -95,7 +90,6 @@ function kernel-check() {
 kernel-check
 
 function usage-guide() {
-  # shellcheck disable=SC2027,SC2046
   echo "usage: ./"$(basename "$0")" [options]"
   echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
@@ -470,7 +464,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       )"
       ;;
     3)
-      # shellcheck disable=SC2034
       DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
         sysctl -p /etc/sysctl.d/wireguard.conf
@@ -510,7 +503,6 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Would you like to install Unbound.
   function ask-install-dns() {
     if [ "$INSTALL_UNBOUND" == "" ]; then
-      # shellcheck disable=SC2034
       read -rp "Do You Want To Install Unbound (y/n): " -e -i y INSTALL_UNBOUND
     fi
     if [ "$INSTALL_UNBOUND" == "n" ]; then
@@ -578,7 +570,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]); then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
@@ -587,7 +578,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      # shellcheck disable=SC1009,SC1073,SC1072,SC1020
       if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
@@ -596,7 +586,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
@@ -612,12 +601,10 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     # Installation begins here
-    # shellcheck disable=SC2235
     if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]); then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
-    # shellcheck disable=SC2235
     if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]); then
       apt-get update
       apt-get install software-properties-common -y
@@ -632,7 +619,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     if [ "$DISTRO" == "debian" ]; then
       apt-get update
       echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-      # shellcheck disable=SC1117
       printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
@@ -642,7 +628,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       apt-get install dirmngr -y
       apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
       echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-      # shellcheck disable=SC1117
       printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
@@ -656,13 +641,11 @@ if [ ! -f "$WG_CONFIG" ]; then
       dnf update -y
       dnf install qrencode wireguard-tools haveged -y
     fi
-    # shellcheck disable=SC2235
     if [ "$DISTRO" = "fedora" ] && ([ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]); then
       dnf update -y
       dnf copr enable jdoss/wireguard -y
       dnf install qrencode wireguard-dkms wireguard-tools haveged -y
     fi
-    # shellcheck disable=SC2235
     if [ "$DISTRO" == "centos" ] && ([ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]); then
       yum update -y
       yum config-manager --set-enabled PowerTools
@@ -679,7 +662,6 @@ if [ ! -f "$WG_CONFIG" ]; then
       yum update -y
       yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
       yum update -y
-      # shellcheck disable=SC2046
       subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
       yum copr enable jdoss/wireguard
       yum install wireguard-dkms wireguard-tools qrencode haveged -y
@@ -953,12 +935,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
     6)
       # Remove User
       echo "Which WireGuard User Do You Want To Remove?"
-      # shellcheck disable=SC2002
       cat $WG_CONFIG | grep start | awk '{ print $2 }'
       read -rp "Type in Client Name : " -e REMOVECLIENT
       read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
       if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # shellcheck disable=SC1117
         sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WG_CONFIG
         rm /etc/wireguard/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
         echo "Client named $REMOVECLIENT has been removed."
@@ -973,13 +953,11 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     7)
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       fi
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
@@ -991,7 +969,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       ;;
     8)
       # Uninstall Wireguard and purging files
-      # shellcheck disable=SC2034
       read -rp "Do you really want to remove Wireguard? [y/n]: " -e -i n REMOVE_WIREGUARD
       if [ "$REMOVE_WIREGUARD" = "y" ]; then
         # Stop WireGuard
@@ -1064,11 +1041,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     9) # Update the script
-      # shellcheck disable=SC2086
       CURRENT_FILE_PATH=$(realpath $0)
-      # shellcheck disable=SC2086
       curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
-      # shellcheck disable=SC2086
       chmod +x $CURRENT_FILE_PATH || exit
       ;;
     esac
