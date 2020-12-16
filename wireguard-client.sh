@@ -31,12 +31,9 @@ virt-check
 
 # Detect Operating System
 function dist-check() {
-  # shellcheck disable=SC1090
   if [ -e /etc/os-release ]; then
-    # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
-    # shellcheck disable=SC2034
     DISTRO_VERSION=$VERSION_ID
   fi
 }
@@ -46,15 +43,12 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]); then
     apt-get update && apt-get install iptables curl bc -y
   fi
-  # shellcheck disable=SC2233,SC2050
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl bc -y
   fi
-  # shellcheck disable=SC2233
   if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu --noconfirm iptables curl bc
   fi
@@ -106,7 +100,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]); then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
@@ -115,7 +108,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      # shellcheck disable=SC2233
       if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
@@ -124,7 +116,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
@@ -140,12 +131,10 @@ if [ ! -f "$WG_CONFIG" ]; then
 # Install WireGuard Client
 function install-wireguard-client() {
   # Installation begins here.
-  # shellcheck disable=SC2235
   if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]); then
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  # shellcheck disable=SC2235
   if [ "$DISTRO" == "ubuntu" ] && ([ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]); then
     apt-get update
     apt-get install software-properties-common -y
@@ -173,7 +162,6 @@ function install-wireguard-client() {
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  # shellcheck disable=SC2233
   if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu
     pacman -Syu --noconfirm haveged qrencode iptables
@@ -183,7 +171,6 @@ function install-wireguard-client() {
     dnf update -y
     dnf install qrencode wireguard-tools haveged resolvconf -y
   fi
-  # shellcheck disable=SC2235
   if [ "$DISTRO" = 'fedora' ] && ([ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]); then
     dnf update -y
     dnf copr enable jdoss/wireguard -y
@@ -206,7 +193,6 @@ function install-wireguard-client() {
     yum update -y
     yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     yum update -y
-    # shellcheck disable=SC2046
     subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
     yum copr enable jdoss/wireguard
     yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
@@ -277,18 +263,15 @@ function take-user-input() {
       fi
       ;;
     5)
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]); then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       fi
-      # shellcheck disable=SC2233,SC2050
       if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]); then
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      # shellcheck disable=SC2233
       if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
@@ -296,7 +279,6 @@ function take-user-input() {
       ;;
     6)
       # Uninstall Wireguard and purging files
-      # shellcheck disable=SC2034
       read -rp "Do you really want to remove Wireguard? [y/n]: " -e -i n REMOVE_WIREGUARD
       if [ "$REMOVE_WIREGUARD" = "y" ]; then
         # Stop WireGuard
@@ -315,15 +297,12 @@ function take-user-input() {
           service unbound disable
           service unbound stop
         fi
-        # shellcheck disable=SC1009
         if [ "$DISTRO" == "centos" ]; then
           yum remove wireguard qrencode haveged -y
-        # shellcheck disable=SC1073,SC1123
         elif [ "$DISTRO" == "debian" ]; then
           apt-get remove --purge wireguard qrencode haveged -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        # shellcheck disable=SC1073
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged -y
           if pgrep systemd-journal; then
@@ -333,13 +312,11 @@ function take-user-input() {
             service systemd-resolved enable
             service systemd-resolved restart
           fi
-        # shellcheck disable=SC1073,SC1123,SC1072
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
           apt-get remove --purge wireguard qrencode haveged dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        # shellcheck disable=SC2233,SC1123,SC1072
         elif ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
           pacman -Rs wireguard qrencode haveged -y
         elif [ "$DISTRO" == "fedora" ]; then
@@ -356,11 +333,8 @@ function take-user-input() {
       fi
       ;;
     7) # Update the script
-      # shellcheck disable=SC2086
       CURRENT_FILE_PATH=$(realpath $0)
-      # shellcheck disable=SC2086
       curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
-      # shellcheck disable=SC2086
       chmod +x $CURRENT_FILE_PATH || exit
       ;;
     esac
