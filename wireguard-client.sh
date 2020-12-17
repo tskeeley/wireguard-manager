@@ -90,7 +90,6 @@ kernel-check
 
 # Wireguard Public Network Interface
 WIREGUARD_PUB_NIC="wg0"
-# Location For WG_CONFIG
 WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 if [ ! -f "$WG_CONFIG" ]; then
 
@@ -125,7 +124,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install WireGuard Client
   function install-wireguard-client() {
-    # Installation begins here.
     if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
       apt-get update
       apt-get install wireguard qrencode haveged resolvconf -y
@@ -204,7 +202,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
 else
 
-  # take user input
   function take-user-input() {
     echo "What do you want to do?"
     echo "   1) Show WireGuard Interface"
@@ -302,7 +299,6 @@ else
         fi
         # Removing Wireguard Files
         rm -rf /etc/wireguard
-        # Removing wireguard config
         rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
       fi
       ;;
