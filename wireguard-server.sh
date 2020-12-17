@@ -32,7 +32,6 @@ virt-check
 # Detect Operating System
 function dist-check() {
   if [ -e /etc/os-release ]; then
-  # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
     DISTRO_VERSION=$VERSION_ID
@@ -44,16 +43,13 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  # shellcheck disable=SC2233
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]}; then
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ];} then
     apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
-  # shellcheck disable=SC2233
-  if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]}; then
+  if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
     yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
-  # shellcheck disable=SC2233
-  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
     pacman -Syu --noconfirm iptables curl bc jq sed
   fi
 }
@@ -94,8 +90,7 @@ function kernel-check() {
 kernel-check
 
 function usage-guide() {
-  # shellcheck disable=SC2233
-  echo "usage: ./"$(basename $0)" [options]"
+  echo usage: ./"$(basename "$0")" <options>
   echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
   echo "  --stop        Stop WireGuard Interface"
@@ -456,23 +451,17 @@ if [ ! -f "$WG_CONFIG" ]; then
     done
     case $DISABLE_HOST_SETTINGS in
     1)
-      DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
         sysctl -p /etc/sysctl.d/wireguard.conf
-      )"
       ;;
     2)
-      DISABLE_HOST="$(
         echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
         sysctl -p /etc/sysctl.d/wireguard.conf
-      )"
       ;;
     3)
-      DISABLE_HOST="$(
         echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
         sysctl -p /etc/sysctl.d/wireguard.conf
-      )"
       ;;
     esac
   }
@@ -575,7 +564,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]}; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ];} then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
       fi
@@ -583,7 +572,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
       fi
@@ -591,7 +580,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-      if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]}; then
+      if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
@@ -606,11 +595,11 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     # Installation begins here
-    if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]}; then
+    if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ];} then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
-    if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]}; then
+    if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ];} then
       apt-get update
       apt-get install software-properties-common -y
       add-apt-repository ppa:wireguard/wireguard -y
@@ -637,7 +626,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
-    if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+    if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
       pacman -Syu
       pacman -Syu --noconfirm haveged qrencode iptables
       pacman -Syu --noconfirm wireguard-tools
@@ -646,12 +635,12 @@ if [ ! -f "$WG_CONFIG" ]; then
       dnf update -y
       dnf install qrencode wireguard-tools haveged -y
     fi
-    if [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]}; then
+    if [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ];} then
       dnf update -y
       dnf copr enable jdoss/wireguard -y
       dnf install qrencode wireguard-dkms wireguard-tools haveged -y
     fi
-    if [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]}; then
+    if [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ];} then
       yum update -y
       yum config-manager --set-enabled PowerTools
       yum copr enable jdoss/wireguard -y
@@ -667,7 +656,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       yum update -y
       yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
       yum update -y
-      subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+      subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
       yum copr enable jdoss/wireguard
       yum install wireguard-dkms wireguard-tools qrencode haveged -y
     fi
@@ -718,7 +707,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       if [ "$DISTRO" == "fedora" ]; then
         dnf install unbound -y
       fi
-      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
         pacman -Syu --noconfirm unbound resolvconf
       fi
       # Remove Unbound Config
@@ -940,7 +929,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
     6)
       # Remove User
       echo "Which WireGuard user do you want to remove?"
-      cat $WG_CONFIG | grep start | awk '{ print $2 }'
+      cmd $WG_CONFIG | grep start | awk '{ print $2 }'
       read -rp "Type in Client Name : " -e REMOVECLIENT
       read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
       if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -958,16 +947,16 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     7)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]}; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ];} then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       fi
-      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]}; then
+      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
@@ -1014,7 +1003,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
           pacman -Rs wireguard qrencode haveged unbound unbound-host -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf remove wireguard qrencode haveged unbound -y
@@ -1046,7 +1035,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     9) # Update the script
-      CURRENT_FILE_PATH="$(realpath $0)"
+      CURRENT_FILE_PATH="$(realpath "$0")"
       curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
