@@ -1039,7 +1039,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
             service pihole disable
             service pihole stop
           fi
-          pihole uninstal
+          pihole uninstall
         fi
       fi
       ;;
