@@ -43,13 +43,13 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]}; then
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ];} then
     apt-get update && apt-get install iptables curl bc -y
   fi
-  if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]}; then
+  if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
     yum update -y && yum install epel-release iptables curl bc -y
   fi
-  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
     pacman -Syu --noconfirm iptables curl bc
   fi
 }
@@ -100,7 +100,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]}; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ];} then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
       fi
@@ -108,7 +108,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       fi
-      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
         pacman -Syu
         pacman -Syu --noconfirm linux-headers
       fi
@@ -116,7 +116,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-      if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]}; then
+      if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
@@ -131,11 +131,11 @@ if [ ! -f "$WG_CONFIG" ]; then
 # Install WireGuard Client
 function install-wireguard-client() {
   # Installation begins here.
-  if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]}; then
+  if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ];} then
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]}; then
+  if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ];} then
     apt-get update
     apt-get install software-properties-common -y
     add-apt-repository ppa:wireguard/wireguard -y
@@ -162,7 +162,7 @@ function install-wireguard-client() {
     apt-get update
     apt-get install wireguard qrencode haveged resolvconf -y
   fi
-  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
     pacman -Syu
     pacman -Syu --noconfirm haveged qrencode iptables
     pacman -Syu --noconfirm wireguard-tools wireguard-arch resolvconf
@@ -171,7 +171,7 @@ function install-wireguard-client() {
     dnf update -y
     dnf install qrencode wireguard-tools haveged resolvconf -y
   fi
-  if [ "$DISTRO" = 'fedora' ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]}; then
+  if [ "$DISTRO" = 'fedora' ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ];} then
     dnf update -y
     dnf copr enable jdoss/wireguard -y
     dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
@@ -263,16 +263,16 @@ function take-user-input() {
       fi
       ;;
     5)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ]}; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ];} then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       fi
-      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ]}; then
+      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ];} then
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
-      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+      if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
@@ -317,7 +317,7 @@ function take-user-input() {
           apt-get remove --purge wireguard qrencode haveged dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]}; then
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ];} then
           pacman -Rs wireguard qrencode haveged -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf remove wireguard qrencode haveged unbound -y
