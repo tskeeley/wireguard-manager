@@ -629,9 +629,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Function to install unbound
   function install-unbound() {
     if [ "$INSTALL_UNBOUND" = "y" ]; then
-      # Installation Begins Here
       if [ "$DISTRO" == "ubuntu" ]; then
-        # Install Unbound
         apt-get install unbound unbound-host e2fsprogs resolvconf -y
         if pgrep systemd-journal; then
           systemctl stop systemd-resolved
@@ -658,11 +656,8 @@ if [ ! -f "$WG_CONFIG" ]; then
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm unbound resolvconf
     fi
-    # Remove Unbound Config
     rm -f /etc/unbound/unbound.conf
-    # Cpu
     NPROC=$(nproc)
-    # Set Config for unbound
     echo "server:
     num-threads: $NPROC
     verbosity: 1
@@ -692,15 +687,11 @@ if [ ! -f "$WG_CONFIG" ]; then
     prefetch-key: yes" >>/etc/unbound/unbound.conf
     # Set DNS Root Servers
     curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-    # Setting Client DNS For Unbound On WireGuard
     CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
-    # Allow the modification of the file
     chattr -i /etc/resolv.conf
     mv /etc/resolv.conf /etc/resolv.conf.old
-    # Set localhost as the DNS resolver
     echo "nameserver 127.0.0.1" >>/etc/resolv.conf
     echo "nameserver ::1" >>/etc/resolv.conf
-    # Stop the modification of the file
     chattr +i /etc/resolv.conf
     echo "Unbound: true" >>/etc/unbound/wireguard-manager
     # restart unbound
@@ -830,8 +821,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi
     # Generate QR Code
-    qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-    # Echo the file
+    qrencode -t ansiutf8 -l L </etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf
     echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
   }
 
@@ -1016,8 +1006,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
       fi
       # Uninstall Unbound
-      INSTALLED_UNBOUND=/etc/unbound/wireguard-manager
-      if [ -f "$INSTALLED_UNBOUND" ]; then
+      UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
+      if [ -f "$UNINSTALL_UNBOUND" ]; then
         if pgrep systemd-journal; then
           systemctl disable unbound
           systemctl stop unbound
@@ -1040,8 +1030,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           dnf remove unbound -y
         fi
         # Uninstall Pihole
-        INSTALLED_PIHOLE=/etc/pihole/wireguard-manager
-        if [ -f "$INSTALLED_PIHOLE" ]; then
+        UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
+        if [ -f "$UNINSTALL_PIHOLE" ]; then
           if pgrep systemd-journal; then
             systemctl disable pihole
             systemctl stop pihole
