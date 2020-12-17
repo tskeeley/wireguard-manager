@@ -1061,7 +1061,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         chattr +i /etc/resolv.conf
         if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
           yum remove unbound unbound-host -y
-        elif [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
           apt-get remove --purge unbound unbound-host -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Rs unbound unbound-host -y
