@@ -934,7 +934,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       ;;
     6)
       # Remove User
-      echo "Which WireGuard User Do You Want To Remove?"
+      echo "Which WireGuard user do you want to remove?"
       cat $WG_CONFIG | grep start | awk '{ print $2 }'
       read -rp "Type in Client Name : " -e REMOVECLIENT
       read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
