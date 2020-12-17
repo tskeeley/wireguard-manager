@@ -282,21 +282,13 @@ function take-user-input() {
       # Uninstall Wireguard and purging files
       read -rp "Do you really want to remove Wireguard? [y/n]:" REMOVE_WIREGUARD
       if [ "$REMOVE_WIREGUARD" = "y" ]; then
-        # Stop WireGuard
+        # Disable, stop WireGuard
         if pgrep systemd-journal; then
-          # Disable WireGuard
           systemctl disable wg-quick@$WIREGUARD_PUB_NIC
           wg-quick down $WIREGUARD_PUB_NIC
-          # Disable Unbound
-          systemctl disable unbound
-          systemctl stop unbound
         else
-          # Disable WireGuard
           service wg-quick@$WIREGUARD_PUB_NIC disable
           wg-quick down $WIREGUARD_PUB_NIC
-          # Disable Unbound
-          service unbound disable
-          service unbound stop
         fi
         if [ "$DISTRO" == "centos" ]; then
           yum remove wireguard qrencode haveged -y
