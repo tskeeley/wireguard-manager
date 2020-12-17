@@ -312,7 +312,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine ipv6
   function server-pub-nic() {
-    echo "How would you like to detect IPV6?"
+    echo "How would you like to detect NIC?"
     echo "  1) IP (Recommended)"
     echo "  2) Custom (Advanced)"
     until [[ "$SERVER_PUB_NIC_SETTINGS" =~ ^[1-2]$ ]]; do
