@@ -632,7 +632,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       apt-get update
       apt-get install wireguard qrencode haveged ifupdown -y
     fi
-    if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
+    if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
       pacman -Syu
       pacman -Syu --noconfirm haveged qrencode iptables
       pacman -Syu --noconfirm wireguard-tools
@@ -1041,9 +1041,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     9) # Update the script
-      CURRENT_FILE_PATH=$(realpath $0)
-      curl -o $CURRENT_FILE_PATH https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
-      chmod +x $CURRENT_FILE_PATH || exit
+      CURRENT_FILE_PATH="$(realpath $0)"
+      curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
+      chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
     esac
   }
