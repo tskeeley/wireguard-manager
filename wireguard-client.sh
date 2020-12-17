@@ -193,7 +193,7 @@ function install-wireguard-client() {
     yum update -y
     yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     yum update -y
-    subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+    subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
     yum copr enable jdoss/wireguard
     yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
   fi
@@ -333,7 +333,7 @@ function take-user-input() {
       fi
       ;;
     7) # Update the script
-      CURRENT_FILE_PATH="$(realpath $0)"
+      CURRENT_FILE_PATH="$(realpath "$0")"
       curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
