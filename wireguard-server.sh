@@ -452,17 +452,17 @@ if [ ! -f "$WG_CONFIG" ]; then
     done
     case $DISABLE_HOST_SETTINGS in
     1)
-        echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-        echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p /etc/sysctl.d/wireguard.conf
+        echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf >/dev/null 2>&1
+        echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf >/dev/null 2>&1
+        sysctl -p /etc/sysctl.d/wireguard.conf >/dev/null 2>&1
       ;;
     2)
-        echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p /etc/sysctl.d/wireguard.conf
+        echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf >/dev/null 2>&1
+        sysctl -p /etc/sysctl.d/wireguard.conf >/dev/null 2>&1
       ;;
     3)
-        echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-        sysctl -p /etc/sysctl.d/wireguard.conf
+        echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf >/dev/null 2>&1
+        sysctl -p /etc/sysctl.d/wireguard.conf >/dev/null 2>&1
       ;;
     esac
   }
