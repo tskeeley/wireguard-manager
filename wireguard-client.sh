@@ -98,7 +98,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
       elif [ "$DISTRO" == "raspbian" ]; then
@@ -212,7 +212,7 @@ else
     echo "   6) Uninstall WireGuard Interface"
     echo "   7) Update this script"
     until [[ "$USER_OPTIONS" =~ ^[1-7]$ ]]; do
-      read -rp "Select an Option [1-7]: " -e -i 1 USER_OPTIONS
+      read -rp "Select an option [1-7]: " -e -i 1 USER_OPTIONS
     done
     case $USER_OPTIONS in
     1)
@@ -244,7 +244,7 @@ else
       fi
       ;;
     5)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
