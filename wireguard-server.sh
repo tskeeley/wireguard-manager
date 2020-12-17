@@ -713,7 +713,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       if [ "$DISTRO" == "fedora" ]; then
         dnf install unbound -y
       fi
-      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"]); then
+      if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro"] ); then
         pacman -Syu --noconfirm unbound resolvconf
       fi
       # Remove Unbound Config
