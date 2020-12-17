@@ -32,6 +32,7 @@ virt-check
 # Detect Operating System
 function dist-check() {
   if [ -e /etc/os-release ]; then
+  # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
     DISTRO_VERSION=$VERSION_ID
@@ -43,12 +44,15 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
+  # shellcheck disable=SC2233
   if ([ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]); then
     apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
   fi
+  # shellcheck disable=SC2233
   if ([ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]); then
     yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
   fi
+  # shellcheck disable=SC2233
   if ([ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]); then
     pacman -Syu --noconfirm iptables curl bc jq sed
   fi
