@@ -821,7 +821,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi
     # Generate QR Code
-    qrencode -t ansiutf8 -l L </etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf
+    qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
     echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
   }
 
