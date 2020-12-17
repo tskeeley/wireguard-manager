@@ -814,8 +814,8 @@ if [ ! -f "$WG_CONFIG" ]; then
     mkdir -p /etc/wireguard
     mkdir -p /etc/wireguard/clients
     touch $WG_CONFIG && chmod 600 $WG_CONFIG
-    # Set Wireguard settings for this host and first peer.
 
+    # Set Wireguard settings for this host and first peer.
     echo "# $PRIVATE_SUBNET_V4 $PRIVATE_SUBNET_V6 $SERVER_HOST:$SERVER_PORT $SERVER_PUBKEY $CLIENT_DNS $MTU_CHOICE $NAT_CHOICE $CLIENT_ALLOWED_IP
 [Interface]
 Address = $GATEWAY_ADDRESS_V4/$PRIVATE_SUBNET_MASK_V4,$GATEWAY_ADDRESS_V6/$PRIVATE_SUBNET_MASK_V6
@@ -1045,26 +1045,22 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           yum remove wireguard qrencode haveged unbound unbound-host -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-        # Removing Wireguard User Config Files
-        rm -rf /etc/wireguard/clients
         # Removing Wireguard Files
+        rm -rf /etc/wireguard/clients
         rm -rf /etc/wireguard
+        rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
         # Removing system wireguard config
         rm -f /etc/sysctl.d/wireguard.conf
-        # Removing wireguard config
-        rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
-        # Removing Unbound Config
-        rm -f /etc/unbound/unbound.conf
         # Removing Unbound Files
+        rm -f /etc/unbound/unbound.conf
         rm -rf /etc/unbound
-        # Allow the modification of the file
+        # Change to defualt dns
         chattr -i /etc/resolv.conf
-        # remove resolv.conf
         rm -f /etc/resolv.conf
-        # Moving to resolv.conf
         mv /etc/resolv.conf.old /etc/resolv.conf
-        # Stop the modification of the file
         chattr +i /etc/resolv.conf
+        # Remove PiHole
+        pihole uninstal
       fi
       ;;
     9) # Update the script
