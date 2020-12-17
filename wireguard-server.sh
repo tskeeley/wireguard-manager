@@ -90,7 +90,7 @@ function kernel-check() {
 kernel-check
 
 function usage-guide() {
-  echo "usage: ./$(basename "$0") [options]"
+  echo "usage: ./$(basename "$0") <command>"
   echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
   echo "  --stop        Stop WireGuard Interface"
@@ -188,7 +188,6 @@ headless-install
 
 # Wireguard Public Network Interface
 WIREGUARD_PUB_NIC="wg0"
-# Location For WG_CONFIG
 WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 if [ ! -f "$WG_CONFIG" ]; then
 
