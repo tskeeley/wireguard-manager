@@ -32,7 +32,6 @@ virt-check
 # Detect Operating System
 function dist-check() {
   if [ -e /etc/os-release ]; then
-    # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
     DISTRO_VERSION=$VERSION_ID
@@ -91,7 +90,7 @@ function kernel-check() {
 kernel-check
 
 function usage-guide() {
-  echo usage: ./"$(basename "$0")" <options>
+  echo "usage: ./`basename $0` <options>"
   echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
   echo "  --stop        Stop WireGuard Interface"
