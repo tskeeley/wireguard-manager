@@ -1031,16 +1031,16 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           fi
         elif [ "$DISTRO" == "raspbian" ]; then
           apt-key del 04EE7237B7D453EC
-          apt-get remove --purge wireguard qrencode haveged unbound unbound-host dirmngr -y
+          apt-get remove --purge wireguard qrencode haveged dirmngr -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-          pacman -Rs wireguard qrencode haveged unbound unbound-host -y
+          pacman -Rs wireguard qrencode haveged -y
         elif [ "$DISTRO" == "fedora" ]; then
-          dnf remove wireguard qrencode haveged unbound -y
+          dnf remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         elif [ "$DISTRO" == "rhel" ]; then
-          yum remove wireguard qrencode haveged unbound unbound-host -y
+          yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       fi
@@ -1059,22 +1059,14 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         rm -f /etc/resolv.conf
         mv /etc/resolv.conf.old /etc/resolv.conf
         chattr +i /etc/resolv.conf
-        if [ "$DISTRO" == "centos" ]; then
+        if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
           yum remove unbound unbound-host -y
-        elif [ "$DISTRO" == "debian" ]; then
-          apt-get remove --purge unbound unbound-host -y
-        elif [ "$DISTRO" == "pop" ]; then
-          apt-get remove --purge unbound unbound-host -y
-        elif [ "$DISTRO" == "ubuntu" ]; then
-          apt-get remove --purge unbound unbound-host -y
-        elif [ "$DISTRO" == "raspbian" ]; then
+        elif [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
           apt-get remove --purge unbound unbound-host -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Rs unbound unbound-host -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf remove unbound -y
-        elif [ "$DISTRO" == "rhel" ]; then
-          yum remove unbound unbound-host -y
         fi
         # Uninstall Pihole
         INSTALLED_PIHOLE=/etc/pihole/wireguard-manager
