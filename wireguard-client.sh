@@ -168,11 +168,11 @@ function install-wireguard-client() {
     pacman -Syu --noconfirm haveged qrencode iptables
     pacman -Syu --noconfirm wireguard-tools wireguard-arch resolvconf
   fi
-  if [ "$DISTRO" = 'fedora' ] && [ "$DISTRO_VERSION" == "32" ]; then
+  if [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
     dnf update -y
     dnf install qrencode wireguard-tools haveged resolvconf -y
   fi
-  if [ "$DISTRO" = 'fedora' ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ];} then
+  if [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ];} then
     dnf update -y
     dnf copr enable jdoss/wireguard -y
     dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
