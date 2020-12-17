@@ -95,7 +95,7 @@ kernel-check
 
 function usage-guide() {
   # shellcheck disable=SC2233
-  echo 'usage: ./"$(basename $0)" [options]'
+  echo "usage: ./"$(basename $0)" [options]"
   echo "  --install     Install WireGuard Interface"
   echo "  --start       Start WireGuard Interface"
   echo "  --stop        Stop WireGuard Interface"
