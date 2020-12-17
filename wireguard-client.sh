@@ -279,7 +279,7 @@ function take-user-input() {
       ;;
     6)
       # Uninstall Wireguard and purging files
-      read -rp "Do you really want to remove Wireguard? [y/n]: " -e -i n REMOVE_WIREGUARD
+      read -rp "Do you really want to remove Wireguard? [y/n]:" REMOVE_WIREGUARD
       if [ "$REMOVE_WIREGUARD" = "y" ]; then
         # Stop WireGuard
         if pgrep systemd-journal; then
