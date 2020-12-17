@@ -108,10 +108,14 @@ usage: ./wireguard-server.sh <command>
 * `DISABLE_HOST` - Disable or enable ipv4 and ipv6, default disabled
 * `CLIENT_ALLOWED_IP` - private or public IP range allowed in the tunnel
 * `NAT_CHOICE` - Keep sending packets to keep the tunnel alive `25`
-* `INSTALL_UNBOUND` - Install unbound settings `y/n`
+* `INSTALL_UNBOUND` - Install unbound with a basic `y/n`
+* `UNINSTALL_UNBOUND` - Uninstall unbound with `y/n`
+* `INSTALL_PIHOLE` - Install PiHole with a `y/n`
+* `UNINSTALL_PIHOLE` - Uninstall PiHole with `y/n`
+* `REMOVE_WIREGUARD` - Uninstall WireGuard with `y/n`
 * `DNS_CHOICE` - Without Unbound you have to use a public dns like `8.8.8.8`
-* `CLIENT_NAME` - name of the client
-* `MTU_CHOICE` - the MTU the client will use to connect to DNS `1420`
+* `CLIENT_NAME` - Name the first peer from wireguard
+* `MTU_CHOICE` - MTU the peer will use `1420`
 
 ---
 ### 👉👈 Compatibility with Linux Distro
