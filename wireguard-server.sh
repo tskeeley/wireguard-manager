@@ -642,29 +642,29 @@ if [ ! -f "$WG_CONFIG" ]; then
           service systemd-resolved disable
         fi
       fi
-      elif [ "$DISTRO" == "debian" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      elif [ "$DISTRO" == "raspbian" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      elif [ "$DISTRO" == "pop" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
-        yum install unbound unbound-libs -y
-      elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
-        yum install unbound unbound-libs resolvconf -y
-      elif [ "$DISTRO" == "rhel" ]; then
-        yum install unbound unbound-libs -y
-      elif [ "$DISTRO" == "fedora" ]; then
-        dnf install unbound -y
-      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm unbound resolvconf
-      fi
-      # Remove Unbound Config
-      rm -f /etc/unbound/unbound.conf
-      # Cpu
-      NPROC=$(nproc)
-      # Set Config for unbound
-      echo "server:
+    elif [ "$DISTRO" == "debian" ]; then
+      apt-get install unbound unbound-host e2fsprogs resolvconf -y
+    elif [ "$DISTRO" == "raspbian" ]; then
+      apt-get install unbound unbound-host e2fsprogs resolvconf -y
+    elif [ "$DISTRO" == "pop" ]; then
+      apt-get install unbound unbound-host e2fsprogs resolvconf -y
+    elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
+      yum install unbound unbound-libs -y
+    elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
+      yum install unbound unbound-libs resolvconf -y
+    elif [ "$DISTRO" == "rhel" ]; then
+      yum install unbound unbound-libs -y
+    elif [ "$DISTRO" == "fedora" ]; then
+      dnf install unbound -y
+    elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+      pacman -Syu --noconfirm unbound resolvconf
+    fi
+    # Remove Unbound Config
+    rm -f /etc/unbound/unbound.conf
+    # Cpu
+    NPROC=$(nproc)
+    # Set Config for unbound
+    echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
@@ -691,27 +691,26 @@ if [ ! -f "$WG_CONFIG" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>/etc/unbound/unbound.conf
-      # Set DNS Root Servers
-      curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-      # Setting Client DNS For Unbound On WireGuard
-      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
-      # Allow the modification of the file
-      chattr -i /etc/resolv.conf
-      mv /etc/resolv.conf /etc/resolv.conf.old
-      # Set localhost as the DNS resolver
-      echo "nameserver 127.0.0.1" >>/etc/resolv.conf
-      echo "nameserver ::1" >>/etc/resolv.conf
-      # Stop the modification of the file
-      chattr +i /etc/resolv.conf
-      echo "Unbound: true" >>/etc/unbound/wireguard-manager
-      # restart unbound
-      if pgrep systemd-journal; then
-        systemctl enable unbound
-        systemctl restart unbound
-      else
-        service unbound enable
-        service unbound restart
-      fi
+    # Set DNS Root Servers
+    curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
+    # Setting Client DNS For Unbound On WireGuard
+    CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
+    # Allow the modification of the file
+    chattr -i /etc/resolv.conf
+    mv /etc/resolv.conf /etc/resolv.conf.old
+    # Set localhost as the DNS resolver
+    echo "nameserver 127.0.0.1" >>/etc/resolv.conf
+    echo "nameserver ::1" >>/etc/resolv.conf
+    # Stop the modification of the file
+    chattr +i /etc/resolv.conf
+    echo "Unbound: true" >>/etc/unbound/wireguard-manager
+    # restart unbound
+    if pgrep systemd-journal; then
+      systemctl enable unbound
+      systemctl restart unbound
+    else
+      service unbound enable
+      service unbound restart
     fi
   }
 
