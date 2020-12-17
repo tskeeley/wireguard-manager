@@ -32,7 +32,7 @@ virt-check
 # Detect Operating System
 function dist-check() {
   if [ -e /etc/os-release ]; then
-    # shellcheck disable=SC1091	
+    # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=$ID
     DISTRO_VERSION=$VERSION_ID
