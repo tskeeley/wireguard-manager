@@ -726,7 +726,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "nameserver ::1" >>/etc/resolv.conf
       # Stop the modification of the file
       chattr +i /etc/resolv.conf
-      echo "Unbound: true" >>/etc/wireguard/installation
+      echo "Unbound: true" >>/etc/unbound/wireguard-manager
       # restart unbound
       if pgrep systemd-journal; then
         systemctl enable unbound
@@ -745,7 +745,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   function install-pihole() {
     if [ "$INSTALL_PIHOLE" = "y" ]; then
       curl -sSL https://install.pi-hole.net | bash
-      echo "PiHole: true" >>/etc/wireguard/installation
+      echo "PiHole: true" >>/etc/pihole/wireguard-manager
     fi
   }
 
@@ -1044,7 +1044,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       fi
-      if [ "$INSTALLED_UNBOUND" = "true" ]; then
+      # Uninstall Unbound
+      INSTALLED_UNBOUND=/etc/unbound/wireguard-manager
+      if [ -f "$INSTALLED_UNBOUND" ]; then
         if pgrep systemd-journal; then
           systemctl disable unbound
           systemctl stop unbound
@@ -1074,7 +1076,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         elif [ "$DISTRO" == "rhel" ]; then
           yum remove unbound unbound-host -y
         fi
-        if [ "$INSTALLED_PIHOLE" = "true" ]; then
+        # Uninstall Pihole
+        INSTALLED_PIHOLE=/etc/pihole/wireguard-manager
+        if [ -f "$INSTALLED_PIHOLE" ]; then
           if pgrep systemd-journal; then
             systemctl disable pihole
             systemctl stop pihole
