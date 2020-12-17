@@ -1,7 +1,7 @@
 #!/bin/bash
 # https://github.com/complexorganizations/wireguard-manager
 
-# Require script to be run as root (or with sudo)
+# Require script to be run as root
 function super-user-check() {
   if [ "$EUID" -ne 0 ]; then
     echo "You need to run this script as super user."
