@@ -263,12 +263,12 @@ function take-user-input() {
       fi
       ;;
     5)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "DISTRO" == "raspbian" ];} then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ];} then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       fi
-      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "DISTRO" == "rhel" ];} then
+      if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ];} then
         yum reinstall wireguard-dkms -y
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
