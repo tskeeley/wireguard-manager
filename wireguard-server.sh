@@ -638,7 +638,6 @@ if [ ! -f "$WG_CONFIG" ]; then
           service systemd-resolved stop
           service systemd-resolved disable
         fi
-      fi
     elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
       apt-get install unbound unbound-host e2fsprogs resolvconf -y
     elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
@@ -647,6 +646,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       dnf install unbound -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm unbound resolvconf
+      fi
     fi
     rm -f /etc/unbound/unbound.conf
     NPROC=$(nproc)
