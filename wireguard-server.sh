@@ -647,7 +647,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm unbound resolvconf
       fi
-    fi
     rm -f /etc/unbound/unbound.conf
     NPROC=$(nproc)
     echo "server:
@@ -694,6 +693,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       service unbound enable
       service unbound restart
     fi
+fi
   }
 
   # Running Install Unbound
