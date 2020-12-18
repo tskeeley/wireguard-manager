@@ -639,7 +639,7 @@ if [ ! -f "$WG_CONFIG" ]; then
           service systemd-resolved disable
         fi
       fi
-    elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; };
+    elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
       apt-get install unbound unbound-host e2fsprogs resolvconf -y
     elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
       yum install unbound unbound-libs resolvconf -y
