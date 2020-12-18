@@ -1023,7 +1023,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         # Uninstall Pihole
         UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
-        if [ -f "$UNINSTALL_PIHOLE" ]; then
+        if [ ! -f "$UNINSTALL_PIHOLE" ]; then
           if pgrep systemd-journal; then
             systemctl disable pihole
             systemctl stop pihole
