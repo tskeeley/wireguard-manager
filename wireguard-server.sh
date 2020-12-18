@@ -639,18 +639,10 @@ if [ ! -f "$WG_CONFIG" ]; then
           service systemd-resolved disable
         fi
       fi
-    elif [ "$DISTRO" == "debian" ]; then
+    elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; };
       apt-get install unbound unbound-host e2fsprogs resolvconf -y
-    elif [ "$DISTRO" == "raspbian" ]; then
-      apt-get install unbound unbound-host e2fsprogs resolvconf -y
-    elif [ "$DISTRO" == "pop" ]; then
-      apt-get install unbound unbound-host e2fsprogs resolvconf -y
-    elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "8" ]; then
-      yum install unbound unbound-libs -y
-    elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
+    elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
       yum install unbound unbound-libs resolvconf -y
-    elif [ "$DISTRO" == "rhel" ]; then
-      yum install unbound unbound-libs -y
     elif [ "$DISTRO" == "fedora" ]; then
       dnf install unbound -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
