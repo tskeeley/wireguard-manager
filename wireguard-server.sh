@@ -638,18 +638,18 @@ if [ ! -f "$WG_CONFIG" ]; then
           service systemd-resolved stop
           service systemd-resolved disable
         fi
-    elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
-      apt-get install unbound unbound-host e2fsprogs resolvconf -y
-    elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-      yum install unbound unbound-libs resolvconf -y
-    elif [ "$DISTRO" == "fedora" ]; then
-      dnf install unbound -y
-    elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm unbound resolvconf
+      elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+        apt-get install unbound unbound-host e2fsprogs resolvconf -y
+      elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+        yum install unbound unbound-libs resolvconf -y
+      elif [ "$DISTRO" == "fedora" ]; then
+        dnf install unbound -y
+      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+        pacman -Syu --noconfirm unbound resolvconf
       fi
-    rm -f /etc/unbound/unbound.conf
-    NPROC=$(nproc)
-    echo "server:
+      rm -f /etc/unbound/unbound.conf
+      NPROC=$(nproc)
+      echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
@@ -676,24 +676,24 @@ if [ ! -f "$WG_CONFIG" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>/etc/unbound/unbound.conf
-    # Set DNS Root Servers
-    curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-    CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
-    chattr -i /etc/resolv.conf
-    mv /etc/resolv.conf /etc/resolv.conf.old
-    echo "nameserver 127.0.0.1" >>/etc/resolv.conf
-    echo "nameserver ::1" >>/etc/resolv.conf
-    chattr +i /etc/resolv.conf
-    echo "Unbound: true" >>/etc/unbound/wireguard-manager
-    # restart unbound
-    if pgrep systemd-journal; then
-      systemctl enable unbound
-      systemctl restart unbound
-    else
-      service unbound enable
-      service unbound restart
+      # Set DNS Root Servers
+      curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
+      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
+      chattr -i /etc/resolv.conf
+      mv /etc/resolv.conf /etc/resolv.conf.old
+      echo "nameserver 127.0.0.1" >>/etc/resolv.conf
+      echo "nameserver ::1" >>/etc/resolv.conf
+      chattr +i /etc/resolv.conf
+      echo "Unbound: true" >>/etc/unbound/wireguard-manager
+      # restart unbound
+      if pgrep systemd-journal; then
+        systemctl enable unbound
+        systemctl restart unbound
+      else
+        service unbound enable
+        service unbound restart
+      fi
     fi
-fi
   }
 
   # Running Install Unbound
@@ -996,43 +996,43 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-      # Uninstall Unbound
-      UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
-      if [ -f "$UNINSTALL_UNBOUND" ]; then
-        if pgrep systemd-journal; then
-          systemctl disable unbound
-          systemctl stop unbound
-        else
-          service unbound disable
-          service unbound stop
-        fi
-        # Change to defualt dns
-        chattr -i /etc/resolv.conf
-        rm -f /etc/resolv.conf
-        mv /etc/resolv.conf.old /etc/resolv.conf
-        chattr +i /etc/resolv.conf
-        if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-          yum remove unbound unbound-host -y
-        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
-          apt-get remove --purge unbound unbound-host -y
-        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-          pacman -Rs unbound unbound-host -y
-        elif [ "$DISTRO" == "fedora" ]; then
-          dnf remove unbound -y
-        fi
-        # Uninstall Pihole
-        UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
-        if [ -f "$UNINSTALL_PIHOLE" ]; then
+        # Uninstall Unbound
+        UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
+        if [ -f "$UNINSTALL_UNBOUND" ]; then
           if pgrep systemd-journal; then
-            systemctl disable pihole
-            systemctl stop pihole
+            systemctl disable unbound
+            systemctl stop unbound
           else
-            service pihole disable
-            service pihole stop
+            service unbound disable
+            service unbound stop
           fi
-          pihole uninstall
+          # Change to defualt dns
+          chattr -i /etc/resolv.conf
+          rm -f /etc/resolv.conf
+          mv /etc/resolv.conf.old /etc/resolv.conf
+          chattr +i /etc/resolv.conf
+          if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+            yum remove unbound unbound-host -y
+          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
+            apt-get remove --purge unbound unbound-host -y
+          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+            pacman -Rs unbound unbound-host -y
+          elif [ "$DISTRO" == "fedora" ]; then
+            dnf remove unbound -y
+          fi
+          # Uninstall Pihole
+          UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
+          if [ -f "$UNINSTALL_PIHOLE" ]; then
+            if pgrep systemd-journal; then
+              systemctl disable pihole
+              systemctl stop pihole
+            else
+              service pihole disable
+              service pihole stop
+            fi
+            pihole uninstall
+          fi
         fi
-      fi
       fi
       ;;
     9) # Update the script
