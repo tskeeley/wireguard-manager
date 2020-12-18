@@ -996,7 +996,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-      fi
       # Uninstall Unbound
       UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
       if [ -f "$UNINSTALL_UNBOUND" ]; then
@@ -1033,6 +1032,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           fi
           pihole uninstall
         fi
+      fi
       fi
       ;;
     9) # Update the script
