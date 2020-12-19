@@ -504,7 +504,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  2) PiHole"
     echo "  3) Custom (Advanced)"
     until [[ "$DNS_PROVIDER_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "Disable Host Choice [1-3]: " -e -i 1 DNS_PROVIDER_SETTINGS
+      read -rp "DNS provider [1-3]: " -e -i 1 DNS_PROVIDER_SETTINGS
     done
     case $DNS_PROVIDER_SETTINGS in
     1)
