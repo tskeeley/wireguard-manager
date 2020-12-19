@@ -305,6 +305,7 @@ else
             rm -f /etc/yum.repos.d/wireguard.repo
           fi
         fi
+      fi
       ;;
     7) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
