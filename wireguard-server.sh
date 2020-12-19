@@ -959,8 +959,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       ;;
     8)
       # Uninstall Wireguard and purging files
-      read -rp "Do you really want to remove Wireguard? [y/n]:" REMOVE_WIREGUARD
-      if [ "$REMOVE_WIREGUARD" = "y" ]; then
         UNINSTALL_WIREGUARD=/etc/wireguard/wireguard-manager
         if [ -f "$UNINSTALL_WIREGUARD" ]; then
           if pgrep systemd-journal; then
@@ -1044,7 +1042,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
             pihole uninstall
           fi
         fi
-      fi
       ;;
     9) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
