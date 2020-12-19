@@ -123,73 +123,74 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Kernel Version
   install-kernel-headers
 
-  function install-wireguard-client() {
+  # Install WireGuard Server
+  function install-wireguard-server() {
     # Installation begins here
     if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
       apt-get update
-      apt-get install wireguard qrencode haveged ifupdown -y
+      apt-get install wireguard qrencode haveged ifupdown resolvconf -y
     elif [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]; }; then
       apt-get update
       apt-get install software-properties-common -y
       add-apt-repository ppa:wireguard/wireguard -y
       apt-get update
-      apt-get install wireguard qrencode haveged ifupdown -y
+      apt-get install wireguard qrencode haveged ifupdown resolvconf -y
     elif [ "$DISTRO" == "pop" ]; then
       apt-get update
-      apt-get install wireguard qrencode haveged ifupdown -y
+      apt-get install wireguard qrencode haveged ifupdown resolvconf -y
     elif [ "$DISTRO" == "debian" ]; then
       apt-get update
       echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
       printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
       apt-get update
-      apt-get install wireguard qrencode haveged ifupdown -y
+      apt-get install wireguard qrencode haveged ifupdown resolvconf -y
     elif [ "$DISTRO" == "raspbian" ]; then
       apt-get update
       apt-get install dirmngr -y
-      apt-key adv --keyclient keyclient.ubuntu.com --recv-keys 04EE7237B7D453EC
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
       echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
       printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
       apt-get update
-      apt-get install wireguard qrencode haveged ifupdown -y
+      apt-get install wireguard qrencode haveged ifupdown resolvconf -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu
-      pacman -Syu --noconfirm haveged qrencode iptables
+      pacman -Syu --noconfirm haveged qrencode iptables resolvconf
       pacman -Syu --noconfirm wireguard-tools
     elif [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
       dnf update -y
-      dnf install qrencode wireguard-tools haveged -y
+      dnf install qrencode wireguard-tools haveged resolvconf -y
     elif [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]; }; then
       dnf update -y
       dnf copr enable jdoss/wireguard -y
-      dnf install qrencode wireguard-dkms wireguard-tools haveged -y
+      dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
     elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]; }; then
       yum update -y
       yum config-manager --set-enabled PowerTools
       yum copr enable jdoss/wireguard -y
-      yum install wireguard-dkms wireguard-tools qrencode haveged -y
+      yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
     elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
       yum update -y
       curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
       yum update -y
-      yum install wireguard-dkms wireguard-tools qrencode haveged -y
+      yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
     elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "8" ]; then
       yum update -y
       yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
       yum update -y
       subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
       yum copr enable jdoss/wireguard
-      yum install wireguard-dkms wireguard-tools qrencode haveged -y
+      yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
     elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "7" ]; then
       yum update -y
       curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
       yum update -y
-      yum install wireguard-dkms wireguard-tools qrencode haveged -y
+      yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
     fi
     echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
   }
 
-  # Install WireGuard client
-  install-wireguard-client
+  # Install WireGuard Server
+  install-wireguard-server
 
   echo "Move the files to /etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 
