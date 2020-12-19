@@ -629,27 +629,29 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Function to install unbound
   function install-unbound() {
     if [ "$INSTALL_UNBOUND" = "y" ]; then
-      if [ "$DISTRO" == "ubuntu" ]; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-        if pgrep systemd-journal; then
-          systemctl stop systemd-resolved
-          systemctl disable systemd-resolved
-        else
-          service systemd-resolved stop
-          service systemd-resolved disable
+      UNBOUND_DIR=/etc/unbound
+      if [ ! -f "$UNBOUND_DIR" ]; then
+        if [ "$DISTRO" == "ubuntu" ]; then
+          apt-get install unbound unbound-host e2fsprogs resolvconf -y
+          if pgrep systemd-journal; then
+            systemctl stop systemd-resolved
+            systemctl disable systemd-resolved
+          else
+            service systemd-resolved stop
+            service systemd-resolved disable
+          fi
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+          apt-get install unbound unbound-host e2fsprogs resolvconf -y
+        elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+          yum install unbound unbound-libs resolvconf -y
+        elif [ "$DISTRO" == "fedora" ]; then
+          dnf install unbound -y
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+          pacman -Syu --noconfirm unbound resolvconf
         fi
-      elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
-        apt-get install unbound unbound-host e2fsprogs resolvconf -y
-      elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-        yum install unbound unbound-libs resolvconf -y
-      elif [ "$DISTRO" == "fedora" ]; then
-        dnf install unbound -y
-      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm unbound resolvconf
-      fi
-      rm -f /etc/unbound/unbound.conf
-      NPROC=$(nproc)
-      echo "server:
+        rm -f /etc/unbound/unbound.conf
+        NPROC=$(nproc)
+        echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
@@ -676,23 +678,24 @@ if [ ! -f "$WG_CONFIG" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>/etc/unbound/unbound.conf
-      # Set DNS Root Servers
-      curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
-      chattr -i /etc/resolv.conf
-      mv /etc/resolv.conf /etc/resolv.conf.old
-      echo "nameserver 127.0.0.1" >>/etc/resolv.conf
-      echo "nameserver ::1" >>/etc/resolv.conf
-      chattr +i /etc/resolv.conf
-      echo "Unbound: true" >>/etc/unbound/wireguard-manager
-      # restart unbound
-      if pgrep systemd-journal; then
-        systemctl enable unbound
-        systemctl restart unbound
-      else
-        service unbound enable
-        service unbound restart
+        # Set DNS Root Servers
+        curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
+        chattr -i /etc/resolv.conf
+        mv /etc/resolv.conf /etc/resolv.conf.old
+        echo "nameserver 127.0.0.1" >>/etc/resolv.conf
+        echo "nameserver ::1" >>/etc/resolv.conf
+        chattr +i /etc/resolv.conf
+        echo "Unbound: true" >>/etc/unbound/wireguard-manager
+        # restart unbound
+        if pgrep systemd-journal; then
+          systemctl enable unbound
+          systemctl restart unbound
+        else
+          service unbound enable
+          service unbound restart
+        fi
       fi
+      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
     fi
   }
 
@@ -702,8 +705,11 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install pihole
   function install-pihole() {
     if [ "$INSTALL_PIHOLE" = "y" ]; then
-      curl -sSL https://install.pi-hole.net | bash
-      echo "PiHole: true" >>/etc/pihole/wireguard-manager
+      PIHOLE_DIR=/etc/pihole
+      if [ ! -f "$PIHOLE_DIR" ]; then
+        curl -sSL https://install.pi-hole.net | bash
+        echo "PiHole: true" >>/etc/pihole/wireguard-manager
+      fi
     fi
   }
 
