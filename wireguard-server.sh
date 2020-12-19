@@ -667,6 +667,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Syu --noconfirm unbound
         fi
+        rm -f /etc/unbound/unbound.conf
         NPROC=$(nproc)
         echo "server:
     num-threads: $NPROC
