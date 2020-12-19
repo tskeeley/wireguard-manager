@@ -139,16 +139,24 @@ if [ ! -f "$WG_CONFIG" ]; then
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
       elif [ "$DISTRO" == "debian" ]; then
         apt-get update
-        echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-        printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+        if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
+          echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
+        fi
+        if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
+          printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+        fi
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
       elif [ "$DISTRO" == "raspbian" ]; then
         apt-get update
         apt-get install dirmngr -y
         apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
-        echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-        printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+        if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
+          echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
+        fi
+        if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
+          printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+        fi
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
@@ -169,7 +177,9 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
         yum update -y
-        curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+        fi
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "8" ]; then
@@ -181,7 +191,9 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "7" ]; then
         yum update -y
-        curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+        fi
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
@@ -269,9 +281,10 @@ else
           wg-quick down $WIREGUARD_PUB_NIC
         fi
         # Removing Wireguard Files
-        rm -rf /etc/wireguard/clients
         rm -rf /etc/wireguard
+        rm -rf /etc/wireguard/clients
         rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+        rm -f /etc/sysctl.d/wireguard.conf
         if [ "$DISTRO" == "centos" ]; then
           yum remove wireguard qrencode haveged -y
         elif [ "$DISTRO" == "debian" ]; then
