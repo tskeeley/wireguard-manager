@@ -710,6 +710,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         curl -sSL https://install.pi-hole.net | bash
         echo "PiHole: true" >>/etc/pihole/wireguard-manager
       fi
+      CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
     fi
   }
 
