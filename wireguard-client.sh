@@ -260,51 +260,51 @@ else
       ;;
     6)
       # Uninstall Wireguard and purging files
-        UNINSTALL_WIREGUARD=/etc/wireguard/wireguard-manager
-        if [ -f "$UNINSTALL_WIREGUARD" ]; then
-          if pgrep systemd-journal; then
-            systemctl disable wg-quick@$WIREGUARD_PUB_NIC
-            wg-quick down $WIREGUARD_PUB_NIC
-          else
-            service wg-quick@$WIREGUARD_PUB_NIC disable
-            wg-quick down $WIREGUARD_PUB_NIC
-          fi
-          # Removing Wireguard Files
-          rm -rf /etc/wireguard/clients
-          rm -rf /etc/wireguard
-          rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
-          if [ "$DISTRO" == "centos" ]; then
-            yum remove wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "debian" ]; then
-            apt-get remove --purge wireguard qrencode -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif [ "$DISTRO" == "pop" ]; then
-            apt-get remove --purge wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "ubuntu" ]; then
-            apt-get remove --purge wireguard qrencode haveged -y
-            if pgrep systemd-journal; then
-              systemctl enable systemd-resolved
-              systemctl restart systemd-resolved
-            else
-              service systemd-resolved enable
-              service systemd-resolved restart
-            fi
-          elif [ "$DISTRO" == "raspbian" ]; then
-            apt-key del 04EE7237B7D453EC
-            apt-get remove --purge wireguard qrencode haveged dirmngr -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-            pacman -Rs wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "fedora" ]; then
-            dnf remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          elif [ "$DISTRO" == "rhel" ]; then
-            yum remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          fi
+      UNINSTALL_WIREGUARD=/etc/wireguard/wireguard-manager
+      if [ -f "$UNINSTALL_WIREGUARD" ]; then
+        if pgrep systemd-journal; then
+          systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+          wg-quick down $WIREGUARD_PUB_NIC
+        else
+          service wg-quick@$WIREGUARD_PUB_NIC disable
+          wg-quick down $WIREGUARD_PUB_NIC
         fi
+        # Removing Wireguard Files
+        rm -rf /etc/wireguard/clients
+        rm -rf /etc/wireguard
+        rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+        if [ "$DISTRO" == "centos" ]; then
+          yum remove wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "debian" ]; then
+          apt-get remove --purge wireguard qrencode -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif [ "$DISTRO" == "pop" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "ubuntu" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
+          if pgrep systemd-journal; then
+            systemctl enable systemd-resolved
+            systemctl restart systemd-resolved
+          else
+            service systemd-resolved enable
+            service systemd-resolved restart
+          fi
+        elif [ "$DISTRO" == "raspbian" ]; then
+          apt-key del 04EE7237B7D453EC
+          apt-get remove --purge wireguard qrencode haveged dirmngr -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+          pacman -Rs wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "fedora" ]; then
+          dnf remove wireguard qrencode haveged -y
+          rm -f /etc/yum.repos.d/wireguard.repo
+        elif [ "$DISTRO" == "rhel" ]; then
+          yum remove wireguard qrencode haveged -y
+          rm -f /etc/yum.repos.d/wireguard.repo
+        fi
+      fi
       ;;
     7) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
