@@ -638,7 +638,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     if [ "$INSTALL_UNBOUND" = "y" ]; then
       if [ ! -f "/etc/unbound" ]; then
         if [ "$DISTRO" == "ubuntu" ]; then
-          apt-get install unbound unbound-host e2fsprogs resolvconf -y
+          apt-get install unbound unbound-host e2fsprogs -y
           if pgrep systemd-journal; then
             systemctl stop systemd-resolved
             systemctl disable systemd-resolved
@@ -647,13 +647,13 @@ if [ ! -f "$WG_CONFIG" ]; then
             service systemd-resolved disable
           fi
         elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
-          apt-get install unbound unbound-host e2fsprogs resolvconf -y
+          apt-get install unbound unbound-host e2fsprogs -y
         elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-          yum install unbound unbound-libs resolvconf -y
+          yum install unbound unbound-libs -y
         elif [ "$DISTRO" == "fedora" ]; then
           dnf install unbound -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm unbound resolvconf
+          pacman -Syu --noconfirm unbound
         fi
         rm -f /etc/unbound/unbound.conf
         NPROC=$(nproc)
