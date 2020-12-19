@@ -45,11 +45,9 @@ dist-check
 function installing-system-requirements() {
   if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
     apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
-  fi
-  if { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+  elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
     yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
-  fi
-  if { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+  elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
     pacman -Syu --noconfirm iptables curl bc jq sed
   fi
 }
