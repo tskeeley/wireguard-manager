@@ -959,89 +959,89 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       ;;
     8)
       # Uninstall Wireguard and purging files
-        UNINSTALL_WIREGUARD=/etc/wireguard/wireguard-manager
-        if [ -f "$UNINSTALL_WIREGUARD" ]; then
-          if pgrep systemd-journal; then
-            systemctl disable wg-quick@$WIREGUARD_PUB_NIC
-            wg-quick down $WIREGUARD_PUB_NIC
-          else
-            service wg-quick@$WIREGUARD_PUB_NIC disable
-            wg-quick down $WIREGUARD_PUB_NIC
-          fi
-          # Removing Wireguard Files
-          rm -rf /etc/wireguard/clients
-          rm -rf /etc/wireguard
-          rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
-          rm -f /etc/sysctl.d/wireguard.conf
-          if [ "$DISTRO" == "centos" ]; then
-            yum remove wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "debian" ]; then
-            apt-get remove --purge wireguard qrencode -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif [ "$DISTRO" == "pop" ]; then
-            apt-get remove --purge wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "ubuntu" ]; then
-            apt-get remove --purge wireguard qrencode haveged -y
-            if pgrep systemd-journal; then
-              systemctl enable systemd-resolved
-              systemctl restart systemd-resolved
-            else
-              service systemd-resolved enable
-              service systemd-resolved restart
-            fi
-          elif [ "$DISTRO" == "raspbian" ]; then
-            apt-key del 04EE7237B7D453EC
-            apt-get remove --purge wireguard qrencode haveged dirmngr -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-            pacman -Rs wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "fedora" ]; then
-            dnf remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          elif [ "$DISTRO" == "rhel" ]; then
-            yum remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          fi
+      UNINSTALL_WIREGUARD=/etc/wireguard/wireguard-manager
+      if [ -f "$UNINSTALL_WIREGUARD" ]; then
+        if pgrep systemd-journal; then
+          systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+          wg-quick down $WIREGUARD_PUB_NIC
+        else
+          service wg-quick@$WIREGUARD_PUB_NIC disable
+          wg-quick down $WIREGUARD_PUB_NIC
         fi
-        # Uninstall Unbound
-        UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
-        if [ -f "$UNINSTALL_UNBOUND" ]; then
+        # Removing Wireguard Files
+        rm -rf /etc/wireguard/clients
+        rm -rf /etc/wireguard
+        rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+        rm -f /etc/sysctl.d/wireguard.conf
+        if [ "$DISTRO" == "centos" ]; then
+          yum remove wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "debian" ]; then
+          apt-get remove --purge wireguard qrencode -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif [ "$DISTRO" == "pop" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "ubuntu" ]; then
+          apt-get remove --purge wireguard qrencode haveged -y
           if pgrep systemd-journal; then
-            systemctl disable unbound
-            systemctl stop unbound
+            systemctl enable systemd-resolved
+            systemctl restart systemd-resolved
           else
-            service unbound disable
-            service unbound stop
+            service systemd-resolved enable
+            service systemd-resolved restart
           fi
-          # Change to defualt dns
-          chattr -i /etc/resolv.conf
-          rm -f /etc/resolv.conf
-          mv /etc/resolv.conf.old /etc/resolv.conf
-          chattr +i /etc/resolv.conf
-          if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-            yum remove unbound unbound-host -y
-          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
-            apt-get remove --purge unbound unbound-host -y
-          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-            pacman -Rs unbound unbound-host -y
-          elif [ "$DISTRO" == "fedora" ]; then
-            dnf remove unbound -y
-          fi
-          # Uninstall Pihole
-          UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
-          if [ -f "$UNINSTALL_PIHOLE" ]; then
-            if pgrep systemd-journal; then
-              systemctl disable pihole
-              systemctl stop pihole
-            else
-              service pihole disable
-              service pihole stop
-            fi
-            pihole uninstall
-          fi
+        elif [ "$DISTRO" == "raspbian" ]; then
+          apt-key del 04EE7237B7D453EC
+          apt-get remove --purge wireguard qrencode haveged dirmngr -y
+          rm -f /etc/apt/sources.list.d/unstable.list
+          rm -f /etc/apt/preferences.d/limit-unstable
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+          pacman -Rs wireguard qrencode haveged -y
+        elif [ "$DISTRO" == "fedora" ]; then
+          dnf remove wireguard qrencode haveged -y
+          rm -f /etc/yum.repos.d/wireguard.repo
+        elif [ "$DISTRO" == "rhel" ]; then
+          yum remove wireguard qrencode haveged -y
+          rm -f /etc/yum.repos.d/wireguard.repo
         fi
+      fi
+      # Uninstall Unbound
+      UNINSTALL_UNBOUND=/etc/unbound/wireguard-manager
+      if [ -f "$UNINSTALL_UNBOUND" ]; then
+        if pgrep systemd-journal; then
+          systemctl disable unbound
+          systemctl stop unbound
+        else
+          service unbound disable
+          service unbound stop
+        fi
+        # Change to defualt dns
+        chattr -i /etc/resolv.conf
+        rm -f /etc/resolv.conf
+        mv /etc/resolv.conf.old /etc/resolv.conf
+        chattr +i /etc/resolv.conf
+        if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+          yum remove unbound unbound-host -y
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
+          apt-get remove --purge unbound unbound-host -y
+        elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+          pacman -Rs unbound unbound-host -y
+        elif [ "$DISTRO" == "fedora" ]; then
+          dnf remove unbound -y
+        fi
+        # Uninstall Pihole
+        UNINSTALL_PIHOLE=/etc/pihole/wireguard-manager
+        if [ -f "$UNINSTALL_PIHOLE" ]; then
+          if pgrep systemd-journal; then
+            systemctl disable pihole
+            systemctl stop pihole
+          else
+            service pihole disable
+            service pihole stop
+          fi
+          pihole uninstall
+        fi
+      fi
       ;;
     9) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
