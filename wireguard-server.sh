@@ -738,9 +738,9 @@ if [ ! -f "$WG_CONFIG" ]; then
   function custom-dns() {
     if [ "$CUSTOM_DNS" == "y" ]; then
       echo "Which DNS do you want to use with the VPN?"
-      echo "  1) NextDNS (Recommended)"
+      echo "  1) Google (Recommended)"
       echo "  2) AdGuard"
-      echo "  3) Google"
+      echo "  3) NextDNS"
       echo "  4) OpenDNS"
       echo "  5) Cloudflare"
       echo "  6) Verisign"
@@ -752,13 +752,13 @@ if [ ! -f "$WG_CONFIG" ]; then
       done
       case $CLIENT_DNS_SETTINGS in
       1)
-        CLIENT_DNS="45.90.28.167,45.90.30.167,2a07:a8c0::12:cf53,2a07:a8c1::12:cf53"
+        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
         ;;
       2)
         CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
         ;;
       3)
-        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+        CLIENT_DNS="45.90.28.167,45.90.30.167,2a07:a8c0::12:cf53,2a07:a8c1::12:cf53"
         ;;
       4)
         CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
