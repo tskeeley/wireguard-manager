@@ -198,7 +198,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  2) 10.0.0.0/24"
     echo "  3) Custom (Advanced)"
     until [[ "$IPV4_SUBNET_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "Subnetwork choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
+      read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
     done
     # Apply port response
     case $IPV4_SUBNET_SETTINGS in
@@ -224,7 +224,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  2) fd86:ea04:1115::0/64"
     echo "  3) Custom (Advanced)"
     until [[ "$IPV6_SUBNET_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "Subnetwork choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
+      read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
     done
     # Apply port response
     case $IPV6_SUBNET_SETTINGS in
@@ -258,12 +258,12 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine host port
   function test-connectivity-v4() {
-    echo "How would you like to detect IPV4?"
+    echo "How would you like to detect IPv4?"
     echo "  1) Curl (Recommended)"
     echo "  2) IP (Advanced)"
     echo "  3) Custom (Advanced)"
     until [[ "$SERVER_HOST_V4_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "ipv4 choice [1-3]: " -e -i 1 SERVER_HOST_V4_SETTINGS
+      read -rp "IPv4 Choice [1-3]: " -e -i 1 SERVER_HOST_V4_SETTINGS
     done
     # Apply port response
     case $SERVER_HOST_V4_SETTINGS in
@@ -274,7 +274,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST_V4=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
       ;;
     3)
-      read -rp "Custom IPV4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
+      read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
       ;;
     esac
   }
@@ -284,12 +284,12 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine ipv6
   function test-connectivity-v6() {
-    echo "How would you like to detect IPV6?"
+    echo "How would you like to detect IPv6?"
     echo "  1) Curl (Recommended)"
     echo "  2) IP (Advanced)"
     echo "  3) Custom (Advanced)"
     until [[ "$SERVER_HOST_V6_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "ipv6 choice [1-3]: " -e -i 1 SERVER_HOST_V6_SETTINGS
+      read -rp "IPv6 Choice [1-3]: " -e -i 1 SERVER_HOST_V6_SETTINGS
     done
     # Apply port response
     case $SERVER_HOST_V6_SETTINGS in
@@ -300,7 +300,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       SERVER_HOST_V6=$(ip r get to 2001:4860:4860::8888 | perl -ne '/src { [\w:]+)/ && print "$1\n"')
       ;;
     3)
-      read -rp "Custom IPV6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
+      read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
       ;;
     esac
   }
@@ -314,7 +314,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  1) IP (Recommended)"
     echo "  2) Custom (Advanced)"
     until [[ "$SERVER_PUB_NIC_SETTINGS" =~ ^[1-2]$ ]]; do
-      read -rp "nic choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
+      read -rp "nic Choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
     done
     # Apply port response
     case $SERVER_PUB_NIC_SETTINGS in
@@ -337,7 +337,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  2) Custom (Advanced)"
     echo "  3) Random [1024-65535]"
     until [[ "$SERVER_PORT_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "Port choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
+      read -rp "Port Choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
     done
     # Apply port response
     case $SERVER_PORT_SETTINGS in
@@ -394,7 +394,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     echo "  2) 1420"
     echo "  3) Custom (Advanced)"
     until [[ "$MTU_CHOICE_SETTINGS" =~ ^[1-3]$ ]]; do
-      read -rp "MTU choice [1-3]: " -e -i 1 MTU_CHOICE_SETTINGS
+      read -rp "MTU Choice [1-3]: " -e -i 1 MTU_CHOICE_SETTINGS
     done
     case $MTU_CHOICE_SETTINGS in
     1)
