@@ -43,12 +43,14 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
-    apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
-  elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-    yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
-  elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-    pacman -Syu --noconfirm iptables curl bc jq sed
+  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v iptables)" ]; }; then
+    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
+    elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
+    elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+      pacman -Syu --noconfirm iptables curl bc jq sed
+    fi
   fi
 }
 
@@ -123,8 +125,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if [ ! -f "/etc/wireguard" ]; then
-      # Installation begins here
+    if ! [ -x "$(command -v wg)" ]; }; then
       if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
@@ -197,8 +198,8 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
-    fi
     echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+    fi
   }
 
   # Install WireGuard Server
