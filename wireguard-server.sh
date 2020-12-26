@@ -43,12 +43,14 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
-    apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
-  elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-    yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
-  elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-    pacman -Syu --noconfirm iptables curl bc jq sed
+  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v iptables)" ]; }; then
+    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
+    elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
+    elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+      pacman -Syu --noconfirm iptables curl bc jq sed
+    fi
   fi
 }
 
