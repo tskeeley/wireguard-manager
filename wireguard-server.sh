@@ -639,7 +639,7 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
-    echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+      echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
   }
 
