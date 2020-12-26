@@ -853,6 +853,10 @@ else
 
   # Already installed what next?
   function wireguard-next-questions() {
+    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+      rm -rf /etc/wireguard
+      exit
+    fi
     echo "What do you want to do?"
     echo "   1) Show WireGuard Interface"
     echo "   2) Start WireGuard Interface"
@@ -896,10 +900,7 @@ else
       fi
       ;;
     5)
-      if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-        rm -rf /etc/wireguard
-        exit
-      elif [ "$NEW_CLIENT_NAME" == "" ]; then
+      if [ "$NEW_CLIENT_NAME" == "" ]; then
         echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
         read -rp "New client peer: " -e NEW_CLIENT_NAME
       fi
