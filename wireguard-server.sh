@@ -43,7 +43,7 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v iptables)" ]; }; then
+  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ]; }; then
     if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
       apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
     elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
@@ -946,7 +946,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
     6)
       # Remove User
       echo "Which WireGuard user do you want to remove?"
-      cmd $WG_CONFIG | grep start | awk '{ print $2 }'
+      cat $WG_CONFIG | grep start | awk '{ print $2 }'
       read -rp "Type in Client Name : " -e REMOVECLIENT
       read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
       if [[ $REPLY =~ ^[Yy]$ ]]; then
