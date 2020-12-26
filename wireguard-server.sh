@@ -788,6 +788,9 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # WireGuard Set Config
   function wireguard-setconf() {
+    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+      rm -rf /etc/wireguard
+    fi
     SERVER_PRIVKEY=$(wg genkey)
     SERVER_PUBKEY=$(echo "$SERVER_PRIVKEY" | wg pubkey)
     CLIENT_PRIVKEY=$(wg genkey)
