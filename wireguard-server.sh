@@ -566,8 +566,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if [ ! -f "/etc/wireguard" ]; then
-      # Installation begins here
+    if ! [ -x "$(command -v wg)" ]; }; then
       if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
@@ -640,8 +639,8 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
-    fi
     echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+    fi
   }
 
   # Install WireGuard Server
@@ -650,7 +649,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Function to install unbound
   function install-unbound() {
     if [ "$INSTALL_UNBOUND" = "y" ]; then
-      if [ ! -f "/etc/unbound" ]; then
+      if ! [ -x "$(command -v unbound)" ]; then
         if [ "$DISTRO" == "ubuntu" ]; then
           apt-get install unbound unbound-host e2fsprogs -y
           if pgrep systemd-journal; then
@@ -725,7 +724,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install pihole
   function install-pihole() {
     if [ "$INSTALL_PIHOLE" = "y" ]; then
-      if [ ! -f "/etc/pihole" ]; then
+      if ! [ -x "$(command -v pihole)" ]; then
         curl -sSL https://install.pi-hole.net | bash
         echo "PiHole: true" >>/etc/pihole/wireguard-manager
       fi
