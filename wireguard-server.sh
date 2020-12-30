@@ -579,7 +579,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       elif [ "$DISTRO" == "pop" ]; then
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "debian" ]; then
+      elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
         apt-get update
         if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
           echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
@@ -659,7 +659,7 @@ if [ ! -f "$WG_CONFIG" ]; then
             service systemd-resolved stop
             service systemd-resolved disable
           fi
-        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
           apt-get install unbound unbound-host e2fsprogs -y
         elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
           yum install unbound unbound-libs -y
@@ -969,7 +969,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     7)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -1002,7 +1002,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           apt-get remove --purge wireguard qrencode -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
-        elif [ "$DISTRO" == "pop" ]; then
+        elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
           apt-get remove --purge wireguard qrencode haveged -y
         elif [ "$DISTRO" == "ubuntu" ]; then
           apt-get remove --purge wireguard qrencode haveged -y
@@ -1044,7 +1044,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         chattr +i /etc/resolv.conf
         if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
           yum remove unbound unbound-host -y
-        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ]; }; then
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "kali" ]; }; then
           apt-get remove --purge unbound unbound-host -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Rs unbound unbound-host -y
