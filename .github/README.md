@@ -165,12 +165,7 @@ usage: ./wireguard-server.sh <command>
 ### 💻 Compatibility with Linux Kernel
 | Kernel          | Supported          |
 | --------------  | ------------------ |
-| Kernel 5.4 ≥    |:heavy_check_mark:  |
-| Kernel 4.19     |:heavy_check_mark:  |
-| Kernel 4.14     |:heavy_check_mark:  |
-| Kernel 4.9      |:heavy_check_mark:  |
-| Kernel 4.4      |:heavy_check_mark:  |
-| Kernel 3.16     |:heavy_check_mark:  |
+| Kernel 3.16 ≥   |:heavy_check_mark:  |
 | Kernel 3.1 ≤    |:x:                 |
 
 ---
