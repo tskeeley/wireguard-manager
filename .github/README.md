@@ -131,12 +131,12 @@ usage: ./wireguard-server.sh <command>
 | Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
 | RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
+| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
@@ -165,8 +165,8 @@ usage: ./wireguard-server.sh <command>
 ### 💻 Compatibility with Linux Kernel
 | Kernel          | Supported          |
 | --------------  | ------------------ |
-| Kernel 3.16 ≥   |:heavy_check_mark:  |
-| Kernel 3.1 ≤    |:x:                 |
+| Kernel 3.0 ≤    |:x:                 |
+| Kernel 3.1 ≥    |:heavy_check_mark:  |
 
 ---
 ### 🙋 Q&A
