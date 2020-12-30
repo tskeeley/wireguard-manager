@@ -44,7 +44,7 @@ dist-check
 # Pre-Checks
 function installing-system-requirements() {
   if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ]; }; then
-    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
       apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
     elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
       yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
@@ -99,7 +99,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
       elif [ "$DISTRO" == "raspbian" ]; then
@@ -138,7 +138,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       elif [ "$DISTRO" == "pop" ]; then
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "debian" ]; then
+      elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
         apt-get update
         if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
           echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
@@ -259,7 +259,7 @@ else
       fi
       ;;
     5)
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -288,7 +288,7 @@ else
         rm -f /etc/sysctl.d/wireguard.conf
         if [ "$DISTRO" == "centos" ]; then
           yum remove wireguard qrencode haveged -y
-        elif [ "$DISTRO" == "debian" ]; then
+        elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
           apt-get remove --purge wireguard qrencode -y
           rm -f /etc/apt/sources.list.d/unstable.list
           rm -f /etc/apt/preferences.d/limit-unstable
