@@ -43,7 +43,7 @@ dist-check
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ]; }; then
+  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ]; }; then
     if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ]; }; then
       apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
     elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
