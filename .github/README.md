@@ -88,14 +88,13 @@ usage: ./wireguard-server.sh <command>
 ---
 ### 🥰 Features
 - Installs and configures a ready-to-use WireGuard Interface
-- (IPv4|IPv6) Supported, (IPv4|IPv6) Leak Protection
+- (IPv4|IPv6) Supported, Leak Protection
 - Iptables rules and forwarding managed in a seamless way
 - If needed, the script can cleanly remove WireGuard, including configuration and iptables rules
 - Variety of DNS resolvers to be pushed to the clients
-- The choice to use a self-hosted resolver with Unbound.
-- Preshared-key for an extra layer of security.
-- Block DNS leaks
-- Dynamic DNS supported
+- The choice to use a self-hosted resolver with Unbound
+- Preshared-key for an extra layer of security. *Required*
+- Block DNS leaks, Dynamic DNS supported
 - Many other little things!
 
 ---
@@ -123,28 +122,21 @@ usage: ./wireguard-server.sh <command>
 | OS              | Supported          | i386               | amd64              | armhf              | arm64              |
 | --------------  | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Ubuntu 16       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Ubuntu 18       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Ubuntu 19 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Ubuntu 16 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Debian 8        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Debian 9        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Debian 10 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| CentOS 7        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| CentOS 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| CentOS 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Fedora 30       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Fedora 31       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Fedora 32 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| RedHat 7        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| RedHat 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Kali            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
+| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
