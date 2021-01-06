@@ -89,6 +89,16 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
+# Remove old WG files.
+function previous-wireguard-installation() {
+  if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+    rm -rf /etc/wireguard
+  fi
+}
+
+# Run the function to check for previous installation
+previous-wireguard-installation
+
 function usage-guide() {
   echo "usage: ./$(basename "$0") <command>"
   echo "  --install     Install WireGuard Interface"
