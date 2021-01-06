@@ -863,10 +863,6 @@ else
 
   # Already installed what next?
   function wireguard-next-questions() {
-    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-      rm -rf /etc/wireguard
-      exit
-    fi
     echo "What do you want to do?"
     echo "   1) Show WireGuard Interface"
     echo "   2) Start WireGuard Interface"
