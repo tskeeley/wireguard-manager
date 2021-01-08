@@ -197,7 +197,7 @@ Official Links
 
 ---
 ### 📐 Architecture
-![image](https://user-images.githubusercontent.com/16564273/80664029-a6059300-8a63-11ea-867b-4f399eabcaaf.png)
+![image](https://user-images.githubusercontent.com/16564273/103967799-bb71a780-5130-11eb-8462-69e728e1fd95.png)
 
 ---
 ### 🤝 Developing
