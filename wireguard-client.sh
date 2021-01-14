@@ -50,6 +50,8 @@ function installing-system-requirements() {
       yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm iptables curl bc jq sed
+    else
+      exit
     fi
   fi
 }
@@ -114,6 +116,8 @@ if [ ! -f "$WG_CONFIG" ]; then
       elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      else
+        exit
       fi
     else
       echo "Correct: You do not need kernel headers." >/dev/null 2>&1
@@ -197,6 +201,8 @@ if [ ! -f "$WG_CONFIG" ]; then
         fi
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+      else
+        exit
       fi
       echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
@@ -269,6 +275,8 @@ else
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
+      else
+        exit
       fi
       ;;
     6)
@@ -316,6 +324,8 @@ else
         elif [ "$DISTRO" == "rhel" ]; then
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
+        else
+          exit
         fi
       fi
       ;;
