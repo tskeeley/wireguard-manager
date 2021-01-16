@@ -50,6 +50,8 @@ function installing-system-requirements() {
       yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm iptables curl bc jq sed
+    else
+      exit
     fi
   fi
 }
@@ -798,9 +800,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # WireGuard Set Config
   function wireguard-setconf() {
-    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-      rm -rf /etc/wireguard
-    fi
     SERVER_PRIVKEY=$(wg genkey)
     SERVER_PUBKEY=$(echo "$SERVER_PRIVKEY" | wg pubkey)
     CLIENT_PRIVKEY=$(wg genkey)
