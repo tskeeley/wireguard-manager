@@ -163,10 +163,12 @@ usage: ./wireguard-server.sh <command>
 | Docker          |:heavy_check_mark:  |
 
 ### 💻 Compatibility with Linux Kernel
-| Kernel          | Supported          |
-| --------------  | ------------------ |
-| Kernel 3.0 ≤    |:x:                 |
-| Kernel 3.1 ≥    |:heavy_check_mark:  |
+| Kernel                 | Supported              |
+| ---------------------  | ---------------------  |
+| Linux Kernel 3.0 ≤     |:x:                     |
+| Linux Kernel 3.1 ≥     |:heavy_check_mark:      |
+| Docker Kernel 5.5 ≤    |:x:                     |
+| Docker Kernel 5.6 ≥    |:heavy_check_mark:      |
 
 ---
 ### 🙋 Q&A
