@@ -43,12 +43,12 @@ dist-check
 
 # Check if they are using a supported linux distro
 function check-operating-system() {
-    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        echo "Correct: Linux Distro" >/dev/null 2>&1
-    else
-        echo "Error: Distro not supported."
-        exit
-    fi
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+    echo "Correct: Linux Distro" >/dev/null 2>&1
+  else
+    echo "Error: Distro not supported."
+    exit
+  fi
 }
 
 # Just a basic check to check for the correct os.
