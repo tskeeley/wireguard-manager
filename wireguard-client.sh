@@ -41,6 +41,18 @@ function dist-check() {
 # Check Operating System
 dist-check
 
+# Check if they are using a supported linux distro
+function check-operating-system() {
+    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+        echo "Correct: Linux Distro" >/dev/null 2>&1
+    else
+        exit
+    fi
+}
+
+# Just a basic check to check for the correct os.
+check-operating-system
+
 # Pre-Checks
 function installing-system-requirements() {
   if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ]; }; then
