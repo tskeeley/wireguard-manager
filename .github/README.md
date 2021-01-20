@@ -119,24 +119,24 @@ usage: ./wireguard-server.sh <command>
 
 ---
 ### 👉👈 Compatibility with Linux Distro
-| OS              | Supported          | i386               | amd64              | armhf              | arm64              |
-| --------------  | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Ubuntu 16 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Debian 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| CentOS 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |:x:                 |
-| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| OS              | i386               | amd64              | armhf              | arm64              |
+| --------------  | ------------------ | ------------------ | ------------------ | ------------------ |
+| Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
+| Ubuntu 16 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Debian 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| CentOS 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
+| Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
