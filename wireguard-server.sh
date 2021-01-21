@@ -233,7 +233,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$IPV4_SUBNET_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
     done
-    # Apply port response
     case $IPV4_SUBNET_SETTINGS in
     1)
       IPV4_SUBNET="10.8.0.0/24"
@@ -259,7 +258,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$IPV6_SUBNET_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
     done
-    # Apply port response
     case $IPV6_SUBNET_SETTINGS in
     1)
       IPV6_SUBNET="fd42:42:42::0/64"
@@ -298,7 +296,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$SERVER_HOST_V4_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "IPv4 Choice [1-3]: " -e -i 1 SERVER_HOST_V4_SETTINGS
     done
-    # Apply port response
     case $SERVER_HOST_V4_SETTINGS in
     1)
       SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
@@ -324,7 +321,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$SERVER_HOST_V6_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "IPv6 Choice [1-3]: " -e -i 1 SERVER_HOST_V6_SETTINGS
     done
-    # Apply port response
     case $SERVER_HOST_V6_SETTINGS in
     1)
       SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
@@ -349,7 +345,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$SERVER_PUB_NIC_SETTINGS" =~ ^[1-2]$ ]]; do
       read -rp "nic Choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
     done
-    # Apply port response
     case $SERVER_PUB_NIC_SETTINGS in
     1)
       SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
@@ -372,7 +367,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$SERVER_PORT_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "Port Choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
     done
-    # Apply port response
     case $SERVER_PORT_SETTINGS in
     1)
       SERVER_PORT="51820"
@@ -401,7 +395,6 @@ if [ ! -f "$WG_CONFIG" ]; then
     until [[ "$NAT_CHOICE_SETTINGS" =~ ^[1-3]$ ]]; do
       read -rp "Nat Choice [1-3]: " -e -i 1 NAT_CHOICE_SETTINGS
     done
-    # Nat Choices
     case $NAT_CHOICE_SETTINGS in
     1)
       NAT_CHOICE="25"
