@@ -82,12 +82,15 @@ usage: ./wireguard-server.sh <command>
   --reinstall   Reinstall WireGuard Interface
   --uninstall   Uninstall WireGuard Interface
   --update      Update WireGuard Script
+  --backup      Backup WireGuard Configs
+  --restore     Restore WireGuard Configs
   --help        Show Usage Guide
 ```
 
 ---
 ### 🥰 Features
 - Installs and configures a ready-to-use WireGuard Interface
+- Ability to backup & restore WireGuard configs
 - (IPv4|IPv6) Supported, Leak Protection
 - Iptables rules and forwarding managed in a seamless way
 - If needed, the script can cleanly remove WireGuard, including configuration and iptables rules
