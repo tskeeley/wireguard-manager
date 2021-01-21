@@ -892,8 +892,8 @@ else
     echo "   7) Reinstall WireGuard Interface"
     echo "   8) Uninstall WireGuard Interface"
     echo "   9) Update this script"
-    echo "   10) Backup"
-    echo "   11) Restore"
+    echo "   10) Backup WireGuard Config"
+    echo "   11) Restore WireGuard Config"
     until [[ "$WIREGUARD_OPTIONS" =~ ^[1-11]$ ]]; do
       read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
     done
@@ -1054,6 +1054,11 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
+        # Delete wireguard backup
+        read -rp "Do you really want to remove Wireguard backup? (y/n): " -n 1 -r
+        if [ "$REPLY" = "y" ]; then
+          rm -f /var/backups/wireguard-manager.zip
+        fi
       fi
       # Uninstall Unbound
       if [ -f "/etc/unbound/wireguard-manager" ]; then
@@ -1096,11 +1101,11 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
-    10) # Backup Wireguard Configs
+    10) # Backup Wireguard Config
       rm -f /var/backups/wireguard-manager.zip
       zip -r /var/backups/wireguard-manager.zip /etc/wireguard/
       ;;
-    11) # Restore Wireguard Configs
+    11) # Restore Wireguard Config
       rm -rf /etc/wireguard/
       unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
       ;;
