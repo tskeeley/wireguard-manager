@@ -895,7 +895,7 @@ else
     echo "   9) Update this script"
     echo "   10) Backup WireGuard Config"
     echo "   11) Restore WireGuard Config"
-    until [[ "$WIREGUARD_OPTIONS" =~ ^[1-11]$ ]]; do
+    until [[ "$WIREGUARD_OPTIONS" =~ ^[0-9]+$ ]] && [ "$WIREGUARD_OPTIONS" -ge 1 ] && [ "$WIREGUARD_OPTIONS" -le 11 ]; do
       read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
     done
     case $WIREGUARD_OPTIONS in
@@ -1009,8 +1009,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    8)
-      # Uninstall Wireguard and purging files
+    8) # Uninstall Wireguard and purging files
       if [ -f "/etc/wireguard/wireguard-manager" ]; then
         if pgrep systemd-journal; then
           systemctl disable wg-quick@$WIREGUARD_PUB_NIC
@@ -1116,6 +1115,12 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
       else
         exit
+      fi
+      # Restart Wireguard
+      if pgrep systemd-journal; then
+        systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+      else
+        service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
     esac
