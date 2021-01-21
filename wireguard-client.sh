@@ -233,6 +233,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
 else
 
+  # Start asking the user questions
   function take-user-input() {
     echo "What do you want to do?"
     echo "   1) Show WireGuard Interface"
@@ -246,10 +247,10 @@ else
       read -rp "Select an option [1-9]: " -e -i 1 USER_OPTIONS
     done
     case $USER_OPTIONS in
-    1)
+    1) # WG Show
       wg show
       ;;
-    2)
+    2) # Enable & Start WireGuard
       if pgrep systemd-journal; then
         systemctl enable wg-quick@$WIREGUARD_PUB_NIC
         systemctl start wg-quick@$WIREGUARD_PUB_NIC
@@ -258,7 +259,7 @@ else
         service wg-quick@$WIREGUARD_PUB_NIC start
       fi
       ;;
-    3)
+    3) # Disable & Stop WireGuard
       if pgrep systemd-journal; then
         systemctl disable wg-quick@$WIREGUARD_PUB_NIC
         systemctl stop wg-quick@$WIREGUARD_PUB_NIC
@@ -267,14 +268,14 @@ else
         service wg-quick@$WIREGUARD_PUB_NIC stop
       fi
       ;;
-    4)
+    4) # Restart WireGuard
       if pgrep systemd-journal; then
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       else
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    5)
+    5) # Reinstall WireGuard
       if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
