@@ -46,7 +46,7 @@ function check-operating-system() {
   if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
     echo "Correct: Linux Distro" >/dev/null 2>&1
   else
-    echo "Error: Distro not supported."
+    echo "Error: Linux Distro not supported." >&2
     exit
   fi
 }
@@ -239,8 +239,8 @@ else
     echo "   5) Reinstall WireGuard Interface"
     echo "   6) Uninstall WireGuard Interface"
     echo "   7) Update this script"
-    until [[ "$USER_OPTIONS" =~ ^[1-7]$ ]]; do
-      read -rp "Select an option [1-7]: " -e -i 1 USER_OPTIONS
+    until [[ "$USER_OPTIONS" =~ ^[1-9]$ ]]; do
+      read -rp "Select an option [1-9]: " -e -i 1 USER_OPTIONS
     done
     case $USER_OPTIONS in
     1)
@@ -336,6 +336,26 @@ else
       CURRENT_FILE_PATH="$(realpath "$0")"
       curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
+      ;;
+    8) # Backup Wireguard Config
+      if [ -f "/etc/wireguard" ]; then
+        rm -f /var/backups/wireguard-manager.zip
+        zip -r /var/backups/wireguard-manager.zip /etc/wireguard/
+      fi
+      ;;
+    9) # Restore Wireguard Config
+      if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        rm -rf /etc/wireguard/
+        unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
+      else
+        exit
+      fi
+      # Restart Wireguard
+      if pgrep systemd-journal; then
+        systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+      else
+        service wg-quick@$WIREGUARD_PUB_NIC restart
+      fi
       ;;
     esac
   }
