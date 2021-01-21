@@ -341,6 +341,8 @@ else
       if [ ! -f "/etc/wireguard" ]; then
         rm -f /var/backups/wireguard-manager.zip
         zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf /etc/wireguard/wireguard-manager
+      else
+        exit
       fi
       ;;
     9) # Restore Wireguard Config
