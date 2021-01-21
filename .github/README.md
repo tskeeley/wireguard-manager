@@ -220,7 +220,6 @@ bash -x /usr/local/bin/wireguard-(server|client).sh >> /usr/local/bin/wireguard-
 
 ---
 ### 👤 Author
-
 * Name: Prajwal Koirala
 * Website: [prajwalkoirala.com](https://www.prajwalkoirala.com)
 * Github: [@prajwal-koirala](https://github.com/prajwal-koirala)
@@ -231,7 +230,6 @@ bash -x /usr/local/bin/wireguard-(server|client).sh >> /usr/local/bin/wireguard-
 
 ---
 ### ⛑️ Support
-
 Give a ⭐️ and 🍴 if this project helped you!
 
 <p align="center">
