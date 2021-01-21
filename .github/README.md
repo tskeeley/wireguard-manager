@@ -67,6 +67,8 @@ In your `/etc/wireguard/clients` directory, you will have `.conf` files. These a
 - Remove WireGuard Peer
 - Uninstall WireGuard Interface
 - Update this script
+- Backup WireGuard Configs
+- Restore WireGuard Configs
 
 ---
 ### 🔑 Usage
