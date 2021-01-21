@@ -211,7 +211,10 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
-      echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+      # Show that WG was installed via this script
+      if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+        echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+      fi
     fi
   }
 
