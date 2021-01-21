@@ -1104,7 +1104,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       chmod +x "$CURRENT_FILE_PATH" || exit
       ;;
     10) # Backup Wireguard Config
-      if [ ! -f "/var/backups/wireguard-manager.zip" ]; then
+      if [ -f "/var/backups/wireguard-manager.zip" ]; then
         rm -f /var/backups/wireguard-manager.zip
         zip -r /var/backups/wireguard-manager.zip /etc/wireguard/
       else
@@ -1112,7 +1112,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       fi
       ;;
     11) # Restore Wireguard Config
-      if [ ! -f "/var/backups/wireguard-manager.zip" ]; then
+      if [ -f "/var/backups/wireguard-manager.zip" ]; then
         rm -rf /etc/wireguard/
         unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
       else
