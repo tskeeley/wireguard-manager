@@ -1107,6 +1107,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       if [ ! -f "/etc/wireguard" ]; then
         rm -f /var/backups/wireguard-manager.zip
         zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf /etc/wireguard/wireguard-manager
+      else
+        exit
       fi
       ;;
     11) # Restore Wireguard Config
