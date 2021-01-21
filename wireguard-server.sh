@@ -1054,11 +1054,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-        # Delete wireguard backup
-        read -rp "Do you really want to remove Wireguard backup? (y/n): " -n 1 -r
-        if [ "$REPLY" = "y" ]; then
-          rm -f /var/backups/wireguard-manager.zip
-        fi
       fi
       # Uninstall Unbound
       if [ -f "/etc/unbound/wireguard-manager" ]; then
@@ -1093,6 +1088,13 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
             service pihole stop
           fi
           pihole uninstall
+        fi
+      fi
+      # Delete wireguard Backup
+      if [ -f "/var/backups/wireguard-manager.zipr" ]; then
+        read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
+        if [ "$REPLY" = "y" ]; then
+          rm -f /var/backups/wireguard-manager.zip
         fi
       fi
       ;;
