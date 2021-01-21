@@ -284,8 +284,7 @@ else
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    6)
-      # Uninstall Wireguard and purging files
+    6) # Uninstall Wireguard and purging files
       if [ -f "/etc/wireguard/wireguard-manager" ]; then
         if pgrep systemd-journal; then
           systemctl disable wg-quick@$WIREGUARD_PUB_NIC
@@ -329,6 +328,15 @@ else
         elif [ "$DISTRO" == "rhel" ]; then
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
+        fi
+      fi
+      # Delete wireguard Backup
+      if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          rm -f /var/backups/wireguard-manager.zip
+        elif [[ $REPLY =~ ^[Nn]$ ]]; then
+          exit
         fi
       fi
       ;;
