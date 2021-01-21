@@ -901,10 +901,10 @@ else
       read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
     done
     case $WIREGUARD_OPTIONS in
-    1)
+    1) # WG Show
       wg show
       ;;
-    2)
+    2) # Enable & Start Wireguard
       if pgrep systemd-journal; then
         systemctl enable wg-quick@$WIREGUARD_PUB_NIC
         systemctl start wg-quick@$WIREGUARD_PUB_NIC
@@ -913,7 +913,7 @@ else
         service wg-quick@$WIREGUARD_PUB_NIC start
       fi
       ;;
-    3)
+    3) # Disable & Stop WireGuard
       if pgrep systemd-journal; then
         systemctl disable wg-quick@$WIREGUARD_PUB_NIC
         systemctl stop wg-quick@$WIREGUARD_PUB_NIC
@@ -922,14 +922,14 @@ else
         service wg-quick@$WIREGUARD_PUB_NIC stop
       fi
       ;;
-    4)
+    4) # Restart WireGuard
       if pgrep systemd-journal; then
         systemctl restart wg-quick@$WIREGUARD_PUB_NIC
       else
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    5)
+    5) # WireGuard add Peer
       if [ "$NEW_CLIENT_NAME" == "" ]; then
         echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
         read -rp "New client peer: " -e NEW_CLIENT_NAME
@@ -980,7 +980,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    6)
+    6) # Remove WireGuard Peer
       echo "Which WireGuard user do you want to remove?"
       # shellcheck disable=SC2002
       cat $WG_CONFIG | grep start | awk '{ print $2 }'
@@ -998,7 +998,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       ;;
-    7)
+    7) # Reinstall Wireguard
       if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
