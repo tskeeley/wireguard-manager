@@ -673,7 +673,6 @@ if [ ! -f "$WG_CONFIG" ]; then
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
       fi
     fi
-    echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
   }
 
   # Install WireGuard Server
@@ -869,6 +868,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       service wg-quick@$WIREGUARD_PUB_NIC enable
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi
+    # Show that WG was installed via this script
+    echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     # Generate QR Code
     qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
     echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
