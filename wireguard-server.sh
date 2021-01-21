@@ -1093,8 +1093,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       # Delete wireguard Backup
       if [ -f "/var/backups/wireguard-manager.zip" ]; then
         read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
-        if [ "$REPLY" = "y" ]; then
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
           rm -f /var/backups/wireguard-manager.zip
+        elif [[ $REPLY =~ ^[Nn]$ ]]; then
+          exit
         fi
       fi
       ;;
