@@ -58,11 +58,11 @@ check-operating-system
 function installing-system-requirements() {
   if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ]; }; then
     if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
-      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs -y
+      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip -y
     elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs -y
+      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm iptables curl bc jq sed
+      pacman -Syu --noconfirm iptables curl bc jq sed zip unzip
     fi
   fi
 }
@@ -124,6 +124,8 @@ function usage-guide() {
   echo "  --reinstall   Reinstall WireGuard Interface"
   echo "  --uninstall   Uninstall WireGuard Interface"
   echo "  --update      Update WireGuard Script"
+  echo "  --backup      Backup wireguard configs"
+  echo "  --restore     Restore wireguard configs"
   echo "  --help        Show Usage Guide"
   exit
 }
@@ -170,6 +172,14 @@ function usage() {
     --update)
       shift
       WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-9}
+      ;;
+    --backup)
+      shift
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-10}
+      ;;
+    --restore)
+      shift
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
       ;;
     --help)
       shift
@@ -882,8 +892,10 @@ else
     echo "   7) Reinstall WireGuard Interface"
     echo "   8) Uninstall WireGuard Interface"
     echo "   9) Update this script"
-    until [[ "$WIREGUARD_OPTIONS" =~ ^[1-9]$ ]]; do
-      read -rp "Select an Option [1-9]: " -e -i 1 WIREGUARD_OPTIONS
+    echo "   10) Backup"
+    echo "   11) Restore"
+    until [[ "$WIREGUARD_OPTIONS" =~ ^[1-11]$ ]]; do
+      read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
     done
     case $WIREGUARD_OPTIONS in
     1)
@@ -1083,6 +1095,14 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       CURRENT_FILE_PATH="$(realpath "$0")"
       curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
       chmod +x "$CURRENT_FILE_PATH" || exit
+      ;;
+    10) # Backup
+      rm -f /var/backups/wireguard-manager.zip
+      zip -r /var/backups/wireguard-manager.zip /etc/wireguard/
+      ;;
+    11) # Restore
+      rm -rf /etc/wireguard/
+      unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
       ;;
     esac
   }
