@@ -869,7 +869,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       service wg-quick@$WIREGUARD_PUB_NIC restart
     fi
     # Show that WG was installed via this script
-    echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+      echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+    fi
     # Generate QR Code
     qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
     echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
