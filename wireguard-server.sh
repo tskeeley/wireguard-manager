@@ -56,13 +56,13 @@ check-operating-system
 
 # Pre-Checks
 function installing-system-requirements() {
-  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ]; }; then
+  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ]; }; then
     if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
-      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip -y
+      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk -y
     elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip -y
+      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm iptables curl bc jq sed zip unzip
+      pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk
     fi
   fi
 }
