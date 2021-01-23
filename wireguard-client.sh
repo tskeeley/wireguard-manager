@@ -346,8 +346,10 @@ else
       ;;
     7) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
-      curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
-      chmod +x "$CURRENT_FILE_PATH" || exit
+      if [ -f $CURRENT_FILE_PATH ]; then
+        curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
+        chmod +x "$CURRENT_FILE_PATH" || exit
+      fi
       ;;
     8) # Backup Wireguard Config
       if [ ! -f "/etc/wireguard" ]; then
