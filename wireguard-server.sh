@@ -1099,7 +1099,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       ;;
     9) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
-      if [ -f $CURRENT_FILE_PATH ]; then
+      if [ -f "$CURRENT_FILE_PATH" ]; then
         curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
         chmod +x "$CURRENT_FILE_PATH" || exit
       fi
