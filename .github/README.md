@@ -44,7 +44,7 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 ---
 ### 📲 Installation
 #### Instance Installation
-Lets use `curl` to download and lets run the script
+Lets use `curl` to download the script to `/usr/local/bin/wireguard-server.sh` and lets run the script
 ```
 curl -sSL https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh | bash
 ```
