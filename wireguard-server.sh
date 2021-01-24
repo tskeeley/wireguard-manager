@@ -54,7 +54,7 @@ function check-operating-system() {
 # Just a basic check to check for the correct os.
 check-operating-system
 
-# Pre-Checks
+# Pre-Checks system requirements
 function installing-system-requirements() {
   if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ]; }; then
     if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
@@ -116,6 +116,7 @@ function previous-wireguard-installation() {
 # Run the function to check for previous installation
 previous-wireguard-installation
 
+# Usage Guide
 function usage-guide() {
   echo "usage: ./$(basename "$0") <command>"
   echo "  --install     Install WireGuard Interface"
@@ -228,7 +229,7 @@ WIREGUARD_PUB_NIC="wg0"
 WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 if [ ! -f "$WG_CONFIG" ]; then
 
-  # Custom subnet
+  # Custom ipv4 subnet
   function set-ipv4-subnet() {
     echo "What ipv4 subnet do you want to use?"
     echo "  1) 10.8.0.0/24 (Recommended)"
@@ -250,10 +251,10 @@ if [ ! -f "$WG_CONFIG" ]; then
     esac
   }
 
-  # Custom Subnet
+  # Custom ipv4 Subnet
   set-ipv4-subnet
 
-  # Custom subnet
+  # Custom ipv6 subnet
   function set-ipv6-subnet() {
     echo "What ipv6 subnet do you want to use?"
     echo "  1) fd42:42:42::0/64 (Recommended)"
@@ -275,7 +276,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     esac
   }
 
-  # Custom Subnet
+  # Custom ipv6 Subnet
   set-ipv6-subnet
 
   # Private Subnet Ipv4
@@ -291,7 +292,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   # IPv6 Getaway
   GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}1"
 
-  # Determine host port
+  # Get the IPV4
   function test-connectivity-v4() {
     echo "How would you like to detect IPv4?"
     echo "  1) Curl (Recommended)"
@@ -313,7 +314,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     esac
   }
 
-  # Set Port
+  # Get the IPV4
   test-connectivity-v4
 
   # Determine ipv6
@@ -338,10 +339,10 @@ if [ ! -f "$WG_CONFIG" ]; then
     esac
   }
 
-  # Set Port
+  # Get the IPV6
   test-connectivity-v6
 
-  # Determine ipv6
+  # Determine public nic
   function server-pub-nic() {
     echo "How would you like to detect NIC?"
     echo "  1) IP (Recommended)"
@@ -359,7 +360,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     esac
   }
 
-  # Set Port
+  # Determine public nic
   server-pub-nic
 
   # Determine host port
