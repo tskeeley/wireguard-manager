@@ -43,7 +43,7 @@ dist-check
 
 # Check if they are using a supported linux distro
 function check-operating-system() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
     echo "Correct: Linux Distro" >/dev/null 2>&1
   else
     echo "Error: Linux Distro not supported." >&2
@@ -63,6 +63,8 @@ function installing-system-requirements() {
       yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk -y
     elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
       pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk
+    elif [ "$DISTRO" == "alpine" ]; then
+      apk update && apk add iptables curl bc jq sed zip unzip grep gawk
     fi
   fi
 }
@@ -210,6 +212,9 @@ if [ ! -f "$WG_CONFIG" ]; then
         fi
         yum update -y
         yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+      elif [ "$DISTRO" == "alpine" ]; then
+        apk update
+        apk add wireguard-tools libqrencode haveged
       fi
       # Show that WG was installed via this script
       if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
@@ -288,6 +293,8 @@ else
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools
         service wg-quick@$WIREGUARD_PUB_NIC restart
+      elif [ "$DISTRO" == "alpine" ]; then
+        apk fix wireguard-tools
       fi
       ;;
     6) # Uninstall Wireguard and purging files
@@ -334,6 +341,8 @@ else
         elif [ "$DISTRO" == "rhel" ]; then
           yum remove wireguard qrencode haveged -y
           rm -f /etc/yum.repos.d/wireguard.repo
+        elif [ "$DISTRO" == "alpine" ]; then
+          apk del wireguard-tools libqrencode haveged
         fi
       fi
       # Delete wireguard Backup
