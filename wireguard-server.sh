@@ -104,19 +104,6 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
-# Save wireguard manager
-function save-wireguard-manager() {
-  WIREGUARD_MANAGER_PATH="/usr/local/bin/wireguard-server.sh"
-  if [ ! -f "$WIREGUARD_MANAGER_PATH" ]; then
-    curl -o "$WIREGUARD_MANAGER_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
-    chmod +x "$WIREGUARD_MANAGER_PATH" || exit
-    bash "$WIREGUARD_MANAGER_PATH"
-  fi
-}
-
-# save wireguard manager
-save-wireguard-manager
-
 # Remove old WG files.
 function previous-wireguard-installation() {
   if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
