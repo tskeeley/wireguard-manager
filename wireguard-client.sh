@@ -108,7 +108,7 @@ kernel-check
 function save-wireguard-manager() {
   WIREGUARD_MANAGER_PATH="/usr/local/bin/wireguard-server.sh"
   if [ ! -f "$WIREGUARD_MANAGER_PATH" ]; then
-    curl -o "$WIREGUARD_MANAGER_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
+    curl -o "$WIREGUARD_MANAGER_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-client.sh
     chmod +x "$WIREGUARD_MANAGER_PATH"
   fi
 }
