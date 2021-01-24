@@ -106,8 +106,10 @@ kernel-check
 
 # Remove old WG files.
 function previous-wireguard-installation() {
-  if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-    rm -rf /etc/wireguard
+  if [ -d "/etc/wireguard" ]; then
+    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+      rm -rf /etc/wireguard
+    fi
   fi
 }
 
