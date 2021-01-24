@@ -93,13 +93,12 @@ usage: ./wireguard-server.sh <command>
 ### 🥰 Features
 - Installs and configures a ready-to-use WireGuard Interface
 - Ability to backup & restore WireGuard configs
+- Variety of DNS resolvers to be pushed to the clients
 - (IPv4|IPv6) Supported, Leak Protection
+- The choice to use a self-hosted resolver with Unbound, Block DNS leaks, DNSSEC supported
 - Iptables rules and forwarding managed in a seamless way
 - If needed, the script can cleanly remove WireGuard, including configuration and iptables rules
-- Variety of DNS resolvers to be pushed to the clients
-- The choice to use a self-hosted resolver with Unbound
 - Preshared-key for an extra layer of security. *Required*
-- Block DNS leaks, Dynamic DNS supported
 - Many other little things!
 
 ---
