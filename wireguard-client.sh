@@ -363,7 +363,7 @@ else
       fi
       ;;
     8) # Backup Wireguard Config
-      if [ ! -f "/etc/wireguard" ]; then
+      if [ ! -d "/etc/wireguard" ]; then
         rm -f /var/backups/wireguard-manager.zip
         zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf /etc/wireguard/wireguard-manager
       else
