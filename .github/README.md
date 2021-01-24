@@ -1,23 +1,23 @@
 <h1 align="center">WireGuard Manager 👋</h1>
 <p align="center">
-  <a href="https://github.com/complexorganizations/wireguard-manager/releases">
-    <img alt="Release" src="https://img.shields.io/github/v/release/complexorganizations/wireguard-manager" target="_blank" />
-  </a>
-  <a href="https://github.com/complexorganizations/wireguard-manager/actions">
-    <img alt="ShellCheck" src="https://github.com/complexorganizations/wireguard-manager/workflows/ShellCheck/badge.svg" target="_blank" />
-  </a>
-  <a href="https://github.com/complexorganizations/wireguard-manager/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/complexorganizations/wireguard-manager" target="_blank" />
-  </a>
-  <a href="https://github.com/sponsors/Prajwal-Koirala">
-    <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
-  </a>
-  <a href="https://github.com/complexorganizations/gocreate/pulls">
-    <img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/wireguard-manager" target="_blank" />
-  </a>
-  <a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
-  </a>
+	<a href="https://github.com/complexorganizations/wireguard-manager/releases">
+		<img alt="Release" src="https://img.shields.io/github/v/release/complexorganizations/wireguard-manager" target="_blank" />
+	</a>
+	<a href="https://github.com/complexorganizations/wireguard-manager/actions">
+		<img alt="ShellCheck" src="https://github.com/complexorganizations/wireguard-manager/workflows/ShellCheck/badge.svg" target="_blank" />
+	</a>
+	<a href="https://github.com/complexorganizations/wireguard-manager/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/complexorganizations/wireguard-manager" target="_blank" />
+	</a>
+	<a href="https://github.com/sponsors/Prajwal-Koirala">
+		<img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
+	</a>
+	<a href="https://github.com/complexorganizations/gocreate/pulls">
+		<img alt="PullRequest" src="https://img.shields.io/github/issues-pr/complexorganizations/wireguard-manager" target="_blank" />
+	</a>
+	<a href="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE">
+		<img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
+	</a>
 </p>
 
 ---
@@ -232,9 +232,9 @@ bash -x /usr/local/bin/wireguard-(server|client).sh >> /usr/local/bin/wireguard-
 Give a ⭐️ and 🍴 if this project helped you!
 
 <p align="center">
-<a href="https://github.com/sponsors/Prajwal-Koirala">
-  <img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
-</a>
+	<a href="https://github.com/sponsors/Prajwal-Koirala">
+		<img alt="Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub" target="_blank" />
+	</a>
 </p>
 
 - BCH : `qzq9ae4jlewtz7v7mn4tv7kav3dc9rvjwsg5f36099`
@@ -245,11 +245,6 @@ Give a ⭐️ and 🍴 if this project helped you!
 - ETH : `0xe000C5094398dd83A3ef8228613CF4aD134eB0EA`
 - LTC : `MVwkmnnaLDq7UccDeudcpQYwFnnDwDxxmq`
 - XRP : `rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg (1790476900)`
-
----
-### ❤️ Credits
-[Angristan](https://raw.githubusercontent.com/angristan/wireguard-install/master/LICENSE)
-[l-n-s](https://raw.githubusercontent.com/l-n-s/wireguard-install/master/LICENSE)
 
 ---
 ### 📝 License
