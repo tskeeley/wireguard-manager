@@ -44,11 +44,21 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 ---
 ### 📲 Installation
 #### Instance Installation
-Lets use `curl` to download the script to `/usr/local/bin/wireguard-server.sh` and lets run the script
+Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
-curl -sSL https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh | bash
+curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh --create-dirs -o /usr/local/bin/wireguard-server.sh
 ```
+Then let's make the script user executable (Optional)
+```
+chmod +x /usr/local/bin/wireguard-server.sh
+```
+It's finally time to execute the script
+```
+bash /usr/local/bin/wireguard-server.sh
+```
+
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
+
 #### Docker Installation
 ```
 docker build -t wireguard https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
