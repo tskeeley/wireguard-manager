@@ -63,7 +63,7 @@ Lets first use `git` to save the repo to the system
 ```
 git clone https://github.com/complexorganizations/wireguard-manager
 ```
-Now we are finally ready to build and deploy for docker
+Finally ready to build and deploy the docker container
 ```
 docker build -t wireguard .
 ```
