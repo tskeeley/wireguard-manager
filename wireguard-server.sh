@@ -22,6 +22,10 @@ function virt-check() {
   elif [ "$(systemd-detect-virt)" == "lxc" ]; then
     echo "LXC virtualization is not supported (yet)."
     exit
+  elif [ "$(systemd-detect-virt)" == "kvm" ]; then
+    echo "Correct: KVM virtualization." >/dev/null 2>&1
+  else
+    echo "Correct: Your installation is experimental."
   fi
 }
 
