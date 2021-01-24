@@ -1,5 +1,7 @@
 FROM alpine:latest
 LABEL maintainer="Prajwal Koirala <prajwalkoirala23@protonmail.com>"
+EXPOSE 51820
+EXPOSE 53
 RUN apk update && \
     apk add curl && \
     curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh --create-dirs -o /usr/local/bin/wireguard-server.sh && \
