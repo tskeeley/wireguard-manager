@@ -109,7 +109,7 @@ function save-wireguard-manager() {
   WIREGUARD_MANAGER_PATH="/usr/local/bin/wireguard-server.sh"
   if [ ! -f "$WIREGUARD_MANAGER_PATH" ]; then
     curl -o "$WIREGUARD_MANAGER_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-server.sh
-    chmod +x "$WIREGUARD_MANAGER_PATH"
+    chmod +x "$WIREGUARD_MANAGER_PATH" || exit
     bash "$WIREGUARD_MANAGER_PATH"
   fi
 }
