@@ -774,7 +774,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "  7) Quad9"
       echo "  8) FDN"
       echo "  9) Custom (Advanced)"
-      until [[ "$CLIENT_DNS_SETTINGS" =~ ^[1-9]$ ]]; do
+      until [[ "$CLIENT_DNS_SETTINGS" =~ ^[0-9]+$ ]] && [ "$CLIENT_DNS_SETTINGS" -ge 1 ] && [ "$CLIENT_DNS_SETTINGS" -le 9 ]; do
         read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
       done
       case $CLIENT_DNS_SETTINGS in
