@@ -120,29 +120,27 @@ previous-wireguard-installation
 
 # Which would you like to install interface or peer?
 function interface-peer() {
-  if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
-    if [ ! -f "/etc/wireguard/WG_PEER" ]; then
-      echo "Do you want to install interface or peer?"
-      echo "  1) Interface"
-      echo "  2) Peer"
-      until [[ "$INTERFACE_OR_PEER" =~ ^[1-2]$ ]]; do
-        read -rp "Interface Or Peer [1-2]: " -e -i 1 INTERFACE_OR_PEER
-      done
-      case $INTERFACE_OR_PEER in
-      1)
-        if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
-          mkdir -p /etc/wireguard
-          echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
-        fi
-        ;;
-      2)
-        if [ ! -f "/etc/wireguard/WG_PEER" ]; then
-          mkdir -p /etc/wireguard
-          echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
-        fi
-        ;;
-      esac
-    fi
+  if [ -f "/etc/wireguard/wireguard-manager" ]; then
+    echo "Do you want to install interface or peer?"
+    echo "  1) Interface"
+    echo "  2) Peer"
+    until [[ "$INTERFACE_OR_PEER" =~ ^[1-2]$ ]]; do
+      read -rp "Interface Or Peer [1-2]: " -e -i 1 INTERFACE_OR_PEER
+    done
+    case $INTERFACE_OR_PEER in
+    1)
+      if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
+        mkdir -p /etc/wireguard
+        echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
+      fi
+      ;;
+    2)
+      if [ ! -f "/etc/wireguard/WG_PEER" ]; then
+        mkdir -p /etc/wireguard
+        echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
+      fi
+      ;;
+    esac
   fi
 }
 
