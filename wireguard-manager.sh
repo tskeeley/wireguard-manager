@@ -747,7 +747,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install WireGuard Server
   install-wireguard-server
-  
+
   # Install wireguard manager config
   function install-wireguard-manager-file() {
     # Show that WG was installed via this script
@@ -755,7 +755,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
   }
-  
+
   # wireguard manager config
   install-wireguard-manager-file
 
