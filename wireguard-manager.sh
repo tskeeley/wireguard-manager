@@ -129,12 +129,18 @@ function interface-peer() {
     if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
       mkdir -p /etc/wireguard
       echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
+      if [ -f "/etc/wireguard/WG_PEER" ]; then
+        rm -f /etc/wireguard/WG_PEER
+      fi
     fi
     ;;
   2)
     if [ ! -f "/etc/wireguard/WG_PEER" ]; then
       mkdir -p /etc/wireguard
       echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
+      if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+        rm -f /etc/wireguard/WG_INTERFACE
+      fi
     fi
     ;;
   esac
