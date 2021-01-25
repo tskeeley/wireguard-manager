@@ -602,119 +602,124 @@ if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
     client-name
 
   fi
+  if [ -f "/etc/wireguard/WG_PEER" ]; then
+    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
 
-  # Lets check the kernel version and check if headers are required
-  function install-kernel-headers() {
-    KERNEL_VERSION_LIMIT=5.6
-    KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-    if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
-        apt-get update
-        apt-get install linux-headers-"$(uname -r)" -y
-      elif [ "$DISTRO" == "raspbian" ]; then
-        apt-get update
-        apt-get install raspberrypi-kernel-headers -y
-      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu
-        pacman -Syu --noconfirm linux-headers
-      elif [ "$DISTRO" == "fedora" ]; then
-        dnf update -y
-        dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-      elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-        yum update -y
-        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-      fi
-    else
-      echo "Correct: You do not need kernel headers." >/dev/null 2>&1
+      # Lets check the kernel version and check if headers are required
+      function install-kernel-headers() {
+        KERNEL_VERSION_LIMIT=5.6
+        KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+        if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
+          if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+            apt-get update
+            apt-get install linux-headers-"$(uname -r)" -y
+          elif [ "$DISTRO" == "raspbian" ]; then
+            apt-get update
+            apt-get install raspberrypi-kernel-headers -y
+          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+            pacman -Syu
+            pacman -Syu --noconfirm linux-headers
+          elif [ "$DISTRO" == "fedora" ]; then
+            dnf update -y
+            dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+          elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+            yum update -y
+            yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+          fi
+        else
+          echo "Correct: You do not need kernel headers." >/dev/null 2>&1
+        fi
+      }
+
+      # Kernel Version
+      install-kernel-headers
+
+      # Install WireGuard Server
+      function install-wireguard-server() {
+        if ! [ -x "$(command -v wg)" ]; then
+          if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
+            apt-get update
+            apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          elif [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]; }; then
+            apt-get update
+            apt-get install software-properties-common -y
+            add-apt-repository ppa:wireguard/wireguard -y
+            apt-get update
+            apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          elif [ "$DISTRO" == "pop" ]; then
+            apt-get update
+            apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
+            apt-get update
+            if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
+              echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
+            fi
+            if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
+              printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+            fi
+            apt-get update
+            apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          elif [ "$DISTRO" == "raspbian" ]; then
+            apt-get update
+            apt-get install dirmngr -y
+            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
+            if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
+              echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
+            fi
+            if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
+              printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
+            fi
+            apt-get update
+            apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+            pacman -Syu
+            pacman -Syu --noconfirm haveged qrencode iptables resolvconf
+            pacman -Syu --noconfirm wireguard-tools
+          elif [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
+            dnf update -y
+            dnf install qrencode wireguard-tools haveged resolvconf -y
+          elif [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]; }; then
+            dnf update -y
+            dnf copr enable jdoss/wireguard -y
+            dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
+          elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]; }; then
+            yum update -y
+            yum config-manager --set-enabled PowerTools
+            yum copr enable jdoss/wireguard -y
+            yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
+            yum update -y
+            if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+              curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+            fi
+            yum update -y
+            yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "8" ]; then
+            yum update -y
+            yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+            yum update -y
+            subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
+            yum copr enable jdoss/wireguard
+            yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "7" ]; then
+            yum update -y
+            if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+              curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+            fi
+            yum update -y
+            yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          elif [ "$DISTRO" == "alpine" ]; then
+            apk update
+            apk add wireguard-tools libqrencode haveged
+          fi
+        fi
+      }
+
+      # Install WireGuard Server
+      install-wireguard-server
+
     fi
-  }
-
-  # Kernel Version
-  install-kernel-headers
-
-  # Install WireGuard Server
-  function install-wireguard-server() {
-    if ! [ -x "$(command -v wg)" ]; then
-      if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
-        apt-get update
-        apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]; }; then
-        apt-get update
-        apt-get install software-properties-common -y
-        add-apt-repository ppa:wireguard/wireguard -y
-        apt-get update
-        apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "pop" ]; then
-        apt-get update
-        apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
-        apt-get update
-        if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
-          echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-        fi
-        if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
-          printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
-        fi
-        apt-get update
-        apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "raspbian" ]; then
-        apt-get update
-        apt-get install dirmngr -y
-        apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
-        if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
-          echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-        fi
-        if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
-          printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
-        fi
-        apt-get update
-        apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu
-        pacman -Syu --noconfirm haveged qrencode iptables resolvconf
-        pacman -Syu --noconfirm wireguard-tools
-      elif [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
-        dnf update -y
-        dnf install qrencode wireguard-tools haveged resolvconf -y
-      elif [ "$DISTRO" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]; }; then
-        dnf update -y
-        dnf copr enable jdoss/wireguard -y
-        dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
-      elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]; }; then
-        yum update -y
-        yum config-manager --set-enabled PowerTools
-        yum copr enable jdoss/wireguard -y
-        yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-      elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
-        yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-        fi
-        yum update -y
-        yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-      elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "8" ]; then
-        yum update -y
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-        yum update -y
-        subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
-        yum copr enable jdoss/wireguard
-        yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-      elif [ "$DISTRO" == "rhel" ] && [ "$DISTRO_VERSION" == "7" ]; then
-        yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-        fi
-        yum update -y
-        yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-      elif [ "$DISTRO" == "alpine" ]; then
-        apk update
-        apk add wireguard-tools libqrencode haveged
-      fi
-    fi
-  }
-
-  # Install WireGuard Server
-  install-wireguard-server
+  fi
 
   if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
     # Function to install unbound
