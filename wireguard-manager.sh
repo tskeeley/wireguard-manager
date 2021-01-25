@@ -117,12 +117,12 @@ function interface-peer() {
       case $INTERFACE_OR_PEER in
       1)
         if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
-          echo "INTERFACE" >>/etc/wireguard/WG_INTERFACE
+          echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
         fi
         ;;
       2)
         if [ ! -f "/etc/wireguard/WG_PEER" ]; then
-          echo "PEER" >>/etc/wireguard/WG_PEER
+          echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
         fi
         ;;
       esac
@@ -133,108 +133,108 @@ function interface-peer() {
 # interface or peer
 interface-peer
 
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
-  
-# Remove old WG files.
-function previous-wireguard-installation() {
-  if [ -d "/etc/wireguard" ]; then
-    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-      rm -rf /etc/wireguard
+if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+
+  # Remove old WG files.
+  function previous-wireguard-installation() {
+    if [ -d "/etc/wireguard" ]; then
+      if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+        rm -rf /etc/wireguard
+      fi
     fi
-  fi
-}
+  }
 
-# Run the function to check for previous installation
-previous-wireguard-installation
+  # Run the function to check for previous installation
+  previous-wireguard-installation
 
-# Usage Guide
-function usage-guide() {
-  echo "usage: ./$(basename "$0") <command>"
-  echo "  --install     Install WireGuard Interface"
-  echo "  --start       Start WireGuard Interface"
-  echo "  --stop        Stop WireGuard Interface"
-  echo "  --restart     Restart WireGuard Interface"
-  echo "  --list        Show WireGuard Peers"
-  echo "  --add         Add WireGuard Peer"
-  echo "  --remove      Remove WireGuard Peer"
-  echo "  --reinstall   Reinstall WireGuard Interface"
-  echo "  --uninstall   Uninstall WireGuard Interface"
-  echo "  --update      Update WireGuard Script"
-  echo "  --backup      Backup WireGuard Configs"
-  echo "  --restore     Restore WireGuard Configs"
-  echo "  --help        Show Usage Guide"
-  exit
-}
+  # Usage Guide
+  function usage-guide() {
+    echo "usage: ./$(basename "$0") <command>"
+    echo "  --install     Install WireGuard Interface"
+    echo "  --start       Start WireGuard Interface"
+    echo "  --stop        Stop WireGuard Interface"
+    echo "  --restart     Restart WireGuard Interface"
+    echo "  --list        Show WireGuard Peers"
+    echo "  --add         Add WireGuard Peer"
+    echo "  --remove      Remove WireGuard Peer"
+    echo "  --reinstall   Reinstall WireGuard Interface"
+    echo "  --uninstall   Uninstall WireGuard Interface"
+    echo "  --update      Update WireGuard Script"
+    echo "  --backup      Backup WireGuard Configs"
+    echo "  --restore     Restore WireGuard Configs"
+    echo "  --help        Show Usage Guide"
+    exit
+  }
 
-function usage() {
-  while [ $# -ne 0 ]; do
-    case "${1}" in
-    --install)
+  function usage() {
+    while [ $# -ne 0 ]; do
+      case "${1}" in
+      --install)
+        shift
+        HEADLESS_INSTALL=${HEADLESS_INSTALL:-y}
+        ;;
+      --start)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-2}
+        ;;
+      --stop)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-3}
+        ;;
+      --restart)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-4}
+        ;;
+      --list)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-1}
+        ;;
+      --add)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-5}
+        ;;
+      --remove)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-6}
+        ;;
+      --reinstall)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-7}
+        ;;
+      --uninstall)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-8}
+        ;;
+      --update)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-9}
+        ;;
+      --backup)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-10}
+        ;;
+      --restore)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
+        ;;
+      --help)
+        shift
+        usage-guide
+        ;;
+      *)
+        echo "Invalid argument: $1"
+        usage-guide
+        exit
+        ;;
+      esac
       shift
-      HEADLESS_INSTALL=${HEADLESS_INSTALL:-y}
-      ;;
-    --start)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-2}
-      ;;
-    --stop)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-3}
-      ;;
-    --restart)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-4}
-      ;;
-    --list)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-1}
-      ;;
-    --add)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-5}
-      ;;
-    --remove)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-6}
-      ;;
-    --reinstall)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-7}
-      ;;
-    --uninstall)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-8}
-      ;;
-    --update)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-9}
-      ;;
-    --backup)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-10}
-      ;;
-    --restore)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
-      ;;
-    --help)
-      shift
-      usage-guide
-      ;;
-    *)
-      echo "Invalid argument: $1"
-      usage-guide
-      exit
-      ;;
-    esac
-    shift
-  done
-}
+    done
+  }
 
-usage "$@"
+  usage "$@"
 
-# Skips all questions and just get a client conf after install.
-function headless-install() {
+  # Skips all questions and just get a client conf after install.
+  function headless-install() {
     if [ "$HEADLESS_INSTALL" == "y" ]; then
       IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
       IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -249,11 +249,11 @@ function headless-install() {
       CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
       DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
       CLIENT_NAME=${CLIENT_NAME:-client}
-  fi
-}
+    fi
+  }
 
-# No GUI
-headless-install
+  # No GUI
+  headless-install
 
   # Wireguard Public Network Interface
   WIREGUARD_PUB_NIC="wg0"
