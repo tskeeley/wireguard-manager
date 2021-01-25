@@ -710,7 +710,7 @@ if [ ! -f "$WG_CONFIG" ]; then
     num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
-    auto-trust-anchor-file: /etc/unbound/root.key
+    # auto-trust-anchor-file: /etc/unbound/root.key
     interface: 0.0.0.0
     interface: ::0
     max-udp-size: 3072
