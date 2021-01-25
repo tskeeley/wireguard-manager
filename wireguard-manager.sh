@@ -116,7 +116,7 @@ function previous-wireguard-installation() {
 # Run the function to check for previous installation
 previous-wireguard-installation
 
-if [ -f "/etc/wireguard/wireguard-manager" ]; then
+if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
 
   # Which would you like to install interface or peer?
   function interface-peer() {
