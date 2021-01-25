@@ -104,6 +104,18 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
+# Remove old WG files.
+function previous-wireguard-installation() {
+  if [ -d "/etc/wireguard" ]; then
+    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+      rm -rf /etc/wireguard
+    fi
+  fi
+}
+
+# Run the function to check for previous installation
+previous-wireguard-installation
+
 # Which would you like to install interface or peer?
 function interface-peer() {
   if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
@@ -117,11 +129,13 @@ function interface-peer() {
       case $INTERFACE_OR_PEER in
       1)
         if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
+          mkdir -p /etc/wireguard
           echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
         fi
         ;;
       2)
         if [ ! -f "/etc/wireguard/WG_PEER" ]; then
+          mkdir -p /etc/wireguard
           echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
         fi
         ;;
@@ -134,18 +148,6 @@ function interface-peer() {
 interface-peer
 
 if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
-
-  # Remove old WG files.
-  function previous-wireguard-installation() {
-    if [ -d "/etc/wireguard" ]; then
-      if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-        rm -rf /etc/wireguard
-      fi
-    fi
-  }
-
-  # Run the function to check for previous installation
-  previous-wireguard-installation
 
   # Usage Guide
   function usage-guide() {
@@ -866,7 +868,6 @@ if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
       CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}3"
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
-      mkdir -p /etc/wireguard
       mkdir -p /etc/wireguard/clients
       touch $WG_CONFIG && chmod 600 $WG_CONFIG
       # Set Wireguard settings for this host and first peer.
