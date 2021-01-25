@@ -109,6 +109,8 @@ function previous-wireguard-installation() {
   if [ -d "/etc/wireguard" ]; then
     if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
       rm -rf /etc/wireguard
+      mkdir -p /etc/wireguard
+      echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
   fi
 }
@@ -906,10 +908,6 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
       else
         service wg-quick@$WIREGUARD_PUB_NIC enable
         service wg-quick@$WIREGUARD_PUB_NIC restart
-      fi
-      # Show that WG was installed via this script
-      if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-        echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
       fi
       # Generate QR Code
       qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
