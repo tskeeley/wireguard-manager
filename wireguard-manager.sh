@@ -106,7 +106,7 @@ kernel-check
 
 # Which would you like to install interface or peer?
 function interface-peer() {
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+  if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
     if [ ! -f "/etc/wireguard/WG_PEER" ]; then
       echo "Do you want to install interface or peer?"
       echo "  1) Interface"
@@ -1184,9 +1184,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
     }
     # Running Questions Command
     wireguard-next-questions
+
   fi
 
-  if [ ! -f "/etc/wireguard/WG_PEER" ]; then
+  if [ -f "/etc/wireguard/WG_PEER" ]; then
     function wireguard-next-questions() {
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
@@ -1337,6 +1338,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
 
     # Running Questions Command
     wireguard-next-questions
+
   fi
 
 fi
