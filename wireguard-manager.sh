@@ -133,6 +133,8 @@ function interface-peer() {
 # interface or peer
 interface-peer
 
+  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+  
 # Remove old WG files.
 function previous-wireguard-installation() {
   if [ -d "/etc/wireguard" ]; then
@@ -233,7 +235,6 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
     if [ "$HEADLESS_INSTALL" == "y" ]; then
       IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
       IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -248,14 +249,12 @@ function headless-install() {
       CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
       DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
       CLIENT_NAME=${CLIENT_NAME:-client}
-    fi
   fi
 }
 
 # No GUI
 headless-install
 
-if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
   # Wireguard Public Network Interface
   WIREGUARD_PUB_NIC="wg0"
   WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
