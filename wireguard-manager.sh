@@ -104,6 +104,31 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
+# Which would you like to install interface or peer?
+function interface-peer() {
+  echo "Do you want to install interface or peer?"
+  echo "  1) Interface"
+  echo "  2) Peer"
+  until [[ "$INTERFACE_OR_PEER" =~ ^[1-2]$ ]]; do
+    read -rp "Interface Or Peer [1-2]: " -e -i 1 INTERFACE_OR_PEER
+  done
+  case $INTERFACE_OR_PEER in
+  1)
+  if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
+        echo "INTERFACE" >>/etc/wireguard/WG_CHOICE
+      fi
+      ;;
+    2)
+      if [ ! -f "/etc/wireguard/WG_PEER" ]; then
+        echo "PEER" >>/etc/wireguard/WG_CHOICE
+      fi
+      ;;
+    esac
+  }
+
+  # interface or peer
+  interface-peer
+
 # Remove old WG files.
 function previous-wireguard-installation() {
   if [ -d "/etc/wireguard" ]; then
@@ -204,6 +229,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
+  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
   if [ "$HEADLESS_INSTALL" == "y" ]; then
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -219,11 +245,13 @@ function headless-install() {
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-client}
   fi
+  fi
 }
 
 # No GUI
 headless-install
 
+  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
 # Wireguard Public Network Interface
 WIREGUARD_PUB_NIC="wg0"
 WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
@@ -565,6 +593,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Client Name
   client-name
+fi
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
@@ -679,6 +708,7 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Install WireGuard Server
   install-wireguard-server
 
+  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
   # Function to install unbound
   function install-unbound() {
     if [ "$INSTALL_UNBOUND" = "y" ]; then
@@ -821,7 +851,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # use custom dns
   custom-dns
-
+  
   # WireGuard Set Config
   function wireguard-setconf() {
     SERVER_PRIVKEY=$(wg genkey)
@@ -883,6 +913,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
 
   # Setting Up Wireguard Config
   wireguard-setconf
+
+fi
 
 # After WireGuard Install
 else
