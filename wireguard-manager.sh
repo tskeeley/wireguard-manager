@@ -743,14 +743,21 @@ if [ ! -f "$WG_CONFIG" ]; then
         apk add wireguard-tools libqrencode haveged
       fi
     fi
+  }
+
+  # Install WireGuard Server
+  install-wireguard-server
+  
+  # Install wireguard manager config
+  function install-wireguard-manager-file() {
     # Show that WG was installed via this script
     if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
       echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
   }
-
-  # Install WireGuard Server
-  install-wireguard-server
+  
+  # wireguard manager config
+  install-wireguard-manager-file
 
   # Function to install unbound
   function install-unbound() {
