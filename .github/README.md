@@ -80,7 +80,7 @@ docker build -t wireguard https://raw.githubusercontent.com/complexorganizations
 ---
 ### 🔑 Usage
 ```
-usage: ./wireguard-server.sh <command>
+usage: ./wireguard-manager.sh <command>
   --install     Install WireGuard Interface
   --start       Start WireGuard Interface
   --stop        Stop WireGuard Interface
