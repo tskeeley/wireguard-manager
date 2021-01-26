@@ -273,7 +273,6 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Custom ipv4 subnet
   function set-ipv4-subnet() {
     if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
-
       echo "What ipv4 subnet do you want to use?"
       echo "  1) 10.8.0.0/24 (Recommended)"
       echo "  2) 10.0.0.0/24"
@@ -301,7 +300,6 @@ if [ ! -f "$WG_CONFIG" ]; then
   # Custom ipv6 subnet
   function set-ipv6-subnet() {
     if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
-
       echo "What ipv6 subnet do you want to use?"
       echo "  1) fd42:42:42::0/64 (Recommended)"
       echo "  2) fd86:ea04:1115::0/64"
