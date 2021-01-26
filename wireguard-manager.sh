@@ -104,6 +104,7 @@ WIREGUARD_MANAGER="$WIREGUARD_PATH/wireguard-manager"
 WIREGUARD_INTERFACE="$WIREGUARD_PATH/wireguard-interface"
 WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -1181,10 +1182,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           fi
         fi
         # Delete wireguard Backup
-        if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
           read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]]; then
-            rm -f /var/backups/wireguard-manager.zip
+            rm -f $WIREGUARD_CONFIG_BACKUP
           elif [[ $REPLY =~ ^[Nn]$ ]]; then
             exit
           fi
@@ -1199,16 +1200,16 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       10) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
-          rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
+          rm -f $WIREGUARD_CONFIG_BACKUP
+          zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
           exit
         fi
         ;;
       11) # Restore Wireguard Config
-        if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
           rm -rf /etc/wireguard/
-          unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
+          unzip $WIREGUARD_CONFIG_BACKUP -d /etc/wireguard/
         else
           exit
         fi
@@ -1334,10 +1335,10 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
           fi
         fi
         # Delete wireguard Backup
-        if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
           read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]]; then
-            rm -f /var/backups/wireguard-manager.zip
+            rm -f $WIREGUARD_CONFIG_BACKUP
           elif [[ $REPLY =~ ^[Nn]$ ]]; then
             exit
           fi
@@ -1352,16 +1353,16 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       8) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
-          rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
+          rm -f $WIREGUARD_CONFIG_BACKUP
+          zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
           exit
         fi
         ;;
       9) # Restore Wireguard Config
-        if [ -f "/var/backups/wireguard-manager.zip" ]; then
+        if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
           rm -rf /etc/wireguard/
-          unzip /var/backups/wireguard-manager.zip -d /etc/wireguard/
+          unzip $WIREGUARD_CONFIG_BACKUP -d /etc/wireguard/
         else
           exit
         fi
