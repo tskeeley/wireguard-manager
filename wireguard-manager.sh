@@ -116,9 +116,11 @@ function previous-wireguard-installation() {
 # Run the function to check for previous installation
 previous-wireguard-installation
 
-# Peer or interface
+# Global variables
 WG_INTERFACE="/etc/wireguard/wg-interface"
 WG_PEER="/etc/wireguard/wg-peer"
+WIREGUARD_PUB_NIC="wg0"
+WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 
 # Which would you like to install interface or peer?
 function interface-peer() {
@@ -269,9 +271,6 @@ function headless-install() {
 # No GUI
 headless-install
 
-# Wireguard Public Network Interface
-WIREGUARD_PUB_NIC="wg0"
-WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom ipv4 subnet
@@ -752,7 +751,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install wireguard manager config
   function install-wireguard-manager-file() {
-    # Show that WG was installed via this script
     if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
       echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
