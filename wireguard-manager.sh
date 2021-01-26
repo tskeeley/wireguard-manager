@@ -241,8 +241,8 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ -f "$WIREGUARD_INTERFACE" ]; then
-    if [ "$HEADLESS_INSTALL" == "y" ]; then
+  if [ "$HEADLESS_INSTALL" == "y" ]; then
+      INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
       IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
       IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
       SERVER_HOST_V4_SETTINGS=${SERVER_HOST_V4_SETTINGS:-1}
@@ -256,7 +256,6 @@ function headless-install() {
       CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
       DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
       CLIENT_NAME=${CLIENT_NAME:-client}
-    fi
   fi
 }
 
