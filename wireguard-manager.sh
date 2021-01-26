@@ -1209,7 +1209,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       10) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf $WG_MANAGER $WG_PEER $WG_INTERFACE
+          zip -r -j /var/backups/wireguard-manager.zip $WG_CONFIG $WG_MANAGER $WG_PEER $WG_INTERFACE
         else
           exit
         fi
@@ -1362,7 +1362,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       8) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf $WG_MANAGER $WG_PEER $WG_INTERFACE
+          zip -r -j /var/backups/wireguard-manager.zip $WG_CONFIG $WG_MANAGER $WG_PEER $WG_INTERFACE
         else
           exit
         fi
