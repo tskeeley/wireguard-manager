@@ -784,14 +784,14 @@ if [ ! -f "$WG_CONFIG" ]; then
           elif [ "$DISTRO" == "alpine" ]; then
             apk add unbound
           fi
-          unbound-anchor -a /etc/unbound/root.key
+          unbound-anchor -a /var/lib/unbound/root.key
           rm -f /etc/unbound/unbound.conf
           NPROC=$(nproc)
           echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: /etc/unbound/root.hints
-    auto-trust-anchor-file: /etc/unbound/root.key
+    auto-trust-anchor-file: /var/lib/unbound/root.key
     interface: 0.0.0.0
     interface: ::0
     max-udp-size: 3072
