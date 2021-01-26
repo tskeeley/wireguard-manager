@@ -941,7 +941,7 @@ AllowedIPs = $CLIENT_ALLOWED_IP
 Endpoint = $SERVER_HOST:$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
-PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
       # Service Restart
       if pgrep systemd-journal; then
         systemctl enable wg-quick@$WIREGUARD_PUB_NIC
@@ -951,8 +951,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_P
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       # Generate QR Code
-      qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-      echo "Client Config --> /etc/wireguard/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+      qrencode -t ansiutf8 -l L <$WIREGUARD_PATH/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+      echo "Client Config --> $WIREGUARD_PATH/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
     fi
   }
 
@@ -1050,9 +1050,9 @@ AllowedIPs = $CLIENT_ALLOWED_IP
 Endpoint = $SERVER_HOST$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
-PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-        qrencode -t ansiutf8 -l L </etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-        echo "Client config --> /etc/wireguard/clients/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+        qrencode -t ansiutf8 -l L <$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+        echo "Client config --> $WIREGUARD_PATH/clients/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
         # Restart WireGuard
         if pgrep systemd-journal; then
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -1207,8 +1207,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       11) # Restore Wireguard Config
         if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
-          rm -rf /etc/wireguard/
-          unzip $WIREGUARD_CONFIG_BACKUP -d /etc/wireguard/
+          rm -rf $WIREGUARD_PATH
+          unzip $WIREGUARD_CONFIG_BACKUP -d $WIREGUARD_PATH
         else
           exit
         fi
@@ -1295,9 +1295,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
             wg-quick down $WIREGUARD_PUB_NIC
           fi
           # Removing Wireguard Files
-          rm -rf /etc/wireguard
-          rm -rf /etc/wireguard/clients
-          rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+          rm -rf $WIREGUARD_PATH
+          rm -rf $WIREGUARD_PATH/clients
+          rm -f $WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf
           rm -f /etc/sysctl.d/wireguard.conf
           if [ "$DISTRO" == "centos" ]; then
             yum remove wireguard qrencode haveged -y
@@ -1351,7 +1351,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       8) # Backup Wireguard Config
-        if [ ! -d "/etc/wireguard" ]; then
+        if [ ! -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
           zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
@@ -1360,8 +1360,8 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       9) # Restore Wireguard Config
         if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
-          rm -rf /etc/wireguard/
-          unzip $WIREGUARD_CONFIG_BACKUP -d /etc/wireguard/
+          rm -rf $WIREGUARD_PATH
+          unzip $WIREGUARD_CONFIG_BACKUP -d $WIREGUARD_PATH
         else
           exit
         fi
