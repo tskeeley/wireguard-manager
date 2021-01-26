@@ -914,7 +914,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}3"
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
-      mkdir -p $WIREGUARD_CLIENT_PATH && && chmod 755 $WIREGUARD_CLIENT_PATH
+      mkdir -p $WIREGUARD_CLIENT_PATH && chmod 755 $WIREGUARD_CLIENT_PATH
       touch $WIREGUARD_CONFIG && chmod 600 $WIREGUARD_CONFIG
       # Set Wireguard settings for this host and first peer.
       echo "# $PRIVATE_SUBNET_V4 $PRIVATE_SUBNET_V6 $SERVER_HOST:$SERVER_PORT $SERVER_PUBKEY $CLIENT_DNS $MTU_CHOICE $NAT_CHOICE $CLIENT_ALLOWED_IP
