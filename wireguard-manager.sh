@@ -1105,9 +1105,9 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
             wg-quick down $WIREGUARD_PUB_NIC
           fi
           # Removing Wireguard Files
-          rm -rf /etc/wireguard
-          rm -rf /etc/wireguard/clients
-          rm -f /etc/wireguard/$WIREGUARD_PUB_NIC.conf
+          rm -rf $WIREGUARD_PATH
+          rm -rf $WIREGUARD_PATH/clients
+          rm -f $WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf
           rm -f /etc/sysctl.d/wireguard.conf
           if [ "$DISTRO" == "centos" ]; then
             yum remove wireguard qrencode haveged -y
