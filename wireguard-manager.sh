@@ -104,10 +104,17 @@ function kernel-check() {
 # Kernel Version
 kernel-check
 
+# Global variables
+WG_INTERFACE="/etc/wireguard/wg-interface"
+WG_PEER="/etc/wireguard/wg-peer"
+WIREGUARD_PUB_NIC="wg0"
+WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
+WG_MANAGER="/etc/wireguard/wireguard-manager"
+
 # Remove old WG files.
 function previous-wireguard-installation() {
   if [ -d "/etc/wireguard" ]; then
-    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+    if [ ! -f "$WG_MANAGER" ]; then
       rm -rf /etc/wireguard
     fi
   fi
@@ -116,15 +123,9 @@ function previous-wireguard-installation() {
 # Run the function to check for previous installation
 previous-wireguard-installation
 
-# Global variables
-WG_INTERFACE="/etc/wireguard/wg-interface"
-WG_PEER="/etc/wireguard/wg-peer"
-WIREGUARD_PUB_NIC="wg0"
-WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
-
 # Which would you like to install interface or peer?
 function interface-peer() {
-  if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
+  if [ ! -f "$WG_MANAGER" ]; then
     echo "Do you want to install interface or peer?"
     echo "  1) Interface"
     echo "  2) Peer"
@@ -751,8 +752,8 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install wireguard manager config
   function install-wireguard-manager-file() {
-    if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
-      echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
+    if [ ! -f "$WG_MANAGER" ]; then
+      echo "WireGuard: true" >>$WG_MANAGER
     fi
   }
 
@@ -1104,7 +1105,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       8) # Uninstall Wireguard and purging files
-        if [ -f "/etc/wireguard/wireguard-manager" ]; then
+        if [ -f "$WG_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
             wg-quick down $WIREGUARD_PUB_NIC
@@ -1208,7 +1209,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       10) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf /etc/wireguard/wireguard-manager
+          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf $WG_MANAGER
         else
           exit
         fi
@@ -1294,7 +1295,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       6) # Uninstall Wireguard and purging files
-        if [ -f "/etc/wireguard/wireguard-manager" ]; then
+        if [ -f "$WG_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
             wg-quick down $WIREGUARD_PUB_NIC
@@ -1361,7 +1362,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       8) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf /etc/wireguard/wireguard-manager /etc/wireguard/WG_PEER /etc/wireguard/WG_INTERFACE
+          zip -r -j /var/backups/wireguard-manager.zip /etc/wireguard/"$WIREGUARD_PUB_NIC".conf $WG_MANAGER /etc/wireguard/WG_PEER /etc/wireguard/WG_INTERFACE
         else
           exit
         fi
