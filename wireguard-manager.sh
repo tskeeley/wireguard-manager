@@ -116,6 +116,12 @@ function previous-wireguard-installation() {
 # Run the function to check for previous installation
 previous-wireguard-installation
 
+# Global variables
+WG_INTERFACE="/etc/wireguard/wg-interface"
+WG_PEER="/etc/wireguard/wg-peer"
+WIREGUARD_PUB_NIC="wg0"
+WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
+
 # Which would you like to install interface or peer?
 function interface-peer() {
   if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
@@ -127,20 +133,20 @@ function interface-peer() {
     done
     case $INTERFACE_OR_PEER in
     1)
-      if [ ! -f "/etc/wireguard/WG_INTERFACE" ]; then
+      if [ ! -f "$WG_INTERFACE" ]; then
         mkdir -p /etc/wireguard
-        echo "WireGuard Interface: true" >>/etc/wireguard/WG_INTERFACE
-        if [ -f "/etc/wireguard/WG_PEER" ]; then
-          rm -f /etc/wireguard/WG_PEER
+        echo "WireGuard Interface: true" >>$WG_INTERFACE
+        if [ -f "$WG_PEER" ]; then
+          rm -f $WG_PEER
         fi
       fi
       ;;
     2)
-      if [ ! -f "/etc/wireguard/WG_PEER" ]; then
+      if [ ! -f "$WG_PEER" ]; then
         mkdir -p /etc/wireguard
-        echo "WireGuard Peer: true" >>/etc/wireguard/WG_PEER
-        if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
-          rm -f /etc/wireguard/WG_INTERFACE
+        echo "WireGuard Peer: true" >>$WG_PEER
+        if [ -f "$WG_INTERFACE" ]; then
+          rm -f $WG_INTERFACE
         fi
       fi
       ;;
@@ -153,7 +159,7 @@ interface-peer
 
 # Usage Guide
 function usage-guide() {
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+  if [ -f "$WG_INTERFACE" ]; then
     echo "usage: ./$(basename "$0") <command>"
     echo "  --install     Install WireGuard Interface"
     echo "  --start       Start WireGuard Interface"
@@ -173,7 +179,7 @@ function usage-guide() {
 }
 
 function usage() {
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+  if [ -f "$WG_INTERFACE" ]; then
     while [ $# -ne 0 ]; do
       case "${1}" in
       --install)
@@ -243,7 +249,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+  if [ -f "$WG_INTERFACE" ]; then
     if [ "$HEADLESS_INSTALL" == "y" ]; then
       IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
       IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -265,14 +271,11 @@ function headless-install() {
 # No GUI
 headless-install
 
-# Wireguard Public Network Interface
-WIREGUARD_PUB_NIC="wg0"
-WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom ipv4 subnet
   function set-ipv4-subnet() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What ipv4 subnet do you want to use?"
       echo "  1) 10.8.0.0/24 (Recommended)"
       echo "  2) 10.0.0.0/24"
@@ -299,7 +302,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom ipv6 subnet
   function set-ipv6-subnet() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What ipv6 subnet do you want to use?"
       echo "  1) fd42:42:42::0/64 (Recommended)"
       echo "  2) fd86:ea04:1115::0/64"
@@ -339,7 +342,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Get the IPV4
   function test-connectivity-v4() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "How would you like to detect IPv4?"
       echo "  1) Curl (Recommended)"
       echo "  2) IP (Advanced)"
@@ -366,7 +369,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine ipv6
   function test-connectivity-v6() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "How would you like to detect IPv6?"
       echo "  1) Curl (Recommended)"
       echo "  2) IP (Advanced)"
@@ -393,7 +396,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine public nic
   function server-pub-nic() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "How would you like to detect NIC?"
       echo "  1) IP (Recommended)"
       echo "  2) Custom (Advanced)"
@@ -416,7 +419,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine host port
   function set-port() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What port do you want WireGuard server to listen to?"
       echo "  1) 51820 (Recommended)"
       echo "  2) Custom (Advanced)"
@@ -446,7 +449,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine Keepalive interval.
   function nat-keepalive() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What do you want your keepalive interval to be?"
       echo "  1) 25 (Default)"
       echo "  2) Custom (Advanced)"
@@ -475,7 +478,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom MTU or default settings
   function mtu-set() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What MTU do you want to use?"
       echo "  1) 1280 (Recommended)"
       echo "  2) 1420"
@@ -504,7 +507,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # What ip version would you like to be available on this VPN?
   function ipvx-select() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What IPv do you want to use to connect to WireGuard server?"
       echo "  1) IPv4 (Recommended)"
       echo "  2) IPv6"
@@ -531,7 +534,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Do you want to disable IPv4 or IPv6 or leave them both enabled?
   function disable-ipvx() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "Do you want to disable IPv4 or IPv6 on the server?"
       echo "  1) No (Recommended)"
       echo "  2) Disable IPV4"
@@ -568,7 +571,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Would you like to allow connections to your LAN neighbors?
   function client-allowed-ip() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What traffic do you want the client to forward to wireguard?"
       echo "  1) Everything (Recommended)"
       echo "  2) Exclude Private IPs"
@@ -595,7 +598,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Would you like to install Unbound.
   function ask-install-dns() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "Which DNS provider would you like to use?"
       echo "  1) Unbound (Recommended)"
       echo "  2) PiHole"
@@ -622,7 +625,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # What would you like to name your first WireGuard peer?
   function client-name() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       if [ "$CLIENT_NAME" == "" ]; then
         echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
         read -rp "Client name: " -e CLIENT_NAME
@@ -748,7 +751,6 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install wireguard manager config
   function install-wireguard-manager-file() {
-    # Show that WG was installed via this script
     if [ ! -f "/etc/wireguard/wireguard-manager" ]; then
       echo "WireGuard: true" >>/etc/wireguard/wireguard-manager
     fi
@@ -759,7 +761,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Function to install unbound
   function install-unbound() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       if [ "$INSTALL_UNBOUND" = "y" ]; then
         if ! [ -x "$(command -v unbound)" ]; then
           if [ "$DISTRO" == "ubuntu" ]; then
@@ -839,7 +841,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install pihole
   function install-pihole() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       if [ "$INSTALL_PIHOLE" = "y" ]; then
         if ! [ -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
@@ -855,7 +857,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Use custom dns
   function custom-dns() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       if [ "$CUSTOM_DNS" == "y" ]; then
         echo "Which DNS do you want to use with the VPN?"
         echo "  1) Google (Recommended)"
@@ -908,7 +910,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # WireGuard Set Config
   function wireguard-setconf() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       SERVER_PRIVKEY=$(wg genkey)
       SERVER_PUBKEY=$(echo "$SERVER_PRIVKEY" | wg pubkey)
       CLIENT_PRIVKEY=$(wg genkey)
@@ -970,7 +972,7 @@ else
 
   # Already installed what next?
   function wireguard-next-questions() {
-    if [ -f "/etc/wireguard/WG_INTERFACE" ]; then
+    if [ -f "$WG_INTERFACE" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
       echo "   2) Start WireGuard Interface"
@@ -1233,7 +1235,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
   wireguard-next-questions
 
   function wireguard-next-questions() {
-    if [ -f "/etc/wireguard/WG_PEER" ]; then
+    if [ -f "$WG_PEER" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
       echo "   2) Start WireGuard Interface"
