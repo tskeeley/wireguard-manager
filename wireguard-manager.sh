@@ -1193,7 +1193,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       9) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_REPO
+          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_UPDATE
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
@@ -1346,7 +1346,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       7) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_REPO
+          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_UPDATE
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
@@ -1379,4 +1379,4 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
   # Running Questions Command
   wireguard-next-questions
 
-fi
+f
