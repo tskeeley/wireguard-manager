@@ -46,7 +46,7 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 #### Instance Installation
 Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
-curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-server.sh
+curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
 ```
 Then let's make the script user executable (Optional)
 ```
@@ -198,8 +198,8 @@ Which WireGuard client do you recommend?
 Is there WireGuard documentation?
 - Yes, please head to the [WireGuard Manual](https://www.wireguard.com), which references all the options.
 
-How do I install a wireguard without the questions? (Headless Install) ***Server Only***
-- ```HEADLESS_INSTALL=y /usr/local/bin/wireguard-server.sh```
+How do I install a wireguard without the questions? (Headless Install)
+- ```HEADLESS_INSTALL=y /usr/local/bin/wireguard-manager.sh```
 
 Official Links
 - Homepage: https://www.wireguard.com
