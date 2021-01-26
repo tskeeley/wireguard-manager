@@ -98,7 +98,7 @@ kernel-check
 
 # Global variables
 WIREGUARD_PATH="/etc/wireguard"
-WIREGUARD_CLIENT_PATH="/etc/wireguard/clients"
+WIREGUARD_CLIENT_PATH="$WIREGUARD_PATH/clients"
 WIREGUARD_PUB_NIC="wg0"
 WIREGUARD_CONFIG="$WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf"
 WIREGUARD_MANAGER="$WIREGUARD_PATH/wireguard-manager"
