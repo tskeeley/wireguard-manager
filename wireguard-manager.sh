@@ -98,6 +98,7 @@ kernel-check
 
 # Global variables
 WIREGUARD_PATH="/etc/wireguard"
+WIREGUARD_CLIENT_PATH="/etc/wireguard/clients"
 WIREGUARD_PUB_NIC="wg0"
 WIREGUARD_CONFIG="$WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf"
 WIREGUARD_MANAGER="$WIREGUARD_PATH/wireguard-manager"
@@ -913,7 +914,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}3"
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
-      mkdir -p $WIREGUARD_PATH/clients
+      mkdir -p $WIREGUARD_CLIENT_PATH && && chmod 755 $WIREGUARD_CLIENT_PATH
       touch $WIREGUARD_CONFIG && chmod 600 $WIREGUARD_CONFIG
       # Set Wireguard settings for this host and first peer.
       echo "# $PRIVATE_SUBNET_V4 $PRIVATE_SUBNET_V6 $SERVER_HOST:$SERVER_PORT $SERVER_PUBKEY $CLIENT_DNS $MTU_CHOICE $NAT_CHOICE $CLIENT_ALLOWED_IP
@@ -943,7 +944,7 @@ AllowedIPs = $CLIENT_ALLOWED_IP
 Endpoint = $SERVER_HOST:$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
-PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
       # Service Restart
       if pgrep systemd-journal; then
         systemctl enable wg-quick@$WIREGUARD_PUB_NIC
@@ -953,8 +954,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$CLIENT_NAME"-$WIREGUARD_
         service wg-quick@$WIREGUARD_PUB_NIC restart
       fi
       # Generate QR Code
-      qrencode -t ansiutf8 -l L <$WIREGUARD_PATH/clients/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-      echo "Client Config --> $WIREGUARD_PATH/clients/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+      qrencode -t ansiutf8 -l L <$WIREGUARD_CLIENT_PATH/"$CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+      echo "Client Config --> $WIREGUARD_CLIENT_PATH/$CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
     fi
   }
 
@@ -1052,9 +1053,9 @@ AllowedIPs = $CLIENT_ALLOWED_IP
 Endpoint = $SERVER_HOST$SERVER_PORT
 PersistentKeepalive = $NAT_CHOICE
 PresharedKey = $PRESHARED_KEY
-PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-        qrencode -t ansiutf8 -l L <$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
-        echo "Client config --> $WIREGUARD_PATH/clients/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+        qrencode -t ansiutf8 -l L <$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
+        echo "Client config --> $WIREGUARD_CLIENT_PATH/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
         # Restart WireGuard
         if pgrep systemd-journal; then
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -1070,7 +1071,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
         read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
         if [[ $REPLY =~ ^[Yy]$ ]]; then
           sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WIREGUARD_CONFIG
-          rm -f $WIREGUARD_PATH/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
+          rm -f $WIREGUARD_CLIENT_PATH/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
           echo "Client $REMOVECLIENT has been removed."
         elif [[ $REPLY =~ ^[Nn]$ ]]; then
           exit
@@ -1108,7 +1109,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
           fi
           # Removing Wireguard Files
           rm -rf $WIREGUARD_PATH
-          rm -rf $WIREGUARD_PATH/clients
+          rm -rf $WIREGUARD_CLIENT_PATH
           rm -f $WIREGUARD_CONFIG
           rm -f /etc/sysctl.d/wireguard.conf
           if [ "$DISTRO" == "centos" ]; then
@@ -1298,7 +1299,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
           fi
           # Removing Wireguard Files
           rm -rf $WIREGUARD_PATH
-          rm -rf $WIREGUARD_PATH/clients
+          rm -rf $WIREGUARD_CLIENT_PATH
           rm -f $WIREGUARD_CONFIG
           rm -f /etc/sysctl.d/wireguard.conf
           if [ "$DISTRO" == "centos" ]; then
