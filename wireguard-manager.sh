@@ -41,31 +41,23 @@ function dist-check() {
 # Check Operating System
 dist-check
 
-# Check if they are using a supported linux distro
-function check-operating-system() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
-    echo "Correct: Linux Distro" >/dev/null 2>&1
-  else
-    echo "Error: Linux Distro not supported." >&2
-    exit
-  fi
-}
-
-# Just a basic check to check for the correct os.
-check-operating-system
-
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ] || ! [ -x "$(command -v ip)" ]; }; then
-    if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
-      apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
-    elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-      yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
-    elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2
-    elif [ "$DISTRO" == "alpine" ]; then
-      apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
+    if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ] || ! [ -x "$(command -v ip)" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
+      elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
+        yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
+      elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2
+      elif [ "$DISTRO" == "alpine" ]; then
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2
+      fi
     fi
+  else
+    echo "Error: $DISTRO not supported."
+    exit
   fi
 }
 
@@ -78,9 +70,9 @@ function docker-check() {
     DOCKER_KERNEL_VERSION_LIMIT=5.6
     DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+      echo "Correct: Kernel $KERNEL_CURRENT_VERSION supported." >>/dev/null
     else
-      echo "Error: Kernel version $DOCKER_KERNEL_CURRENT_VERSION please update to $DOCKER_KERNEL_VERSION_LIMIT" >&2
+      echo "Error: Kernel $DOCKER_KERNEL_CURRENT_VERSION not supported, please update to $DOCKER_KERNEL_VERSION_LIMIT"
       exit
     fi
   fi
@@ -94,9 +86,9 @@ function kernel-check() {
   KERNEL_VERSION_LIMIT=3.1
   KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
   if (($(echo "$KERNEL_CURRENT_VERSION >= $KERNEL_VERSION_LIMIT" | bc -l))); then
-    echo "Correct: Kernel version, $KERNEL_CURRENT_VERSION" >/dev/null 2>&1
+    echo "Correct: Kernel $KERNEL_CURRENT_VERSION supported." >>/dev/null
   else
-    echo "Error: Kernel version $KERNEL_CURRENT_VERSION please update to $KERNEL_VERSION_LIMIT" >&2
+    echo "Error: Kernel $KERNEL_CURRENT_VERSION not supported, please update to $KERNEL_VERSION_LIMIT"
     exit
   fi
 }
@@ -105,29 +97,30 @@ function kernel-check() {
 kernel-check
 
 # Global variables
-WG_INTERFACE="/etc/wireguard/wg-interface"
-WG_PEER="/etc/wireguard/wg-peer"
+WIREGUARD_PATH="/etc/wireguard"
 WIREGUARD_PUB_NIC="wg0"
-WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
-WG_MANAGER="/etc/wireguard/wireguard-manager"
-WG_MANAGER_REPO="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+WIREGUARD_CONFIG="$WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf"
+WIREGUARD_MANAGER="$WIREGUARD_PATH/wireguard-manager"
+WIREGUARD_INTERFACE="$WIREGUARD_PATH/wireguard-interface"
+WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
+WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 
-# Remove old WG files.
+# Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
-  if [ -d "/etc/wireguard" ]; then
-    if [ ! -f "$WG_MANAGER" ]; then
-      rm -rf /etc/wireguard
+  if [ -d "$WIREGUARD_PATH" ]; then
+    if [ ! -f "$WIREGUARD_MANAGER" ]; then
+      rm -rf $WIREGUARD_PATH
     fi
   fi
 }
 
-# Run the function to check for previous installation
+# Run the function to eliminate old installation or another installer
 previous-wireguard-installation
 
 # Which would you like to install interface or peer?
-function interface-peer() {
-  if [ ! -f "$WG_MANAGER" ]; then
-    echo "Do you want to install interface or peer?"
+function interface-or-peer() {
+  if [ ! -f "$WIREGUARD_MANAGER" ]; then
+    echo "Do you want the interface or peer to be installed?"
     echo "  1) Interface"
     echo "  2) Peer"
     until [[ "$INTERFACE_OR_PEER" =~ ^[1-2]$ ]]; do
@@ -135,33 +128,29 @@ function interface-peer() {
     done
     case $INTERFACE_OR_PEER in
     1)
-      if [ ! -f "$WG_INTERFACE" ]; then
-        mkdir -p /etc/wireguard
-        echo "WireGuard Interface: true" >>$WG_INTERFACE
-        if [ -f "$WG_PEER" ]; then
-          rm -f $WG_PEER
-        fi
+      if [ -f "$WIREGUARD_PEER" ]; then
+        rm -f $WIREGUARD_PATH
       fi
+      mkdir -p $WIREGUARD_PATH
+      echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
       ;;
     2)
-      if [ ! -f "$WG_PEER" ]; then
-        mkdir -p /etc/wireguard
-        echo "WireGuard Peer: true" >>$WG_PEER
-        if [ -f "$WG_INTERFACE" ]; then
-          rm -f $WG_INTERFACE
-        fi
+      if [ -f "$WIREGUARD_INTERFACE" ]; then
+        rm -f $WIREGUARD_PATH
       fi
+      mkdir -p $WIREGUARD_PATH
+      echo "WireGuard Peer: true" >>$WIREGUARD_PEER
       ;;
     esac
   fi
 }
 
-# interface or peer
-interface-peer
+# Interface or Peer
+interface-or-peer
 
 # Usage Guide
 function usage-guide() {
-  if [ -f "$WG_INTERFACE" ]; then
+  if [ -f "$WIREGUARD_INTERFACE" ]; then
     echo "usage: ./$(basename "$0") <command>"
     echo "  --install     Install WireGuard Interface"
     echo "  --start       Start WireGuard Interface"
@@ -180,8 +169,9 @@ function usage-guide() {
   fi
 }
 
+# The usage of the script
 function usage() {
-  if [ -f "$WG_INTERFACE" ]; then
+  if [ -f "$WIREGUARD_INTERFACE" ]; then
     while [ $# -ne 0 ]; do
       case "${1}" in
       --install)
@@ -251,7 +241,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ -f "$WG_INTERFACE" ]; then
+  if [ -f "$WIREGUARD_INTERFACE" ]; then
     if [ "$HEADLESS_INSTALL" == "y" ]; then
       IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
       IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -273,11 +263,11 @@ function headless-install() {
 # No GUI
 headless-install
 
-if [ ! -f "$WG_CONFIG" ]; then
+if [ ! -f "$WIREGUARD_CONFIG" ]; then
 
   # Custom ipv4 subnet
   function set-ipv4-subnet() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What ipv4 subnet do you want to use?"
       echo "  1) 10.8.0.0/24 (Recommended)"
       echo "  2) 10.0.0.0/24"
@@ -304,7 +294,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom ipv6 subnet
   function set-ipv6-subnet() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What ipv6 subnet do you want to use?"
       echo "  1) fd42:42:42::0/64 (Recommended)"
       echo "  2) fd86:ea04:1115::0/64"
@@ -344,7 +334,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Get the IPV4
   function test-connectivity-v4() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "How would you like to detect IPv4?"
       echo "  1) Curl (Recommended)"
       echo "  2) IP (Advanced)"
@@ -371,7 +361,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine ipv6
   function test-connectivity-v6() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "How would you like to detect IPv6?"
       echo "  1) Curl (Recommended)"
       echo "  2) IP (Advanced)"
@@ -398,7 +388,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine public nic
   function server-pub-nic() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "How would you like to detect NIC?"
       echo "  1) IP (Recommended)"
       echo "  2) Custom (Advanced)"
@@ -421,7 +411,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine host port
   function set-port() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What port do you want WireGuard server to listen to?"
       echo "  1) 51820 (Recommended)"
       echo "  2) Custom (Advanced)"
@@ -451,7 +441,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Determine Keepalive interval.
   function nat-keepalive() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What do you want your keepalive interval to be?"
       echo "  1) 25 (Default)"
       echo "  2) Custom (Advanced)"
@@ -480,7 +470,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Custom MTU or default settings
   function mtu-set() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What MTU do you want to use?"
       echo "  1) 1280 (Recommended)"
       echo "  2) 1420"
@@ -509,7 +499,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # What ip version would you like to be available on this VPN?
   function ipvx-select() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What IPv do you want to use to connect to WireGuard server?"
       echo "  1) IPv4 (Recommended)"
       echo "  2) IPv6"
@@ -536,7 +526,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Do you want to disable IPv4 or IPv6 or leave them both enabled?
   function disable-ipvx() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "Do you want to disable IPv4 or IPv6 on the server?"
       echo "  1) No (Recommended)"
       echo "  2) Disable IPV4"
@@ -573,7 +563,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Would you like to allow connections to your LAN neighbors?
   function client-allowed-ip() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What traffic do you want the client to forward to wireguard?"
       echo "  1) Everything (Recommended)"
       echo "  2) Exclude Private IPs"
@@ -600,7 +590,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Would you like to install Unbound.
   function ask-install-dns() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "Which DNS provider would you like to use?"
       echo "  1) Unbound (Recommended)"
       echo "  2) PiHole"
@@ -627,7 +617,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # What would you like to name your first WireGuard peer?
   function client-name() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$CLIENT_NAME" == "" ]; then
         echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
         read -rp "Client name: " -e CLIENT_NAME
@@ -753,8 +743,8 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install wireguard manager config
   function install-wireguard-manager-file() {
-    if [ ! -f "$WG_MANAGER" ]; then
-      echo "WireGuard: true" >>$WG_MANAGER
+    if [ ! -f "$WIREGUARD_MANAGER" ]; then
+      echo "WireGuard: true" >>$WIREGUARD_MANAGER
     fi
   }
 
@@ -763,7 +753,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Function to install unbound
   function install-unbound() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$INSTALL_UNBOUND" = "y" ]; then
         if ! [ -x "$(command -v unbound)" ]; then
           if [ "$DISTRO" == "ubuntu" ]; then
@@ -843,7 +833,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Install pihole
   function install-pihole() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$INSTALL_PIHOLE" = "y" ]; then
         if ! [ -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
@@ -859,7 +849,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # Use custom dns
   function custom-dns() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$CUSTOM_DNS" == "y" ]; then
         echo "Which DNS do you want to use with the VPN?"
         echo "  1) Google (Recommended)"
@@ -912,7 +902,7 @@ if [ ! -f "$WG_CONFIG" ]; then
 
   # WireGuard Set Config
   function wireguard-setconf() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       SERVER_PRIVKEY=$(wg genkey)
       SERVER_PUBKEY=$(echo "$SERVER_PRIVKEY" | wg pubkey)
       CLIENT_PRIVKEY=$(wg genkey)
@@ -922,7 +912,7 @@ if [ ! -f "$WG_CONFIG" ]; then
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
       mkdir -p /etc/wireguard/clients
-      touch $WG_CONFIG && chmod 600 $WG_CONFIG
+      touch $WIREGUARD_CONFIG && chmod 600 $WIREGUARD_CONFIG
       # Set Wireguard settings for this host and first peer.
       echo "# $PRIVATE_SUBNET_V4 $PRIVATE_SUBNET_V6 $SERVER_HOST:$SERVER_PORT $SERVER_PUBKEY $CLIENT_DNS $MTU_CHOICE $NAT_CHOICE $CLIENT_ALLOWED_IP
 [Interface]
@@ -937,7 +927,7 @@ SaveConfig = false
 PublicKey = $CLIENT_PUBKEY
 PresharedKey = $PRESHARED_KEY
 AllowedIPs = $CLIENT_ADDRESS_V4/32,$CLIENT_ADDRESS_V6/128
-# $CLIENT_NAME end" >>$WG_CONFIG
+# $CLIENT_NAME end" >>$WIREGUARD_CONFIG
 
       echo "# $CLIENT_NAME
 [Interface]
@@ -974,7 +964,7 @@ else
 
   # Already installed what next?
   function wireguard-next-questions() {
-    if [ -f "$WG_INTERFACE" ]; then
+    if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
       echo "   2) Start WireGuard Interface"
@@ -1028,18 +1018,18 @@ else
         CLIENT_PUBKEY=$(echo "$CLIENT_PRIVKEY" | wg pubkey)
         PRESHARED_KEY=$(wg genpsk)
         PEER_PORT=$(shuf -i1024-65535 -n1)
-        PRIVATE_SUBNET_V4=$(head -n1 $WG_CONFIG | awk '{print $2}')
+        PRIVATE_SUBNET_V4=$(head -n1 $WIREGUARD_CONFIG | awk '{print $2}')
         PRIVATE_SUBNET_MASK_V4=$(echo "$PRIVATE_SUBNET_V4" | cut -d "/" -f 2)
-        PRIVATE_SUBNET_V6=$(head -n1 $WG_CONFIG | awk '{print $3}')
+        PRIVATE_SUBNET_V6=$(head -n1 $WIREGUARD_CONFIG | awk '{print $3}')
         PRIVATE_SUBNET_MASK_V6=$(echo "$PRIVATE_SUBNET_V6" | cut -d "/" -f 2)
-        SERVER_HOST=$(head -n1 $WG_CONFIG | awk '{print $4}')
-        SERVER_PUBKEY=$(head -n1 $WG_CONFIG | awk '{print $5}')
-        CLIENT_DNS=$(head -n1 $WG_CONFIG | awk '{print $6}')
-        MTU_CHOICE=$(head -n1 $WG_CONFIG | awk '{print $7}')
-        NAT_CHOICE=$(head -n1 $WG_CONFIG | awk '{print $8}')
-        CLIENT_ALLOWED_IP=$(head -n1 $WG_CONFIG | awk '{print $9}')
-        LASTIP4=$(grep "/32" $WG_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-        LASTIP6=$(grep "/128" $WG_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+        SERVER_HOST=$(head -n1 $WIREGUARD_CONFIG | awk '{print $4}')
+        SERVER_PUBKEY=$(head -n1 $WIREGUARD_CONFIG | awk '{print $5}')
+        CLIENT_DNS=$(head -n1 $WIREGUARD_CONFIG | awk '{print $6}')
+        MTU_CHOICE=$(head -n1 $WIREGUARD_CONFIG | awk '{print $7}')
+        NAT_CHOICE=$(head -n1 $WIREGUARD_CONFIG | awk '{print $8}')
+        CLIENT_ALLOWED_IP=$(head -n1 $WIREGUARD_CONFIG | awk '{print $9}')
+        LASTIP4=$(grep "/32" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+        LASTIP6=$(grep "/128" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
         CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIP4 + 1))"
         CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIP6 + 1))"
         echo "# $NEW_CLIENT_NAME start
@@ -1047,7 +1037,7 @@ else
 PublicKey = $CLIENT_PUBKEY
 PresharedKey = $PRESHARED_KEY
 AllowedIPs = $CLIENT_ADDRESS_V4/32,$CLIENT_ADDRESS_V6/128
-# $NEW_CLIENT_NAME end" >>$WG_CONFIG
+# $NEW_CLIENT_NAME end" >>$WIREGUARD_CONFIG
         echo "# $NEW_CLIENT_NAME
 [Interface]
 Address = $CLIENT_ADDRESS_V4/$PRIVATE_SUBNET_MASK_V4,$CLIENT_ADDRESS_V6/$PRIVATE_SUBNET_MASK_V6
@@ -1073,11 +1063,11 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       6) # Remove WireGuard Peer
         echo "Which WireGuard user do you want to remove?"
         # shellcheck disable=SC2002
-        cat $WG_CONFIG | grep start | awk '{ print $2 }'
+        cat $WIREGUARD_CONFIG | grep start | awk '{ print $2 }'
         read -rp "Type in Client Name : " -e REMOVECLIENT
         read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-          sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WG_CONFIG
+          sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WIREGUARD_CONFIG
           rm -f /etc/wireguard/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
           echo "Client $REMOVECLIENT has been removed."
         elif [[ $REPLY =~ ^[Nn]$ ]]; then
@@ -1106,7 +1096,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       8) # Uninstall Wireguard and purging files
-        if [ -f "$WG_MANAGER" ]; then
+        if [ -f "$WIREGUARD_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
             wg-quick down $WIREGUARD_PUB_NIC
@@ -1203,14 +1193,14 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       9) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" $WG_MANAGER_REPO
+          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_REPO
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
       10) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip $WG_CONFIG $WG_MANAGER $WG_PEER $WG_INTERFACE
+          zip -r -j /var/backups/wireguard-manager.zip $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
           exit
         fi
@@ -1237,7 +1227,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
   wireguard-next-questions
 
   function wireguard-next-questions() {
-    if [ -f "$WG_PEER" ]; then
+    if [ -f "$WIREGUARD_PEER" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
       echo "   2) Start WireGuard Interface"
@@ -1296,7 +1286,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       6) # Uninstall Wireguard and purging files
-        if [ -f "$WG_MANAGER" ]; then
+        if [ -f "$WIREGUARD_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
             wg-quick down $WIREGUARD_PUB_NIC
@@ -1356,14 +1346,14 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       7) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" $WG_MANAGER_REPO
+          curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_REPO
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
       8) # Backup Wireguard Config
         if [ ! -d "/etc/wireguard" ]; then
           rm -f /var/backups/wireguard-manager.zip
-          zip -r -j /var/backups/wireguard-manager.zip $WG_CONFIG $WG_MANAGER $WG_PEER $WG_INTERFACE
+          zip -r -j /var/backups/wireguard-manager.zip $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
           exit
         fi
