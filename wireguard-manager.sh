@@ -110,6 +110,7 @@ WG_PEER="/etc/wireguard/wg-peer"
 WIREGUARD_PUB_NIC="wg0"
 WG_CONFIG="/etc/wireguard/$WIREGUARD_PUB_NIC.conf"
 WG_MANAGER="/etc/wireguard/wireguard-manager"
+WG_MANAGER_REPO="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 
 # Remove old WG files.
 function previous-wireguard-installation() {
@@ -1202,7 +1203,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       9) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh
+          curl -o "$CURRENT_FILE_PATH" $WG_MANAGER_REPO
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
@@ -1355,7 +1356,7 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
       7) # Update the script
         CURRENT_FILE_PATH="$(realpath "$0")"
         if [ -f "$CURRENT_FILE_PATH" ]; then
-          curl -o "$CURRENT_FILE_PATH" https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh
+          curl -o "$CURRENT_FILE_PATH" $WG_MANAGER_REPO
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
         ;;
