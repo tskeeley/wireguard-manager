@@ -105,6 +105,8 @@ WIREGUARD_INTERFACE="$WIREGUARD_PATH/wireguard-interface"
 WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
+PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
+UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -813,7 +815,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           echo "nameserver 127.0.0.1" >>/etc/resolv.conf
           echo "nameserver ::1" >>/etc/resolv.conf
           chattr +i /etc/resolv.conf
-          echo "Unbound: true" >>/etc/unbound/wireguard-manager
+          echo "Unbound: true" >>$UNBOUND_MANAGER
           # restart unbound
           if pgrep systemd-journal; then
             systemctl enable unbound
@@ -837,7 +839,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       if [ "$INSTALL_PIHOLE" = "y" ]; then
         if ! [ -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
-          echo "PiHole: true" >>/etc/pihole/wireguard-manager
+          echo "PiHole: true" >>$PIHOLE_MANAGER
         fi
         CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
       fi
@@ -911,7 +913,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}3"
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
-      mkdir -p /etc/wireguard/clients
+      mkdir -p $WIREGUARD_PATH/clients
       touch $WIREGUARD_CONFIG && chmod 600 $WIREGUARD_CONFIG
       # Set Wireguard settings for this host and first peer.
       echo "# $PRIVATE_SUBNET_V4 $PRIVATE_SUBNET_V6 $SERVER_HOST:$SERVER_PORT $SERVER_PUBKEY $CLIENT_DNS $MTU_CHOICE $NAT_CHOICE $CLIENT_ALLOWED_IP
@@ -1068,7 +1070,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
         read -rp "Are you sure you want to remove $REMOVECLIENT ? (y/n): " -n 1 -r
         if [[ $REPLY =~ ^[Yy]$ ]]; then
           sed -i "/\# $REMOVECLIENT start/,/\# $REMOVECLIENT end/d" $WIREGUARD_CONFIG
-          rm -f /etc/wireguard/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
+          rm -f $WIREGUARD_PATH/clients/"$REMOVECLIENT"-$WIREGUARD_PUB_NIC.conf
           echo "Client $REMOVECLIENT has been removed."
         elif [[ $REPLY =~ ^[Nn]$ ]]; then
           exit
@@ -1144,7 +1146,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
           fi
         fi
         # Uninstall Unbound
-        if [ -f "/etc/unbound/wireguard-manager" ]; then
+        if [ -f "$UNBOUND_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable unbound
             systemctl stop unbound
@@ -1169,7 +1171,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
             apk del unbound
           fi
           # Uninstall Pihole
-          if [ -f "/etc/pihole/wireguard-manager" ]; then
+          if [ -f "$PIHOLE_MANAGER" ]; then
             if pgrep systemd-journal; then
               systemctl disable pihole
               systemctl stop pihole
@@ -1198,7 +1200,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_PATH/clients/"$NEW_CLIENT_NAME"-$WIREGU
         fi
         ;;
       10) # Backup Wireguard Config
-        if [ ! -d "/etc/wireguard" ]; then
+        if [ ! -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
           zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER $WIREGUARD_INTERFACE
         else
