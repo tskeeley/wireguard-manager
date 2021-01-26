@@ -1379,4 +1379,4 @@ PublicKey = $SERVER_PUBKEY" >>/etc/wireguard/clients/"$NEW_CLIENT_NAME"-$WIREGUA
   # Running Questions Command
   wireguard-next-questions
 
-f
+fi
