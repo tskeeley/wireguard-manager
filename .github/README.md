@@ -132,54 +132,54 @@ usage: ./wireguard-manager.sh <command>
 ### 👉👈 Compatibility with Linux Distro
 | OS              | i386               | amd64              | armhf              | arm64              |
 | --------------  | ------------------ | ------------------ | ------------------ | ------------------ |
-| Ubuntu 14 ≤     | ❌                 | ❌                 | ❌                 | ❌                 |
-| Ubuntu 16 ≥     | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Debian 7 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
-| Debian 8 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| CentOS 6 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
-| CentOS 7 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Fedora 29 ≤     | ❌                 | ❌                 | ❌                 | ❌                 |
-| Fedora 30 ≥     | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| RedHat 6 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
-| RedHat 7 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Kali 1.0 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
-| Kali 1.1 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Arch            | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Raspbian        | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| PopOS           | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Manjaro         | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
+| Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
+| Ubuntu 16 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Debian 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| CentOS 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
+| Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
 | --------------  | ------------------ |
-| AWS             | ✔️                 |
-| Google Cloud    | ✔️                 |
-| Linode          | ✔️                 |
-| Digital Ocean   | ✔️                 |
-| Vultr           | ✔️                 |
-| Microsoft Azure | ✔️                 |
-| OpenStack       | ✔️                 |
-| Rackspace       | ✔️                 |
-| Scaleway        | ✔️                 |
-| EuroVPS         | ✔️                 |
-| Hetzner Cloud   | ❌                 |
-| Strato          | ❌                 |
+| AWS             |:heavy_check_mark:  |
+| Google Cloud    |:heavy_check_mark:  |
+| Linode          |:heavy_check_mark:  |
+| Digital Ocean   |:heavy_check_mark:  |
+| Vultr           |:heavy_check_mark:  |
+| Microsoft Azure |:heavy_check_mark:  |
+| OpenStack       |:heavy_check_mark:  |
+| Rackspace       |:heavy_check_mark:  |
+| Scaleway        |:heavy_check_mark:  |
+| EuroVPS         |:heavy_check_mark:  |
+| Hetzner Cloud   |:x:                 |
+| Strato          |:x:                 |
 
 ### 🛡️ Compatibility with Virtualization
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
-| KVM             | ✔️                 |
-| LXC             | ❌                 |
-| OpenVZ          | ❌                 |
-| Docker          | ✔️                 |
+| KVM             |:heavy_check_mark:  |
+| LXC             |:x:                 |
+| OpenVZ          |:x:                 |
+| Docker          |:heavy_check_mark:  |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
 | ---------------------  | ---------------------  |
-| Linux Kernel 3.0 ≤     | ❌                     |
-| Linux Kernel 3.1 ≥     | ✔️                     |
-| Docker Kernel 5.5 ≤    | ❌                     |
-| Docker Kernel 5.6 ≥    | ✔️                     |
+| Linux Kernel 3.0 ≤     |:x:                     |
+| Linux Kernel 3.1 ≥     |:heavy_check_mark:      |
+| Docker Kernel 5.5 ≤    |:x:                     |
+| Docker Kernel 5.6 ≥    |:heavy_check_mark:      |
 
 ---
 ### 🙋 Q&A
