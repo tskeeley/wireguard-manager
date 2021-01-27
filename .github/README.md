@@ -132,17 +132,17 @@ usage: ./wireguard-manager.sh <command>
 ### 👉👈 Compatibility with Linux Distro
 | OS              | i386               | amd64              | armhf              | arm64              |
 | --------------  | ------------------ | ------------------ | ------------------ | ------------------ |
-| Ubuntu 14 ≤     | ❌                 | ❌                 | ❌                 |:x:                 |
+| Ubuntu 14 ≤     | ❌                 | ❌                 | ❌                 | ❌                 |
 | Ubuntu 16 ≥     | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Debian 7 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
 | Debian 8 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| CentOS 6 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
 | CentOS 7 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
+| Fedora 29 ≤     | ❌                 | ❌                 | ❌                 | ❌                 |
 | Fedora 30 ≥     | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| RedHat 6 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
 | RedHat 7 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
-| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
+| Kali 1.0 ≤      | ❌                 | ❌                 | ❌                 | ❌                 |
 | Kali 1.1 ≥      | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
 | Arch            | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
 | Raspbian        | ✔️                 | ✔️                 | ✔️                 | ✔️                 |
@@ -162,23 +162,23 @@ usage: ./wireguard-manager.sh <command>
 | Rackspace       | ✔️                 |
 | Scaleway        | ✔️                 |
 | EuroVPS         | ✔️                 |
-| Hetzner Cloud   |:x:                 |
-| Strato          |:x:                 |
+| Hetzner Cloud   | ❌                 |
+| Strato          | ❌                 |
 
 ### 🛡️ Compatibility with Virtualization
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
 | KVM             | ✔️                 |
-| LXC             |:x:                 |
-| OpenVZ          |:x:                 |
+| LXC             | ❌                 |
+| OpenVZ          | ❌                 |
 | Docker          | ✔️                 |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
 | ---------------------  | ---------------------  |
-| Linux Kernel 3.0 ≤     |:x:                     |
+| Linux Kernel 3.0 ≤     | ❌                     |
 | Linux Kernel 3.1 ≥     | ✔️                     |
-| Docker Kernel 5.5 ≤    |:x:                     |
+| Docker Kernel 5.5 ≤    | ❌                     |
 | Docker Kernel 5.6 ≥    | ✔️                     |
 
 ---
