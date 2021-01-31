@@ -1201,7 +1201,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       10) # Backup Wireguard Config
-        if [ ! -d "$WIREGUARD_PATH" ]; then
+        if [ -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
           zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_INTERFACE
         else
@@ -1354,7 +1354,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       8) # Backup Wireguard Config
-        if [ ! -d "$WIREGUARD_PATH" ]; then
+        if [ -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
           zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER
         else
