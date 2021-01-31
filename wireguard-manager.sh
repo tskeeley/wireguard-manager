@@ -43,9 +43,9 @@ dist-check
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
     if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ] || ! [ -x "$(command -v ip)" ]; }; then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
         apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
       elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
         yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 -y
@@ -636,7 +636,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
     KERNEL_VERSION_LIMIT=5.6
     KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
     if (($(echo "$KERNEL_CURRENT_VERSION <= $KERNEL_VERSION_LIMIT" | bc -l))); then
-      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+      if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
       elif [ "$DISTRO" == "raspbian" ]; then
@@ -672,7 +672,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         add-apt-repository ppa:wireguard/wireguard -y
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-      elif [ "$DISTRO" == "pop" ]; then
+      elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "linuxmint" ]; }; then
         apt-get update
         apt-get install wireguard qrencode haveged ifupdown resolvconf -y
       elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
@@ -768,7 +768,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
               service systemd-resolved stop
               service systemd-resolved disable
             fi
-          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
             apt-get install unbound unbound-host e2fsprogs -y
           elif { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
             yum install unbound unbound-libs -y
@@ -1084,7 +1084,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       7) # Reinstall Wireguard
-        if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+        if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
           dpkg-reconfigure wireguard-dkms
           modprobe wireguard
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -1118,7 +1118,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             apt-get remove --purge wireguard qrencode -y
             rm -f /etc/apt/sources.list.d/unstable.list
             rm -f /etc/apt/preferences.d/limit-unstable
-          elif [ "$DISTRO" == "pop" ]; then
+          elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "linuxmint" ]; }; then
             apt-get remove --purge wireguard qrencode haveged -y
           elif [ "$DISTRO" == "ubuntu" ]; then
             apt-get remove --purge wireguard qrencode haveged -y
@@ -1162,7 +1162,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           chattr +i /etc/resolv.conf
           if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
             yum remove unbound unbound-host -y
-          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "kali" ]; }; then
+          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
             apt-get remove --purge unbound unbound-host -y
           elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
             pacman -Rs unbound unbound-host -y
@@ -1274,7 +1274,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       5) # Reinstall Wireguard
-        if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ]; }; then
+        if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
           dpkg-reconfigure wireguard-dkms
           modprobe wireguard
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
@@ -1308,7 +1308,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             apt-get remove --purge wireguard qrencode -y
             rm -f /etc/apt/sources.list.d/unstable.list
             rm -f /etc/apt/preferences.d/limit-unstable
-          elif [ "$DISTRO" == "pop" ]; then
+          elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "linuxmint" ]; }; then
             apt-get remove --purge wireguard qrencode haveged -y
           elif [ "$DISTRO" == "ubuntu" ]; then
             apt-get remove --purge wireguard qrencode haveged -y
