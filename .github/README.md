@@ -258,4 +258,4 @@ Give a ⭐️ and 🍴 if this project helped you!
 ### 📝 License
 Copyright © 2020 [Prajwal](https://github.com/prajwal-koirala)
 
-This project is [MIT](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE) licensed
+This project is [unlicensed](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/.github/LICENSE)
