@@ -254,6 +254,10 @@ Give a ⭐️ and 🍴 if this project helped you!
 - LTC : `MVwkmnnaLDq7UccDeudcpQYwFnnDwDxxmq`
 - XRP : `rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg (1790476900)`
 
+---	
+### ❤️ Credits	
+Open Source Community
+
 ---
 ### 📝 License
 Copyright © 2020 [Prajwal](https://github.com/prajwal-koirala)
