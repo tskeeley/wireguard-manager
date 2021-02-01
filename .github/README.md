@@ -255,7 +255,7 @@ Give a ⭐️ and 🍴 if this project helped you!
 - XRP : `rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg (1790476900)`
 
 ---	
-### ❤️ Credits	
+### ❤️ Credits
 Open Source Community
 
 ---
