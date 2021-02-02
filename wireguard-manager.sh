@@ -137,6 +137,7 @@ function interface-or-peer() {
       fi
       mkdir -p $WIREGUARD_PATH
       echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
+      echo "WireGuard: true" >>$WIREGUARD_MANAGER
       ;;
     2)
       if [ -f "$WIREGUARD_INTERFACE" ]; then
@@ -144,6 +145,7 @@ function interface-or-peer() {
       fi
       mkdir -p $WIREGUARD_PATH
       echo "WireGuard Peer: true" >>$WIREGUARD_PEER
+      echo "WireGuard: true" >>$WIREGUARD_MANAGER
       ;;
     esac
   fi
@@ -322,18 +324,20 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
   # Custom ipv6 Subnet
   set-ipv6-subnet
 
-  # Private Subnet Ipv4
-  PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"$IPV4_SUBNET"}
-  # Private Subnet Mask IPv4
-  PRIVATE_SUBNET_MASK_V4=$(echo "$PRIVATE_SUBNET_V4" | cut -d "/" -f 2)
-  # IPv4 Getaway
-  GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}1"
-  # Private Subnet Ipv6
-  PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"$IPV6_SUBNET"}
-  # Private Subnet Mask IPv6
-  PRIVATE_SUBNET_MASK_V6=$(echo "$PRIVATE_SUBNET_V6" | cut -d "/" -f 2)
-  # IPv6 Getaway
-  GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}1"
+  if [ -f "$WIREGUARD_INTERFACE" ]; then
+    # Private Subnet Ipv4
+    PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"$IPV4_SUBNET"}
+    # Private Subnet Mask IPv4
+    PRIVATE_SUBNET_MASK_V4=$(echo "$PRIVATE_SUBNET_V4" | cut -d "/" -f 2)
+    # IPv4 Getaway
+    GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}1"
+    # Private Subnet Ipv6
+    PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"$IPV6_SUBNET"}
+    # Private Subnet Mask IPv6
+    PRIVATE_SUBNET_MASK_V6=$(echo "$PRIVATE_SUBNET_V6" | cut -d "/" -f 2)
+    # IPv6 Getaway
+    GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}1"
+  fi
 
   # Get the IPV4
   function test-connectivity-v4() {
@@ -744,16 +748,6 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
   # Install WireGuard Server
   install-wireguard-server
 
-  # Install wireguard manager config
-  function install-wireguard-manager-file() {
-    if [ ! -f "$WIREGUARD_MANAGER" ]; then
-      echo "WireGuard: true" >>$WIREGUARD_MANAGER
-    fi
-  }
-
-  # wireguard manager config
-  install-wireguard-manager-file
-
   # Function to install unbound
   function install-unbound() {
     if [ -f "$WIREGUARD_INTERFACE" ]; then
@@ -966,7 +960,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$CLIENT_NAME"-$WIREGUARD_P
 else
 
   # Already installed what next?
-  function wireguard-next-questions() {
+  function wireguard-next-questions-interface() {
     if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
@@ -1227,9 +1221,9 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
   }
 
   # Running Questions Command
-  wireguard-next-questions
+  wireguard-next-questions-interface
 
-  function wireguard-next-questions() {
+  function wireguard-next-questions-peer() {
     if [ -f "$WIREGUARD_PEER" ]; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard Interface"
@@ -1380,6 +1374,6 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
   }
 
   # Running Questions Command
-  wireguard-next-questions
+  wireguard-next-questions-peer
 
 fi
