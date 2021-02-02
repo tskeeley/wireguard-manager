@@ -200,7 +200,7 @@ Is there WireGuard documentation?
 - Yes, please head to the [WireGuard Manual](https://www.wireguard.com), which references all the options.
 
 How do I install a wireguard without the questions? (Headless Install)
-- ```HEADLESS_INSTALL=y /usr/local/bin/wireguard-manager.sh```
+- ```./wireguard-manager.sh --install```
 
 Official Links
 - Homepage: https://www.wireguard.com
