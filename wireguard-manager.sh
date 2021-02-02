@@ -109,6 +109,7 @@ WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
+RESOLV_CONFIG="/etc/resolv.conf"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -818,11 +819,11 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
     prefetch-key: yes" >>/etc/unbound/unbound.conf
           # Set DNS Root Servers
           curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
-          chattr -i /etc/resolv.conf
-          mv /etc/resolv.conf /etc/resolv.conf.old
-          echo "nameserver 127.0.0.1" >>/etc/resolv.conf
-          echo "nameserver ::1" >>/etc/resolv.conf
-          chattr +i /etc/resolv.conf
+          chattr -i $RESOLV_CONFIG
+          mv $RESOLV_CONFIG $RESOLV_CONFIG.old
+          echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
+          echo "nameserver ::1" >>$RESOLV_CONFIG
+          chattr +i $RESOLV_CONFIG
           echo "Unbound: true" >>$UNBOUND_MANAGER
           # restart unbound
           if pgrep systemd-journal; then
@@ -1163,10 +1164,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             service unbound stop
           fi
           # Change to defualt dns
-          chattr -i /etc/resolv.conf
-          rm -f /etc/resolv.conf
-          mv /etc/resolv.conf.old /etc/resolv.conf
-          chattr +i /etc/resolv.conf
+          chattr -i $RESOLV_CONFIG
+          rm -f $RESOLV_CONFIG
+          mv $RESOLV_CONFIG.old $RESOLV_CONFIG
+          chattr +i $RESOLV_CONFIG
           if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
             yum remove unbound unbound-host -y
           elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
