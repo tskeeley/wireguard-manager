@@ -667,7 +667,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if ! [ -x "$(command -v wg)" ]; then
+    if [ ! -x "$(command -v wg)" ]; then
       if { [ -f "$WIREGUARD_INTERFACE" ] || [ -f "$WIREGUARD_PEER" ]; }; then
         if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
           apt-get update
@@ -765,7 +765,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
   function install-unbound() {
     if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$INSTALL_UNBOUND" = "y" ]; then
-        if ! [ -x "$(command -v unbound)" ]; then
+        if [ ! -x "$(command -v unbound)" ]; then
           if [ "$DISTRO" == "ubuntu" ]; then
             apt-get install unbound unbound-host e2fsprogs -y
             if pgrep systemd-journal; then
@@ -845,7 +845,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
   function install-pihole() {
     if [ -f "$WIREGUARD_INTERFACE" ]; then
       if [ "$INSTALL_PIHOLE" = "y" ]; then
-        if ! [ -x "$(command -v pihole)" ]; then
+        if [ ! -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
           echo "PiHole: true" >>$PIHOLE_MANAGER
         fi
