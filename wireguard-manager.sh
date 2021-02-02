@@ -110,6 +110,10 @@ WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
+UNBOUND_CONFIG="/etc/unbound/unbound.conf"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
+UNBOUND_ROOT_HINTS="/etc/unbound/root.hints"
+UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -787,14 +791,14 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           elif [ "$DISTRO" == "alpine" ]; then
             apk add unbound
           fi
-          unbound-anchor -a /var/lib/unbound/root.key
-          rm -f /etc/unbound/unbound.conf
+          unbound-anchor -a $UNBOUND_ANCHOR
+          rm -f $UNBOUND_CONFIG
           NPROC=$(nproc)
           echo "server:
     num-threads: $NPROC
     verbosity: 1
-    root-hints: /etc/unbound/root.hints
-    auto-trust-anchor-file: /var/lib/unbound/root.key
+    root-hints: $UNBOUND_ROOT_HINTS
+    auto-trust-anchor-file: $UNBOUND_ANCHOR
     interface: 0.0.0.0
     interface: ::0
     max-udp-size: 3072
@@ -816,9 +820,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
     cache-max-ttl: 14400
     prefetch: yes
     qname-minimisation: yes
-    prefetch-key: yes" >>/etc/unbound/unbound.conf
+    prefetch-key: yes" >>$UNBOUND_CONFIG
           # Set DNS Root Servers
-          curl https://www.internic.net/domain/named.cache --create-dirs -o /etc/unbound/root.hints
+          curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
           chattr -i $RESOLV_CONFIG
           mv $RESOLV_CONFIG $RESOLV_CONFIG.old
           echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
@@ -1179,6 +1183,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           elif [ "$DISTRO" == "alpine" ]; then
             apk del unbound
           fi
+          rm -f $UNBOUND_ANCHOR
+          rm -f $UNBOUND_ROOT_HINTS
+          rm -f $UNBOUND_CONFIG
+          rm -f $UNBOUND_ROOT_SERVER_CONFIG_URL
           # Uninstall Pihole
           if [ -f "$PIHOLE_MANAGER" ]; then
             if pgrep systemd-journal; then
