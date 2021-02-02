@@ -12,22 +12,6 @@ function super-user-check() {
 # Check for root
 super-user-check
 
-# Checking For Virtualization
-function virt-check() {
-  # Deny OpenVZ Virtualization
-  if [ "$(systemd-detect-virt)" == "openvz" ]; then
-    echo "OpenVZ virtualization is not supported (yet)."
-    exit
-  # Deny LXC Virtualization
-  elif [ "$(systemd-detect-virt)" == "lxc" ]; then
-    echo "LXC virtualization is not supported (yet)."
-    exit
-  fi
-}
-
-# Virtualization Check
-virt-check
-
 # Detect Operating System
 function dist-check() {
   if [ -e /etc/os-release ]; then
@@ -44,15 +28,15 @@ dist-check
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
-    if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ] || ! [ -x "$(command -v ip)" ] || ! [ -x "$(command -v hostname)" ]; }; then
+    if { ! [ -x "$(command -v curl)" ] || ! [ -x "$(command -v iptables)" ] || ! [ -x "$(command -v bc)" ] || ! [ -x "$(command -v jq)" ] || ! [ -x "$(command -v sed)" ] || ! [ -x "$(command -v zip)" ] || ! [ -x "$(command -v unzip)" ] || ! [ -x "$(command -v grep)" ] || ! [ -x "$(command -v awk)" ] || ! [ -x "$(command -v ip)" ] || ! [ -x "$(command -v hostname)" ] || ! [ -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname systemd -y
       elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-        yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname -y
+        yum update -y && yum install epel-release iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname systemd -y
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 hostname
+        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd
       elif [ "$DISTRO" == "alpine" ]; then
-        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 hostname
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd
       fi
     fi
   else
@@ -63,6 +47,22 @@ function installing-system-requirements() {
 
 # Run the function and check for requirements
 installing-system-requirements
+
+# Checking For Virtualization
+function virt-check() {
+  # Deny OpenVZ Virtualization
+  if [ "$(systemd-detect-virt)" == "openvz" ]; then
+    echo "OpenVZ virtualization is not supported (yet)."
+    exit
+  # Deny LXC Virtualization
+  elif [ "$(systemd-detect-virt)" == "lxc" ]; then
+    echo "LXC virtualization is not supported (yet)."
+    exit
+  fi
+}
+
+# Virtualization Check
+virt-check
 
 # Check for docker stuff
 function docker-check() {
