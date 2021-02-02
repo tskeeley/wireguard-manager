@@ -106,6 +106,7 @@ WIREGUARD_INTERFACE="$WIREGUARD_PATH/wireguard-interface"
 WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
+WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 
@@ -541,22 +542,22 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       done
       case $DISABLE_HOST_SETTINGS in
       1)
-        if [ ! -f "/etc/sysctl.d/wireguard.conf" ]; then
-          echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-          echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-          sysctl -p /etc/sysctl.d/wireguard.conf
+        if [ ! -f "$WIREGUARD_IP_FORWARDING_CONFIG" ]; then
+          echo "net.ipv4.ip_forward=1" >>$WIREGUARD_IP_FORWARDING_CONFIG
+          echo "net.ipv6.conf.all.forwarding=1" >>$WIREGUARD_IP_FORWARDING_CONFIG
+          sysctl -p $WIREGUARD_IP_FORWARDING_CONFIG
         fi
         ;;
       2)
-        if [ ! -f "/etc/sysctl.d/wireguard.conf" ]; then
-          echo "net.ipv6.conf.all.forwarding=1" >>/etc/sysctl.d/wireguard.conf
-          sysctl -p /etc/sysctl.d/wireguard.conf
+        if [ ! -f "$WIREGUARD_IP_FORWARDING_CONFIG" ]; then
+          echo "net.ipv6.conf.all.forwarding=1" >>$WIREGUARD_IP_FORWARDING_CONFIG
+          sysctl -p $WIREGUARD_IP_FORWARDING_CONFIG
         fi
         ;;
       3)
-        if [ ! -f "/etc/sysctl.d/wireguard.conf" ]; then
-          echo "net.ipv4.ip_forward=1" >>/etc/sysctl.d/wireguard.conf
-          sysctl -p /etc/sysctl.d/wireguard.conf
+        if [ ! -f "$WIREGUARD_IP_FORWARDING_CONFIG" ]; then
+          echo "net.ipv4.ip_forward=1" >>$WIREGUARD_IP_FORWARDING_CONFIG
+          sysctl -p $WIREGUARD_IP_FORWARDING_CONFIG
         fi
         ;;
       esac
@@ -1117,7 +1118,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -rf $WIREGUARD_PATH
           rm -rf $WIREGUARD_CLIENT_PATH
           rm -f $WIREGUARD_CONFIG
-          rm -f /etc/sysctl.d/wireguard.conf
+          rm -f $WIREGUARD_IP_FORWARDING_CONFIG
           if [ "$DISTRO" == "centos" ]; then
             yum remove wireguard qrencode haveged -y
           elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
@@ -1307,7 +1308,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -rf $WIREGUARD_PATH
           rm -rf $WIREGUARD_CLIENT_PATH
           rm -f $WIREGUARD_CONFIG
-          rm -f /etc/sysctl.d/wireguard.conf
+          rm -f $WIREGUARD_IP_FORWARDING_CONFIG
           if [ "$DISTRO" == "centos" ]; then
             yum remove wireguard qrencode haveged -y
           elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
