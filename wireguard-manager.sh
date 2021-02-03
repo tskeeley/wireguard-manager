@@ -752,7 +752,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           apk add wireguard-tools libqrencode haveged
         elif [ "$DISTRO" == "freebsd" ]; then
           pkg update
-          pkg install wireguard
+          pkg install wireguard libqrencode
         fi
       fi
     fi
@@ -1166,7 +1166,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           elif [ "$DISTRO" == "alpine" ]; then
             apk del wireguard-tools libqrencode haveged
           elif [ "$DISTRO" == "freebsd" ]; then
-            pkg delete wireguard
+            pkg delete wireguard libqrencode
           fi
         fi
         # Uninstall Unbound
@@ -1362,7 +1362,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           elif [ "$DISTRO" == "alpine" ]; then
             apk del wireguard-tools libqrencode haveged
           elif [ "$DISTRO" == "freebsd" ]; then
-            pkg delete wireguard
+            pkg delete wireguard libqrencode
           fi
         fi
         # Delete wireguard Backup
