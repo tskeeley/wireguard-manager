@@ -27,7 +27,7 @@ dist-check
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ]; }; then
+  if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ] || [ "$DISTRO" == "freebsd" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v ip)" ]; }; then
       if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
         apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname systemd -y
@@ -37,6 +37,8 @@ function installing-system-requirements() {
         pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd
       elif [ "$DISTRO" == "alpine" ]; then
         apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd
+      elif [ "$DISTRO" == "freebsd" ]; then
+        pkg update && pkg install curl jq zip unzip gawk
       fi
     fi
   else
@@ -748,6 +750,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         elif [ "$DISTRO" == "alpine" ]; then
           apk update
           apk add wireguard-tools libqrencode haveged
+        elif [ "$DISTRO" == "freebsd" ]; then
+          pkg update
+          pkg install wireguard
         fi
       fi
     fi
@@ -790,6 +795,8 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
             pacman -Syu --noconfirm unbound
           elif [ "$DISTRO" == "alpine" ]; then
             apk add unbound
+          elif [ "$DISTRO" == "freebsd" ]; then
+            pkg install unbound
           fi
           unbound-anchor -a $UNBOUND_ANCHOR
           rm -f $UNBOUND_CONFIG
@@ -1108,6 +1115,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           service wg-quick@$WIREGUARD_PUB_NIC restart
         elif [ "$DISTRO" == "alpine" ]; then
           apk fix wireguard-tools
+        elif [ "$DISTRO" == "freebsd" ]; then
+          #
         fi
         ;;
       8) # Uninstall Wireguard and purging files
@@ -1156,6 +1165,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             rm -f /etc/yum.repos.d/wireguard.repo
           elif [ "$DISTRO" == "alpine" ]; then
             apk del wireguard-tools libqrencode haveged
+          elif [ "$DISTRO" == "freebsd" ]; then
+            pkg delete wireguard
           fi
         fi
         # Uninstall Unbound
@@ -1350,6 +1361,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             rm -f /etc/yum.repos.d/wireguard.repo
           elif [ "$DISTRO" == "alpine" ]; then
             apk del wireguard-tools libqrencode haveged
+          elif [ "$DISTRO" == "freebsd" ]; then
+            pkg delete wireguard
           fi
         fi
         # Delete wireguard Backup
