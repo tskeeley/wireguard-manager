@@ -1116,7 +1116,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         elif [ "$DISTRO" == "alpine" ]; then
           apk fix wireguard-tools
         elif [ "$DISTRO" == "freebsd" ]; then
-          pkg update
+          pkg check wireguard
         fi
         ;;
       8) # Uninstall Wireguard and purging files
@@ -1316,7 +1316,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         elif [ "$DISTRO" == "alpine" ]; then
           apk fix wireguard-tools
         elif [ "$DISTRO" == "freebsd" ]; then
-          pkg update
+          pkg check wireguard
         fi
         ;;
       6) # Uninstall Wireguard and purging files
