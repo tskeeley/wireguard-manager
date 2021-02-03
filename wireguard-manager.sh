@@ -1116,7 +1116,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         elif [ "$DISTRO" == "alpine" ]; then
           apk fix wireguard-tools
         elif [ "$DISTRO" == "freebsd" ]; then
-          #
+          pkg update
         fi
         ;;
       8) # Uninstall Wireguard and purging files
@@ -1193,6 +1193,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             dnf remove unbound -y
           elif [ "$DISTRO" == "alpine" ]; then
             apk del unbound
+          elif [ "$DISTRO" == "freebsd" ]; then
+            pkg delete unbound
           fi
           rm -f $UNBOUND_ANCHOR
           rm -f $UNBOUND_ROOT_HINTS
@@ -1313,6 +1315,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           service wg-quick@$WIREGUARD_PUB_NIC restart
         elif [ "$DISTRO" == "alpine" ]; then
           apk fix wireguard-tools
+        elif [ "$DISTRO" == "freebsd" ]; then
+          pkg update
         fi
         ;;
       6) # Uninstall Wireguard and purging files
