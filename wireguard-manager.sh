@@ -723,9 +723,8 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
         elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]; }; then
           yum update -y
-          yum config-manager --set-enabled PowerTools
-          yum copr enable jdoss/wireguard -y
-          yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          yum install elrepo-release -y
+          yum install kmod-wireguard wireguard-tools qrencode haveged -y
         elif [ "$DISTRO" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
@@ -988,14 +987,14 @@ else
   function wireguard-next-questions-interface() {
     if [ -f "$WIREGUARD_INTERFACE" ]; then
       echo "What do you want to do?"
-      echo "   1) Show WireGuard Interface"
-      echo "   2) Start WireGuard Interface"
-      echo "   3) Stop WireGuard Interface"
-      echo "   4) Restart WireGuard Interface"
+      echo "   1) Show WireGuard"
+      echo "   2) Start WireGuard"
+      echo "   3) Stop WireGuard"
+      echo "   4) Restart WireGuard"
       echo "   5) Add WireGuard Peer"
       echo "   6) Remove WireGuard Peer"
-      echo "   7) Reinstall WireGuard Interface"
-      echo "   8) Uninstall WireGuard Interface"
+      echo "   7) Reinstall WireGuard"
+      echo "   8) Uninstall WireGuard"
       echo "   9) Update this script"
       echo "   10) Backup WireGuard Config"
       echo "   11) Restore WireGuard Config"
@@ -1108,7 +1107,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           modprobe wireguard
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
         elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-          yum reinstall wireguard-dkms -y
+          yum reinstall wireguard-tools -y
           service wg-quick@$WIREGUARD_PUB_NIC restart
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Rs --noconfirm wireguard-tools
@@ -1261,12 +1260,12 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
   function wireguard-next-questions-peer() {
     if [ -f "$WIREGUARD_PEER" ]; then
       echo "What do you want to do?"
-      echo "   1) Show WireGuard Interface"
-      echo "   2) Start WireGuard Interface"
-      echo "   3) Stop WireGuard Interface"
-      echo "   4) Restart WireGuard Interface"
-      echo "   5) Reinstall WireGuard Interface"
-      echo "   6) Uninstall WireGuard Interface"
+      echo "   1) Show WireGuard"
+      echo "   2) Start WireGuard"
+      echo "   3) Stop WireGuard"
+      echo "   4) Restart WireGuard"
+      echo "   5) Reinstall WireGuard"
+      echo "   6) Uninstall WireGuard"
       echo "   7) Update this script"
       echo "   8) Backup WireGuard Config"
       echo "   9) Restore WireGuard Config"
