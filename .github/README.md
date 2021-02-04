@@ -202,6 +202,9 @@ Is there WireGuard documentation?
 How do I install a wireguard without the questions? (Headless Install)
 - ```./wireguard-manager.sh --install```
 
+Is there any alternative to wireguard? ***Obfuscation***
+- [ShadowSocks](https://github.com/complexorganizations/shadowsocks-manager)
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
