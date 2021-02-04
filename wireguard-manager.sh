@@ -721,7 +721,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           dnf update -y
           dnf copr enable jdoss/wireguard -y
           dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
-        elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ]; }; then
+        elif [ "$DISTRO" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ] || [ "$DISTRO_VERSION" == "8.2" ]; }; then
           yum update -y
           yum install elrepo-release epel-release -y
           yum install kmod-wireguard wireguard-tools qrencode haveged -y
