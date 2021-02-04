@@ -113,7 +113,7 @@ PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
 UNBOUND_CONFIG="/etc/unbound/unbound.conf"
-UNBOUND_ANCHOR="/etc/unbound/root.key"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_HINTS="/etc/unbound/root.hints"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 
