@@ -113,7 +113,7 @@ PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
 UNBOUND_CONFIG="/etc/unbound/unbound.conf"
-UNBOUND_ANCHOR="/var/lib/unbound/root.key"
+UNBOUND_ANCHOR="/etc/unbound/root.key"
 UNBOUND_ROOT_HINTS="/etc/unbound/root.hints"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 
@@ -797,8 +797,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           elif [ "$DISTRO" == "freebsd" ]; then
             pkg install unbound
           fi
-          unbound-anchor -a $UNBOUND_ANCHOR
+          rm -f $UNBOUND_ANCHOR
           rm -f $UNBOUND_CONFIG
+          unbound-anchor -a $UNBOUND_ANCHOR
           NPROC=$(nproc)
           echo "server:
     num-threads: $NPROC
