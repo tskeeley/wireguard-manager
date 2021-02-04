@@ -980,16 +980,6 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$CLIENT_NAME"-$WIREGUARD_P
   # Setting Up Wireguard Config
   wireguard-setconf
 
-  # On some OS, wireguard wont install the first time so try and reinstall
-  function check-for-wireguard-again() {
-    if [ ! -x "$(command -v wg)" ]; then
-      install-wireguard-server
-    fi
-  }
-
-  # reinstall if not found
-  check-for-wireguard-again
-
 # After WireGuard Install
 else
 
@@ -1117,7 +1107,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           modprobe wireguard
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
         elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-          yum reinstall wireguard-dkms -y
+          yum reinstall wireguard-tools -y
           service wg-quick@$WIREGUARD_PUB_NIC restart
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Rs --noconfirm wireguard-tools
