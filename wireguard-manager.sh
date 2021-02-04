@@ -164,18 +164,18 @@ interface-or-peer
 function usage-guide() {
   if [ -f "$WIREGUARD_INTERFACE" ]; then
     echo "usage: ./$(basename "$0") <command>"
-    echo "  --install     Install WireGuard Interface"
-    echo "  --start       Start WireGuard Interface"
-    echo "  --stop        Stop WireGuard Interface"
-    echo "  --restart     Restart WireGuard Interface"
-    echo "  --list        Show WireGuard Peers"
+    echo "  --install     Install WireGuard"
+    echo "  --start       Start WireGuard"
+    echo "  --stop        Stop WireGuard"
+    echo "  --restart     Restart WireGuard"
+    echo "  --list        Show WireGuard"
     echo "  --add         Add WireGuard Peer"
     echo "  --remove      Remove WireGuard Peer"
-    echo "  --reinstall   Reinstall WireGuard Interface"
-    echo "  --uninstall   Uninstall WireGuard Interface"
-    echo "  --update      Update WireGuard Script"
-    echo "  --backup      Backup WireGuard Configs"
-    echo "  --restore     Restore WireGuard Configs"
+    echo "  --reinstall   Reinstall WireGuard"
+    echo "  --uninstall   Uninstall WireGuard"
+    echo "  --update      Update WireGuard Manager"
+    echo "  --backup      Backup WireGuard"
+    echo "  --restore     Restore WireGuard"
     echo "  --help        Show Usage Guide"
     exit
   fi
@@ -997,8 +997,8 @@ else
       echo "   7) Reinstall WireGuard"
       echo "   8) Uninstall WireGuard"
       echo "   9) Update this script"
-      echo "   10) Backup WireGuard Config"
-      echo "   11) Restore WireGuard Config"
+      echo "   10) Backup WireGuard"
+      echo "   11) Restore WireGuard"
       until [[ "$WIREGUARD_OPTIONS" =~ ^[0-9]+$ ]] && [ "$WIREGUARD_OPTIONS" -ge 1 ] && [ "$WIREGUARD_OPTIONS" -le 11 ]; do
         read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
       done
@@ -1268,8 +1268,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
       echo "   5) Reinstall WireGuard"
       echo "   6) Uninstall WireGuard"
       echo "   7) Update this script"
-      echo "   8) Backup WireGuard Config"
-      echo "   9) Restore WireGuard Config"
+      echo "   8) Backup WireGuard"
+      echo "   9) Restore WireGuard"
       until [[ "$WIREGUARD_OPTIONS" =~ ^[0-9]+$ ]] && [ "$WIREGUARD_OPTIONS" -ge 1 ] && [ "$WIREGUARD_OPTIONS" -le 9 ]; do
         read -rp "Select an Option [1-9]: " -e -i 1 WIREGUARD_OPTIONS
       done
