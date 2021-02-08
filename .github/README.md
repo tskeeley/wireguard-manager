@@ -204,7 +204,6 @@ How do I install a wireguard without the questions? (Headless Install)
 
 Is there any alternative to wireguard?
 - [ShadowSocks](https://github.com/complexorganizations/shadowsocks-manager)
-- [Tinyproxy](https://github.com/complexorganizations/tinyproxy-manager)
 
 Official Links
 - Homepage: https://www.wireguard.com
