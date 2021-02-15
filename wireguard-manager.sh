@@ -1035,8 +1035,9 @@ else
         if [ "$NEW_CLIENT_NAME" == "" ]; then
           echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
           read -rp "New client peer: " -e NEW_CLIENT_NAME
-        elif [ -z "$NEW_CLIENT_NAME" ]; than
-          NEW_CLIENT_NAME=$"(openssl rand -hex 50)"
+        fi
+        if [ -z "$NEW_CLIENT_NAME" ]; then
+          NEW_CLIENT_NAME="$(openssl rand -hex 50)"
         fi
         CLIENT_PRIVKEY=$(wg genkey)
         CLIENT_PUBKEY=$(echo "$CLIENT_PRIVKEY" | wg pubkey)
