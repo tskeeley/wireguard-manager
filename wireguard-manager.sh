@@ -636,7 +636,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         read -rp "Client name: " -e CLIENT_NAME
       fi
       if [ -z "$CLIENT_NAME" ]; then
-        NEW_CLIENT_NAME="$(openssl rand -hex 50)"
+        CLIENT_NAME="$(openssl rand -hex 50)"
       fi
     fi
   }
