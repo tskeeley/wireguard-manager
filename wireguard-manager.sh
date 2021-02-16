@@ -103,6 +103,7 @@ WIREGUARD_PATH="/etc/wireguard"
 WIREGUARD_CLIENT_PATH="$WIREGUARD_PATH/clients"
 WIREGUARD_PUB_NIC="wg0"
 WIREGUARD_CONFIG="$WIREGUARD_PATH/$WIREGUARD_PUB_NIC.conf"
+WIREGUARD_ADDCONF_CONFIG="$WIREGUARD_PATH/$WIREGUARD_PUB_NIC.addconf.conf"
 WIREGUARD_MANAGER="$WIREGUARD_PATH/wireguard-manager"
 WIREGUARD_INTERFACE="$WIREGUARD_PATH/wireguard-interface"
 WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
@@ -1065,7 +1066,7 @@ else
 PublicKey = $CLIENT_PUBKEY
 PresharedKey = $PRESHARED_KEY
 AllowedIPs = $CLIENT_ADDRESS_V4/32,$CLIENT_ADDRESS_V6/128
-# $NEW_CLIENT_NAME end" >>$WIREGUARD_CONFIG
+# $NEW_CLIENT_NAME end" > $WIREGUARD_ADDCONF_CONFIG
         echo "# $NEW_CLIENT_NAME
 [Interface]
 Address = $CLIENT_ADDRESS_V4/$PRIVATE_SUBNET_MASK_V4,$CLIENT_ADDRESS_V6/$PRIVATE_SUBNET_MASK_V6
@@ -1081,12 +1082,8 @@ PresharedKey = $PRESHARED_KEY
 PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
         qrencode -t ansiutf8 -l L <$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
         echo "Client config --> $WIREGUARD_CLIENT_PATH/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
-        # Restart WireGuard
-        if pgrep systemd-journal; then
-          systemctl restart wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC restart
-        fi
+        wg addconf $WIREGUARD_PUB_NIC $WIREGUARD_ADDCONF_CONFIG
+        cat $WIREGUARD_ADDCONF_CONFIG >> $WIREGUARD_CONFIG
         ;;
       6) # Remove WireGuard Peer
         echo "Which WireGuard user do you want to remove?"
