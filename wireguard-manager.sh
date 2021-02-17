@@ -565,6 +565,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname')" SERVER_HOST
+        if [ -z "$SERVER_HOST" ]; then
+          SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        fi
         ;;
       esac
     fi
