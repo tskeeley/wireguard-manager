@@ -468,7 +468,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       2)
         until [[ "$NAT_CHOICE" =~ ^[0-9]+$ ]] && [ "$NAT_CHOICE" -ge 1 ] && [ "$NAT_CHOICE" -le 65535 ]; do
-          read -rp "Custom NAT [0-65535]: " -e -i 25 NAT_CHOICE
+          read -rp "Custom NAT [1-65535]: " -e -i 25 NAT_CHOICE
         done
         ;;
       3)
@@ -499,8 +499,8 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         MTU_CHOICE="1420"
         ;;
       3)
-        until [[ "$MTU_CHOICE" =~ ^[0-9]+$ ]] && [ "$MTU_CHOICE" -ge 0 ] && [ "$MTU_CHOICE" -le 1500 ]; do
-          read -rp "Custom MTU [0-1500]: " -e -i 1280 MTU_CHOICE
+        until [[ "$MTU_CHOICE" =~ ^[0-9]+$ ]] && [ "$MTU_CHOICE" -ge 1 ] && [ "$MTU_CHOICE" -le 65535 ]; do
+          read -rp "Custom MTU [1-65535]: " -e -i 1280 MTU_CHOICE
         done
         ;;
       esac
