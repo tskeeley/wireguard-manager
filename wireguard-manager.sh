@@ -30,13 +30,13 @@ function installing-system-requirements() {
   if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ] || [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ] || [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ] || [ "$DISTRO" == "alpine" ] || [ "$DISTRO" == "freebsd" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ]; }; then
       if { [ "$DISTRO" == "ubuntu" ] || [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "raspbian" ] || [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "kali" ] || [ "$DISTRO" == "linuxmint" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 hostname systemd openssl -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl -y
       elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk hostname systemd openssl -y
+        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl -y
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd coreutils openssl
+        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
       elif [ "$DISTRO" == "alpine" ]; then
-        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 hostname systemd coreutils openssl
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
       elif [ "$DISTRO" == "freebsd" ]; then
         pkg update && pkg install curl jq zip unzip gawk openssl
       fi
@@ -380,7 +380,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         ;;
       2)
-        SERVER_HOST_V4="$(hostname -I | awk '{print $1}')"
+        SERVER_HOST_V4="$(ip route get 8.8.8.8| grep src| sed 's/.*src \(.* \)/\1/g'|cut -f1 -d ' ')"
         ;;
       3)
         read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
@@ -410,7 +410,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         ;;
       2)
-        SERVER_HOST_V6="$(hostname -I | awk '{print $2}')"
+        SERVER_HOST_V6="$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)"
         ;;
       3)
         read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
