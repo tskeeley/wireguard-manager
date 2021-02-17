@@ -387,7 +387,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         ;;
       2)
-        SERVER_HOST_V6="$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)"
+        SERVER_HOST_V6="$(hostname -I | awk '{print $2}')"
         ;;
       3)
         read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
