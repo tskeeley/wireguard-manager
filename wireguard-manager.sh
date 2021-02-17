@@ -143,7 +143,7 @@ function interface-or-peer() {
     1)
       if [ -d "$WIREGUARD_PATH" ]; then
         if [ -f "$WIREGUARD_PEER" ]; then
-          rm -f $WIREGUARD_PATH
+          rm -rf $WIREGUARD_PATH
         elif [ ! -d "$WIREGUARD_PATH" ]; then
           mkdir -p $WIREGUARD_PATH
         elif [ ! -f "$WIREGUARD_INTERFACE" ]; then
@@ -154,7 +154,7 @@ function interface-or-peer() {
     2)
       if [ -d "$WIREGUARD_PATH" ]; then
         if [ -f "$WIREGUARD_INTERFACE" ]; then
-          rm -f $WIREGUARD_PATH
+          rm -rf $WIREGUARD_PATH
         elif [ ! -d "$WIREGUARD_PATH" ]; then
           mkdir -p $WIREGUARD_PATH
         elif [ ! -f "$WIREGUARD_PEER" ]; then
