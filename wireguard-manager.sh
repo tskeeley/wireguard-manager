@@ -1114,12 +1114,12 @@ else
         MTU_CHOICE=$(head -n1 $WIREGUARD_CONFIG | awk '{print $7}')
         NAT_CHOICE=$(head -n1 $WIREGUARD_CONFIG | awk '{print $8}')
         CLIENT_ALLOWED_IP=$(head -n1 $WIREGUARD_CONFIG | awk '{print $9}')
-        LASTIP4=$(grep "/32" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-        LASTIP6=$(grep "/128" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-        CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIP4 + 1))"
-        CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIP6 + 1))"
-        if [ "$LASTIP4" -ge "255" ]; then
-          echo "Error: You have $LASTIP4 peers the max is 255"
+        LASTIPV4=$(grep "/32" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+        LASTIPV6=$(grep "/128" $WIREGUARD_CONFIG | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+        CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
+        CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
+        if [ "$LASTIPV4" -ge "255" ]; then
+          echo "Error: You have $LASTIPV4 peers the max is 255"
           exit
         fi
         echo "# $NEW_CLIENT_NAME start
