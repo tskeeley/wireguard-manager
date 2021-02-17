@@ -458,7 +458,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       echo "What do you want your keepalive interval to be?"
       echo "  1) 25 (Default)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1-25]"
+      echo "  3) Random [1-65535]"
       until [[ "$NAT_CHOICE_SETTINGS" =~ ^[1-3]$ ]]; do
         read -rp "Nat Choice [1-3]: " -e -i 1 NAT_CHOICE_SETTINGS
       done
@@ -522,10 +522,18 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       done
       case $SERVER_HOST_SETTINGS in
       1)
-        SERVER_HOST="$SERVER_HOST_V4"
+        if [ -z "$SERVER_HOST_V4" ]; then
+          SERVER_HOST="[$SERVER_HOST_V6]"
+        else
+          SERVER_HOST="$SERVER_HOST_V4"
+        fi
         ;;
       2)
-        SERVER_HOST="[$SERVER_HOST_V6]"
+        if [ -z "$SERVER_HOST_V6" ]; then
+          SERVER_HOST="$SERVER_HOST_V4"
+        else
+          SERVER_HOST="[$SERVER_HOST_V6]"
+        fi
         ;;
       3)
         read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname')" SERVER_HOST
