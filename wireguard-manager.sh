@@ -467,12 +467,12 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         NAT_CHOICE="25"
         ;;
       2)
-        until [[ "$NAT_CHOICE" =~ ^[0-9]+$ ]] && [ "$NAT_CHOICE" -ge 0 ] && [ "$NAT_CHOICE" -le 25 ]; do
-          read -rp "Custom NAT [0-25]: " -e -i 25 NAT_CHOICE
+        until [[ "$NAT_CHOICE" =~ ^[0-9]+$ ]] && [ "$NAT_CHOICE" -ge 0 ] && [ "$NAT_CHOICE" -le 65535 ]; do
+          read -rp "Custom NAT [0-65535]: " -e -i 25 NAT_CHOICE
         done
         ;;
       3)
-        NAT_CHOICE=$(shuf -i1-25 -n1)
+        NAT_CHOICE=$(shuf -i0-65535 -n1)
         ;;
       esac
     fi
