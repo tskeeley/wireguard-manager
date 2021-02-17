@@ -112,6 +112,7 @@ WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
 UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
+RESOLV_CONFIG_OLD="/etc/resolv.conf.old"
 UNBOUND_CONFIG="/etc/unbound/unbound.conf"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_HINTS="/etc/unbound/root.hints"
@@ -140,18 +141,30 @@ function interface-or-peer() {
     done
     case $INTERFACE_OR_PEER in
     1)
-      if [ -f "$WIREGUARD_PEER" ]; then
-        rm -f $WIREGUARD_PATH
+      if [ -d "$WIREGUARD_PATH" ]; then
+        if [ -f "$WIREGUARD_PEER" ]; then
+          rm -rf $WIREGUARD_PATH
+        fi
       fi
-      mkdir -p $WIREGUARD_PATH
-      echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
+      if [ ! -d "$WIREGUARD_PATH" ]; then
+        mkdir -p $WIREGUARD_PATH
+      fi
+      if [ ! -f "$WIREGUARD_INTERFACE" ]; then
+        echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
+      fi
       ;;
     2)
-      if [ -f "$WIREGUARD_INTERFACE" ]; then
-        rm -f $WIREGUARD_PATH
+      if [ -d "$WIREGUARD_PATH" ]; then
+        if [ -f "$WIREGUARD_INTERFACE" ]; then
+          rm -rf $WIREGUARD_PATH
+        fi
       fi
-      mkdir -p $WIREGUARD_PATH
-      echo "WireGuard Peer: true" >>$WIREGUARD_PEER
+      if [ ! -d "$WIREGUARD_PATH" ]; then
+        mkdir -p $WIREGUARD_PATH
+      fi
+      if [ ! -f "$WIREGUARD_PEER" ]; then
+        echo "WireGuard Peer: true" >>$WIREGUARD_PEER
+      fi
       ;;
     esac
   fi
@@ -295,6 +308,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom Subnet: " -e -i "10.8.0.0/24" IPV4_SUBNET
+        if [ -z "$IPV4_SUBNET" ]; then
+          IPV4_SUBNET="10.8.0.0/24"
+        fi
         ;;
       esac
     fi
@@ -322,6 +338,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom Subnet: " -e -i "fd42:42:42::0/64" IPV6_SUBNET
+        if [ -z "$IPV6_SUBNET" ]; then
+          IPV6_SUBNET="fd42:42:42::0/64"
+        fi
         ;;
       esac
     fi
@@ -364,6 +383,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
+        if [ -z "$SERVER_HOST_V4" ]; then
+          SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        fi
         ;;
       esac
     fi
@@ -391,6 +413,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
+        if [ -z "$SERVER_HOST_V6" ]; then
+          SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        fi
         ;;
       esac
     fi
@@ -414,6 +439,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       2)
         read -rp "Custom NAT: " -e -i "$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)" SERVER_PUB_NIC
+        if [ -z "$SERVER_PUB_NIC" ]; then
+          SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+        fi
         ;;
       esac
     fi
@@ -614,6 +642,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         ;;
       3)
         read -rp "Custom IPs: " -e -i "0.0.0.0/0,::/0" CLIENT_ALLOWED_IP
+        if [ -z "$CLIENT_ALLOWED_IP" ]; then
+          CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
+        fi
         ;;
       esac
     fi
@@ -786,8 +817,10 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
 
   # Install wireguard manager config
   function install-wireguard-manager-file() {
-    if [ ! -f "$WIREGUARD_MANAGER" ]; then
-      echo "WireGuard: true" >>$WIREGUARD_MANAGER
+    if [ -d "$WIREGUARD_PATH" ]; then
+      if [ ! -f "$WIREGUARD_MANAGER" ]; then
+        echo "WireGuard: true" >>$WIREGUARD_MANAGER
+      fi
     fi
   }
 
@@ -855,7 +888,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           # Set DNS Root Servers
           curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
           chattr -i $RESOLV_CONFIG
-          mv $RESOLV_CONFIG $RESOLV_CONFIG.old
+          mv $RESOLV_CONFIG $RESOLV_CONFIG_OLD
           echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
           echo "nameserver ::1" >>$RESOLV_CONFIG
           chattr +i $RESOLV_CONFIG
@@ -1208,7 +1241,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           # Change to defualt dns
           chattr -i $RESOLV_CONFIG
           rm -f $RESOLV_CONFIG
-          mv $RESOLV_CONFIG.old $RESOLV_CONFIG
+          mv $RESOLV_CONFIG_OLD $RESOLV_CONFIG
           chattr +i $RESOLV_CONFIG
           if { [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
             yum remove unbound unbound-host -y
