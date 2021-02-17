@@ -141,19 +141,25 @@ function interface-or-peer() {
     done
     case $INTERFACE_OR_PEER in
     1)
-      if [ -f "$WIREGUARD_PEER" ]; then
-        rm -f $WIREGUARD_PATH
-      elif [ ! -d "$WIREGUARD_PEER" ]; then
-        mkdir -p $WIREGUARD_PATH
-        echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
+      if [ -d "$WIREGUARD_PATH" ]; then
+        if [ -f "$WIREGUARD_PEER" ]; then
+          rm -f $WIREGUARD_PATH
+        elif [ ! -d "$WIREGUARD_PATH" ]; then
+          mkdir -p $WIREGUARD_PATH
+        elif [ ! -f "$WIREGUARD_INTERFACE" ]; then
+          echo "WireGuard Interface: true" >>$WIREGUARD_INTERFACE
+        fi
       fi
       ;;
     2)
-      if [ -f "$WIREGUARD_INTERFACE" ]; then
-        rm -f $WIREGUARD_PATH
-      elif [ ! -d "$WIREGUARD_PEER" ]; then
-        mkdir -p $WIREGUARD_PATH
-        echo "WireGuard Peer: true" >>$WIREGUARD_PEER
+      if [ -d "$WIREGUARD_PATH" ]; then
+        if [ -f "$WIREGUARD_INTERFACE" ]; then
+          rm -f $WIREGUARD_PATH
+        elif [ ! -d "$WIREGUARD_PATH" ]; then
+          mkdir -p $WIREGUARD_PATH
+        elif [ ! -f "$WIREGUARD_PEER" ]; then
+          echo "WireGuard Peer: true" >>$WIREGUARD_PEER
+        fi
       fi
       ;;
     esac
