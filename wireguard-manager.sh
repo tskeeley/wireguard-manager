@@ -1294,6 +1294,9 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           curl -o "$CURRENT_FILE_PATH" $WIREGUARD_MANAGER_UPDATE
           chmod +x "$CURRENT_FILE_PATH" || exit
         fi
+        if [ -f "$UNBOUND_ROOT_HINTS" ]; then
+          curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
+        fi
         ;;
       10) # Backup Wireguard Config
         if [ -d "$WIREGUARD_PATH" ]; then
