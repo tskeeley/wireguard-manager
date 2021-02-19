@@ -869,10 +869,10 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
             rm -f $UNBOUND_ROOT_HINTS
           fi
           if [ -d "$UNBOUND_ROOT" ]; then
-          unbound-anchor -a $UNBOUND_ANCHOR
-          curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
-          NPROC=$(nproc)
-          echo "server:
+            unbound-anchor -a $UNBOUND_ANCHOR
+            curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
+            NPROC=$(nproc)
+            echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: $UNBOUND_ROOT_HINTS
