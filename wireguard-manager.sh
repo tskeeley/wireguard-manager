@@ -1364,9 +1364,12 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
       done
       case $WIREGUARD_OPTIONS in
       1) # WG Show
-        wg show
+        if [ -x "$(command -v wg)" ]; then
+          wg show
+        fi
         ;;
       2) # Enable & Start Wireguard
+        if [ -x "$(command -v wg)" ]; then
         if pgrep systemd-journal; then
           systemctl enable wg-quick@$WIREGUARD_PUB_NIC
           systemctl start wg-quick@$WIREGUARD_PUB_NIC
@@ -1374,8 +1377,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           service wg-quick@$WIREGUARD_PUB_NIC enable
           service wg-quick@$WIREGUARD_PUB_NIC start
         fi
+        fi
         ;;
       3) # Disable & Stop WireGuard
+        if [ -x "$(command -v wg)" ]; then
         if pgrep systemd-journal; then
           systemctl disable wg-quick@$WIREGUARD_PUB_NIC
           systemctl stop wg-quick@$WIREGUARD_PUB_NIC
@@ -1383,12 +1388,15 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           service wg-quick@$WIREGUARD_PUB_NIC disable
           service wg-quick@$WIREGUARD_PUB_NIC stop
         fi
+        fi
         ;;
       4) # Restart WireGuard
+        if [ -x "$(command -v wg)" ]; then
         if pgrep systemd-journal; then
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
         else
           service wg-quick@$WIREGUARD_PUB_NIC restart
+        fi
         fi
         ;;
       5) # Reinstall Wireguard
@@ -1410,6 +1418,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       6) # Uninstall Wireguard and purging files
         if [ -f "$WIREGUARD_MANAGER" ]; then
+                if [ -x "$(command -v wg)" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
             wg-quick down $WIREGUARD_PUB_NIC
@@ -1457,6 +1466,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           elif [ "$DISTRO" == "freebsd" ]; then
             pkg delete wireguard libqrencode
           fi
+        fi
         fi
         # Delete wireguard Backup
         if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
