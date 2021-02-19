@@ -380,7 +380,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         ;;
       2)
-        SERVER_HOST_V4="$(ip route get 8.8.8.8| grep src| sed 's/.*src \(.* \)/\1/g'|cut -f1 -d ' ')"
+        SERVER_HOST_V4="$(ip route get 8.8.8.8 | grep src | sed 's/.*src \(.* \)/\1/g' | cut -f1 -d ' ')"
         ;;
       3)
         read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
@@ -1127,9 +1127,9 @@ else
 PublicKey = $CLIENT_PUBKEY
 PresharedKey = $PRESHARED_KEY
 AllowedIPs = $CLIENT_ADDRESS_V4/32,$CLIENT_ADDRESS_V6/128
-# $NEW_CLIENT_NAME end" > $WIREGUARD_ADD_PEER_CONFIG
+# $NEW_CLIENT_NAME end" >$WIREGUARD_ADD_PEER_CONFIG
         wg addconf $WIREGUARD_PUB_NIC $WIREGUARD_ADD_PEER_CONFIG
-        cat $WIREGUARD_ADD_PEER_CONFIG >> $WIREGUARD_CONFIG
+        cat $WIREGUARD_ADD_PEER_CONFIG >>$WIREGUARD_CONFIG
         rm -f $WIREGUARD_ADD_PEER_CONFIG
         # Write client file
         echo "# $NEW_CLIENT_NAME
@@ -1301,7 +1301,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
       10) # Backup Wireguard Config
         if [ -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
-          zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_INTERFACE
+          zip -re -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_INTERFACE
         else
           exit
         fi
@@ -1458,7 +1458,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
       8) # Backup Wireguard Config
         if [ -d "$WIREGUARD_PATH" ]; then
           rm -f $WIREGUARD_CONFIG_BACKUP
-          zip -r -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER
+          zip -re -j $WIREGUARD_CONFIG_BACKUP $WIREGUARD_CONFIG $WIREGUARD_MANAGER $WIREGUARD_PEER
         else
           exit
         fi
