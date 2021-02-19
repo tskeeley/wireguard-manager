@@ -111,12 +111,13 @@ WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations
 WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
-UNBOUND_MANAGER="/etc/unbound/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="/etc/resolv.conf.old"
-UNBOUND_CONFIG="/etc/unbound/unbound.conf"
+UNBOUND_ROOT="/etc/unbound"
+UNBOUND_MANAGER="$UNBOUND_ROOT/wireguard-manager"
+UNBOUND_CONFIG="$UNBOUND_ROOT/unbound.conf"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
-UNBOUND_ROOT_HINTS="/etc/unbound/root.hints"
+UNBOUND_ROOT_HINTS="$UNBOUND_ROOT/root.hints"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 
 # Verify that it is an old installation or another installer
@@ -858,11 +859,20 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           elif [ "$DISTRO" == "freebsd" ]; then
             pkg install unbound
           fi
-          rm -f $UNBOUND_ANCHOR
-          rm -f $UNBOUND_CONFIG
-          unbound-anchor -a $UNBOUND_ANCHOR
-          NPROC=$(nproc)
-          echo "server:
+          if [ -f "$UNBOUND_ANCHOR" ]; then
+            rm -f $UNBOUND_ANCHOR
+          fi
+          if [ -f "$UNBOUND_CONFIG" ]; then
+            rm -f $UNBOUND_CONFIG
+          fi
+          if [ -f "$UNBOUND_ROOT_HINTS" ]; then
+            rm -f $UNBOUND_ROOT_HINTS
+          fi
+          if [ -d "$UNBOUND_ROOT" ]; then
+            unbound-anchor -a $UNBOUND_ANCHOR
+            curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
+            NPROC=$(nproc)
+            echo "server:
     num-threads: $NPROC
     verbosity: 1
     root-hints: $UNBOUND_ROOT_HINTS
@@ -889,13 +899,20 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>$UNBOUND_CONFIG
-          # Set DNS Root Servers
-          curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
-          chattr -i $RESOLV_CONFIG
-          mv $RESOLV_CONFIG $RESOLV_CONFIG_OLD
-          echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
-          echo "nameserver ::1" >>$RESOLV_CONFIG
-          chattr +i $RESOLV_CONFIG
+          fi
+          if [ -f "$RESOLV_CONFIG_OLD" ]; then
+            rm -f $RESOLV_CONFIG_OLD
+          fi
+          if [ -f "$RESOLV_CONFIG" ]; then
+            chattr -i $RESOLV_CONFIG
+            mv $RESOLV_CONFIG $RESOLV_CONFIG_OLD
+            echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
+            echo "nameserver ::1" >>$RESOLV_CONFIG
+            chattr +i $RESOLV_CONFIG
+          else
+            echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
+            echo "nameserver ::1" >>$RESOLV_CONFIG
+          fi
           echo "Unbound: true" >>$UNBOUND_MANAGER
           # restart unbound
           if pgrep systemd-journal; then
