@@ -1370,33 +1370,33 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       2) # Enable & Start Wireguard
         if [ -x "$(command -v wg)" ]; then
-        if pgrep systemd-journal; then
-          systemctl enable wg-quick@$WIREGUARD_PUB_NIC
-          systemctl start wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC enable
-          service wg-quick@$WIREGUARD_PUB_NIC start
-        fi
+          if pgrep systemd-journal; then
+            systemctl enable wg-quick@$WIREGUARD_PUB_NIC
+            systemctl start wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC enable
+            service wg-quick@$WIREGUARD_PUB_NIC start
+          fi
         fi
         ;;
       3) # Disable & Stop WireGuard
         if [ -x "$(command -v wg)" ]; then
-        if pgrep systemd-journal; then
-          systemctl disable wg-quick@$WIREGUARD_PUB_NIC
-          systemctl stop wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC disable
-          service wg-quick@$WIREGUARD_PUB_NIC stop
-        fi
+          if pgrep systemd-journal; then
+            systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+            systemctl stop wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC disable
+            service wg-quick@$WIREGUARD_PUB_NIC stop
+          fi
         fi
         ;;
       4) # Restart WireGuard
         if [ -x "$(command -v wg)" ]; then
-        if pgrep systemd-journal; then
-          systemctl restart wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC restart
-        fi
+          if pgrep systemd-journal; then
+            systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC restart
+          fi
         fi
         ;;
       5) # Reinstall Wireguard
@@ -1418,55 +1418,55 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       6) # Uninstall Wireguard and purging files
         if [ -f "$WIREGUARD_MANAGER" ]; then
-                if [ -x "$(command -v wg)" ]; then
-          if pgrep systemd-journal; then
-            systemctl disable wg-quick@$WIREGUARD_PUB_NIC
-            wg-quick down $WIREGUARD_PUB_NIC
-          else
-            service wg-quick@$WIREGUARD_PUB_NIC disable
-            wg-quick down $WIREGUARD_PUB_NIC
-          fi
-          # Removing Wireguard Files
-          rm -rf $WIREGUARD_PATH
-          rm -rf $WIREGUARD_CLIENT_PATH
-          rm -f $WIREGUARD_CONFIG
-          rm -f $WIREGUARD_IP_FORWARDING_CONFIG
-          if [ "$DISTRO" == "centos" ]; then
-            yum remove wireguard qrencode haveged -y
-          elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
-            apt-get remove --purge wireguard qrencode -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "linuxmint" ]; }; then
-            apt-get remove --purge wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "ubuntu" ]; then
-            apt-get remove --purge wireguard qrencode haveged -y
+          if [ -x "$(command -v wg)" ]; then
             if pgrep systemd-journal; then
-              systemctl enable systemd-resolved
-              systemctl restart systemd-resolved
+              systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+              wg-quick down $WIREGUARD_PUB_NIC
             else
-              service systemd-resolved enable
-              service systemd-resolved restart
+              service wg-quick@$WIREGUARD_PUB_NIC disable
+              wg-quick down $WIREGUARD_PUB_NIC
             fi
-          elif [ "$DISTRO" == "raspbian" ]; then
-            apt-key del 04EE7237B7D453EC
-            apt-get remove --purge wireguard qrencode haveged dirmngr -y
-            rm -f /etc/apt/sources.list.d/unstable.list
-            rm -f /etc/apt/preferences.d/limit-unstable
-          elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-            pacman -Rs wireguard qrencode haveged -y
-          elif [ "$DISTRO" == "fedora" ]; then
-            dnf remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          elif [ "$DISTRO" == "rhel" ]; then
-            yum remove wireguard qrencode haveged -y
-            rm -f /etc/yum.repos.d/wireguard.repo
-          elif [ "$DISTRO" == "alpine" ]; then
-            apk del wireguard-tools libqrencode haveged
-          elif [ "$DISTRO" == "freebsd" ]; then
-            pkg delete wireguard libqrencode
+            # Removing Wireguard Files
+            rm -rf $WIREGUARD_PATH
+            rm -rf $WIREGUARD_CLIENT_PATH
+            rm -f $WIREGUARD_CONFIG
+            rm -f $WIREGUARD_IP_FORWARDING_CONFIG
+            if [ "$DISTRO" == "centos" ]; then
+              yum remove wireguard qrencode haveged -y
+            elif { [ "$DISTRO" == "debian" ] || [ "$DISTRO" == "kali" ]; }; then
+              apt-get remove --purge wireguard qrencode -y
+              rm -f /etc/apt/sources.list.d/unstable.list
+              rm -f /etc/apt/preferences.d/limit-unstable
+            elif { [ "$DISTRO" == "pop" ] || [ "$DISTRO" == "linuxmint" ]; }; then
+              apt-get remove --purge wireguard qrencode haveged -y
+            elif [ "$DISTRO" == "ubuntu" ]; then
+              apt-get remove --purge wireguard qrencode haveged -y
+              if pgrep systemd-journal; then
+                systemctl enable systemd-resolved
+                systemctl restart systemd-resolved
+              else
+                service systemd-resolved enable
+                service systemd-resolved restart
+              fi
+            elif [ "$DISTRO" == "raspbian" ]; then
+              apt-key del 04EE7237B7D453EC
+              apt-get remove --purge wireguard qrencode haveged dirmngr -y
+              rm -f /etc/apt/sources.list.d/unstable.list
+              rm -f /etc/apt/preferences.d/limit-unstable
+            elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
+              pacman -Rs wireguard qrencode haveged -y
+            elif [ "$DISTRO" == "fedora" ]; then
+              dnf remove wireguard qrencode haveged -y
+              rm -f /etc/yum.repos.d/wireguard.repo
+            elif [ "$DISTRO" == "rhel" ]; then
+              yum remove wireguard qrencode haveged -y
+              rm -f /etc/yum.repos.d/wireguard.repo
+            elif [ "$DISTRO" == "alpine" ]; then
+              apk del wireguard-tools libqrencode haveged
+            elif [ "$DISTRO" == "freebsd" ]; then
+              pkg delete wireguard libqrencode
+            fi
           fi
-        fi
         fi
         # Delete wireguard Backup
         if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
