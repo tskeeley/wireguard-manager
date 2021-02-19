@@ -1352,8 +1352,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       11) # Restore Wireguard Config
         if [ -x "$(command -v wg)" ]; then
-          if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
+          if [ -d "$WIREGUARD_PATH" ]; then
             rm -rf $WIREGUARD_PATH
+          fi
+          if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
             unzip $WIREGUARD_CONFIG_BACKUP -d $WIREGUARD_PATH
           else
             exit
@@ -1525,8 +1527,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         ;;
       9) # Restore Wireguard Config
         if [ -x "$(command -v wg)" ]; then
-          if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
+          if [ -d "$WIREGUARD_PATH" ]; then
             rm -rf $WIREGUARD_PATH
+          fi
+          if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
             unzip $WIREGUARD_CONFIG_BACKUP -d $WIREGUARD_PATH
           else
             exit
