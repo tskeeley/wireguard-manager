@@ -74,7 +74,7 @@ docker build -t wireguard https://raw.githubusercontent.com/complexorganizations
 - Remove WireGuard Peer
 - Uninstall WireGuard Interface
 - Update this script
-- Backup WireGuard Configs
+- Encrypt & Backup Configs
 - Restore WireGuard Configs
 
 ---
