@@ -110,14 +110,15 @@ WIREGUARD_PEER="$WIREGUARD_PATH/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
-PIHOLE_MANAGER="/etc/pihole/wireguard-manager"
+PIHOLE_ROOT="/etc/pihole"
+PIHOLE_MANAGER="$PIHOLE_ROOT/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="/etc/resolv.conf.old"
 UNBOUND_ROOT="/etc/unbound"
 UNBOUND_MANAGER="$UNBOUND_ROOT/wireguard-manager"
 UNBOUND_CONFIG="$UNBOUND_ROOT/unbound.conf"
-UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_HINTS="$UNBOUND_ROOT/root.hints"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 
 # Verify that it is an old installation or another installer
@@ -937,7 +938,9 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       if [ "$INSTALL_PIHOLE" = "y" ]; then
         if [ ! -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
-          echo "PiHole: true" >>$PIHOLE_MANAGER
+          if [ -d "$PIHOLE_ROOT" ]; then
+            echo "PiHole: true" >>$PIHOLE_MANAGER
+          fi
         fi
         CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
       fi
