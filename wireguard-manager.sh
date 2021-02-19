@@ -904,7 +904,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
             echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
             echo "nameserver ::1" >>$RESOLV_CONFIG
             chattr +i $RESOLV_CONFIG
-          elif [ ! -f "$RESOLV_CONFIG" ]; then
+          else
             echo "nameserver 127.0.0.1" >>$RESOLV_CONFIG
             echo "nameserver ::1" >>$RESOLV_CONFIG
           fi
