@@ -1085,34 +1085,43 @@ else
       done
       case $WIREGUARD_OPTIONS in
       1) # WG Show
-        wg show
+        if [ -x "$(command -v wg)" ]; then
+          wg show
+        fi
         ;;
       2) # Enable & Start Wireguard
-        if pgrep systemd-journal; then
-          systemctl enable wg-quick@$WIREGUARD_PUB_NIC
-          systemctl start wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC enable
-          service wg-quick@$WIREGUARD_PUB_NIC start
+        if [ -x "$(command -v wg)" ]; then
+          if pgrep systemd-journal; then
+            systemctl enable wg-quick@$WIREGUARD_PUB_NIC
+            systemctl start wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC enable
+            service wg-quick@$WIREGUARD_PUB_NIC start
+          fi
         fi
         ;;
       3) # Disable & Stop WireGuard
-        if pgrep systemd-journal; then
-          systemctl disable wg-quick@$WIREGUARD_PUB_NIC
-          systemctl stop wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC disable
+        if [ -x "$(command -v wg)" ]; then
+          if pgrep systemd-journal; then
+            systemctl disable wg-quick@$WIREGUARD_PUB_NIC
+            systemctl stop wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC disable
           service wg-quick@$WIREGUARD_PUB_NIC stop
+          fi
         fi
         ;;
       4) # Restart WireGuard
-        if pgrep systemd-journal; then
-          systemctl restart wg-quick@$WIREGUARD_PUB_NIC
-        else
-          service wg-quick@$WIREGUARD_PUB_NIC restart
+        if [ -x "$(command -v wg)" ]; then
+          if pgrep systemd-journal; then
+            systemctl restart wg-quick@$WIREGUARD_PUB_NIC
+          else
+            service wg-quick@$WIREGUARD_PUB_NIC restart
+          fi
         fi
         ;;
       5) # WireGuard add Peer
+        if [ -x "$(command -v wg)" ]; then
         if [ "$NEW_CLIENT_NAME" == "" ]; then
           echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
           read -rp "New client peer: " -e NEW_CLIENT_NAME
@@ -1167,8 +1176,10 @@ PresharedKey = $PRESHARED_KEY
 PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
         qrencode -t ansiutf8 -l L <$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUARD_PUB_NIC.conf
         echo "Client config --> $WIREGUARD_CLIENT_PATH/$NEW_CLIENT_NAME-$WIREGUARD_PUB_NIC.conf"
+        fi
         ;;
       6) # Remove WireGuard Peer
+        if [ -x "$(command -v wg)" ]; then
         echo "Which WireGuard user do you want to remove?"
         # shellcheck disable=SC2002
         cat $WIREGUARD_CONFIG | grep start | awk '{ print $2 }'
@@ -1186,6 +1197,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           systemctl restart wg-quick@$WIREGUARD_PUB_NIC
         else
           service wg-quick@$WIREGUARD_PUB_NIC restart
+        fi
         fi
         ;;
       7) # Reinstall Wireguard
@@ -1206,6 +1218,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         ;;
       8) # Uninstall Wireguard and purging files
+        if [ -x "$(command -v wg)" ]; then
         if [ -f "$WIREGUARD_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable wg-quick@$WIREGUARD_PUB_NIC
@@ -1255,7 +1268,9 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             pkg delete wireguard libqrencode
           fi
         fi
+        fi
         # Uninstall Unbound
+        if [ -x "$(command -v unbound)" ]; then
         if [ -f "$UNBOUND_MANAGER" ]; then
           if pgrep systemd-journal; then
             systemctl disable unbound
@@ -1286,7 +1301,9 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
           rm -f $UNBOUND_ROOT_HINTS
           rm -f $UNBOUND_CONFIG
           rm -f $UNBOUND_ROOT_SERVER_CONFIG_URL
+          fi
           # Uninstall Pihole
+          if [ -x "$(command -v pihole)" ]; then
           if [ -f "$PIHOLE_MANAGER" ]; then
             if pgrep systemd-journal; then
               systemctl disable pihole
@@ -1296,7 +1313,10 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
               service pihole stop
             fi
             pihole uninstall
+            rm -rf $PIHOLE_ROOT
+            rm -f $PIHOLE_MANAGER
           fi
+        fi
         fi
         # Delete wireguard Backup
         if [ -f "$WIREGUARD_CONFIG_BACKUP" ]; then
