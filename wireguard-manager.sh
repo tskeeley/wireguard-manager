@@ -868,6 +868,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           if [ -f "$UNBOUND_ROOT_HINTS" ]; then
             rm -f $UNBOUND_ROOT_HINTS
           fi
+          if [ -d "$UNBOUND_ROOT" ]; then
           unbound-anchor -a $UNBOUND_ANCHOR
           curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
           NPROC=$(nproc)
@@ -898,6 +899,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>$UNBOUND_CONFIG
+          fi
           if [ -f "$RESOLV_CONFIG_OLD" ]; then
             rm -f $RESOLV_CONFIG_OLD
           fi
