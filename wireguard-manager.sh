@@ -942,6 +942,8 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           if [ -d "$PIHOLE_ROOT" ]; then
             echo "PiHole: true" >>$PIHOLE_MANAGER
           fi
+        else
+          pihole reconfigure
         fi
         CLIENT_DNS="$GATEWAY_ADDRESS_V4,$GATEWAY_ADDRESS_V6"
       fi
@@ -1316,6 +1318,8 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
               pihole uninstall
               rm -rf $PIHOLE_ROOT
               rm -f $PIHOLE_MANAGER
+            else
+              pihole reconfigure
             fi
           fi
         fi
