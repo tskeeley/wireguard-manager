@@ -554,17 +554,17 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
       done
       case $SERVER_HOST_SETTINGS in
       1)
-        if [ -z "$SERVER_HOST_V4" ]; then
-          SERVER_HOST="[$SERVER_HOST_V6]"
-        else
+        if [ -n "$SERVER_HOST_V4" ]; then
           SERVER_HOST="$SERVER_HOST_V4"
+        else
+          SERVER_HOST="[$SERVER_HOST_V6]"
         fi
         ;;
       2)
-        if [ -z "$SERVER_HOST_V6" ]; then
-          SERVER_HOST="$SERVER_HOST_V4"
-        else
+        if [ -n "$SERVER_HOST_V6" ]; then
           SERVER_HOST="[$SERVER_HOST_V6]"
+        else
+          SERVER_HOST="$SERVER_HOST_V4"
         fi
         ;;
       3)
