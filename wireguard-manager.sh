@@ -1341,7 +1341,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
             chmod +x "$CURRENT_FILE_PATH" || exit
           fi
           if [ -f "$UNBOUND_ROOT_HINTS" ]; then
-            curl $UNBOUND_ROOT_SERVER_CONFIG_URL --create-dirs -o $UNBOUND_ROOT_HINTS
+            curl $UNBOUND_ROOT_SERVER_CONFIG_URL $UNBOUND_ROOT_HINTS
           fi
         fi
         ;;
