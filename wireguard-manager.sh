@@ -736,7 +736,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if [ ! -x "$(command -v wg)" ]; then
+    if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "$WIREGUARD_INTERFACE" ] || [ -f "$WIREGUARD_PEER" ]; }; then
         if [ "$DISTRO" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
           apt-get update
