@@ -717,7 +717,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           apt-get install raspberrypi-kernel-headers -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Syu
-          pacman -Syu --noconfirm linux-headers
+          pacman -Syu --noconfirm --needed linux-headers
         elif [ "$DISTRO" == "fedora" ]; then
           dnf update -y
           dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
@@ -775,7 +775,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Syu
           pacman -Syu --noconfirm --needed haveged qrencode iptables resolvconf
-          pacman -Syu --noconfirm wireguard-tools
+          pacman -Syu --noconfirm --needed wireguard-tools
         elif [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
