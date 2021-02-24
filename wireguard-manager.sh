@@ -34,7 +34,7 @@ function installing-system-requirements() {
       elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
         yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl -y
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
+        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl qrencode
       elif [ "$DISTRO" == "alpine" ]; then
         apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
       elif [ "$DISTRO" == "freebsd" ]; then
