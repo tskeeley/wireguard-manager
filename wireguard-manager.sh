@@ -34,7 +34,7 @@ function installing-system-requirements() {
       elif { [ "$DISTRO" == "fedora" ] || [ "$DISTRO" == "centos" ] || [ "$DISTRO" == "rhel" ]; }; then
         yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl -y
       elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl qrencode
+        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
       elif [ "$DISTRO" == "alpine" ]; then
         apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
       elif [ "$DISTRO" == "freebsd" ]; then
@@ -774,7 +774,7 @@ if [ ! -f "$WIREGUARD_CONFIG" ]; then
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "$DISTRO" == "arch" ] || [ "$DISTRO" == "manjaro" ]; }; then
           pacman -Syu
-          pacman -Syu --noconfirm haveged qrencode iptables resolvconf
+          pacman -Syu --noconfirm --needed haveged qrencode iptables resolvconf
           pacman -Syu --noconfirm wireguard-tools
         elif [ "$DISTRO" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
           dnf update -y
