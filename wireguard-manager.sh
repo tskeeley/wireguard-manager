@@ -1124,7 +1124,7 @@ else
         fi
         ;;
       5) # WireGuard add Peer
-        if [ -x "$(command -v wg)" ]; then
+        if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
           if [ "$NEW_CLIENT_NAME" == "" ]; then
             echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
             read -rp "New client peer: " -e NEW_CLIENT_NAME
