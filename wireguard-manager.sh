@@ -1343,7 +1343,7 @@ PublicKey = $SERVER_PUBKEY" >>$WIREGUARD_CLIENT_PATH/"$NEW_CLIENT_NAME"-$WIREGUA
         fi
         if [ -x "$(command -v unbound)" ]; then
           if [ -f "$UNBOUND_ROOT_HINTS" ]; then
-            curl -o $UNBOUND_ROOT_SERVER_CONFIG_URL $UNBOUND_ROOT_HINTS
+            curl -o $UNBOUND_ROOT_HINTS $UNBOUND_ROOT_SERVER_CONFIG_URL
           fi
         fi
         ;;
