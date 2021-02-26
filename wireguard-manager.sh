@@ -1359,13 +1359,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       11) # Restore Wireguard Config
         if [ -x "$(command -v wg)" ]; then
-          if [ -d "${WIREGUARD_PATH}" ]; then
-            rm -rf ${WIREGUARD_PATH}
-          fi
           if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
             unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
           else
             exit
+          fi
+          if [ -d "${WIREGUARD_PATH}" ]; then
+            rm -rf ${WIREGUARD_PATH}
           fi
           # Restart Wireguard
           if pgrep systemd-journal; then
@@ -1525,7 +1525,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       8) # Backup Wireguard Config
         if [ -x "$(command -v wg)" ]; then
           if [ -d "${WIREGUARD_PATH}" ]; then
-            rm -f ${WIREGUARD_CONFIG_BACKUP}
+            if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+              rm -f ${WIREGUARD_CONFIG_BACKUP}
+            fi
             zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_PEER}
           else
             exit
@@ -1534,19 +1536,21 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       9) # Restore Wireguard Config
         if [ -x "$(command -v wg)" ]; then
-          if [ -d "${WIREGUARD_PATH}" ]; then
-            rm -rf ${WIREGUARD_PATH}
-          fi
           if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-            unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
-          else
-            exit
-          fi
-          # Restart Wireguard
-          if pgrep systemd-journal; then
-            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-          else
-            service wg-quick@${WIREGUARD_PUB_NIC} restart
+            if [ -d "${WIREGUARD_PATH}" ]; then
+              rm -rf ${WIREGUARD_PATH}
+            fi
+            if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+              unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
+            else
+              exit
+            fi
+            # Restart Wireguard
+            if pgrep systemd-journal; then
+              systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+            else
+              service wg-quick@${WIREGUARD_PUB_NIC} restart
+            fi
           fi
         fi
         ;;
