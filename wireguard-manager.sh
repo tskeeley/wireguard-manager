@@ -270,7 +270,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ "$HEADLESS_INSTALL" == "y" ]; then
+  if [ "${HEADLESS_INSTALL}" == "y" ]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
