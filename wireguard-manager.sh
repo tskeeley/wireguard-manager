@@ -140,10 +140,10 @@ function interface-or-peer() {
     echo "Do you want the interface or peer to be installed?"
     echo "  1) Interface"
     echo "  2) Peer"
-    until [[ "$INTERFACE_OR_PEER" =~ ^[1-2]$ ]]; do
+    until [[ "${INTERFACE_OR_PEER}" =~ ^[1-2]$ ]]; do
       read -rp "Interface Or Peer [1-2]: " -e -i 1 INTERFACE_OR_PEER
     done
-    case $INTERFACE_OR_PEER in
+    case ${INTERFACE_OR_PEER} in
     1)
       if [ -d "${WIREGUARD_PATH}" ]; then
         if [ -f "${WIREGUARD_PEER}" ]; then
