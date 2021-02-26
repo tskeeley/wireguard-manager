@@ -1230,16 +1230,28 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               wg-quick down ${WIREGUARD_PUB_NIC}
             fi
             # Removing Wireguard Files
-            rm -rf ${WIREGUARD_PATH}
-            rm -rf ${WIREGUARD_CLIENT_PATH}
-            rm -f ${WIREGUARD_CONFIG}
-            rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
+            if [ -d "${WIREGUARD_PATH}" ]; then
+              rm -rf ${WIREGUARD_PATH}
+            fi
+            if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
+              rm -rf ${WIREGUARD_CLIENT_PATH}
+            fi
+            if [ -f "${WIREGUARD_CONFIG}" ]; then
+              rm -f ${WIREGUARD_CONFIG}
+            fi
+            if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+              rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
+            fi
             if [ "${DISTRO}" == "centos" ]; then
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
               apt-get remove --purge wireguard qrencode -y
-              rm -f /etc/apt/sources.list.d/unstable.list
-              rm -f /etc/apt/preferences.d/limit-unstable
+              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
+                rm -f /etc/apt/sources.list.d/unstable.list
+              fi
+              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
+                rm -f /etc/apt/preferences.d/limit-unstable
+              fi
             elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
               apt-get remove --purge wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "ubuntu" ]; then
@@ -1254,8 +1266,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "raspbian" ]; then
               apt-key del 04EE7237B7D453EC
               apt-get remove --purge wireguard qrencode haveged dirmngr -y
-              rm -f /etc/apt/sources.list.d/unstable.list
-              rm -f /etc/apt/preferences.d/limit-unstable
+              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
+                rm -f /etc/apt/sources.list.d/unstable.list
+              fi
+              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
+                rm -f /etc/apt/preferences.d/limit-unstable
+              fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
               pacman -Rs wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "fedora" ]; then
@@ -1358,14 +1374,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       11) # Restore Wireguard Config
+        if [ -d "${WIREGUARD_PATH}" ]; then
+          rm -rf ${WIREGUARD_PATH}
+        fi
         if [ -x "$(command -v wg)" ]; then
           if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
             unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
           else
             exit
-          fi
-          if [ -d "${WIREGUARD_PATH}" ]; then
-            rm -rf ${WIREGUARD_PATH}
           fi
           # Restart Wireguard
           if pgrep systemd-journal; then
@@ -1462,10 +1478,18 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               wg-quick down ${WIREGUARD_PUB_NIC}
             fi
             # Removing Wireguard Files
-            rm -rf ${WIREGUARD_PATH}
-            rm -rf ${WIREGUARD_CLIENT_PATH}
-            rm -f ${WIREGUARD_CONFIG}
-            rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
+            if [ -d "${WIREGUARD_PATH}" ]; then
+              rm -rf ${WIREGUARD_PATH}
+            fi
+            if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
+              rm -rf ${WIREGUARD_CLIENT_PATH}
+            fi
+            if [ -f "${WIREGUARD_CONFIG}" ]; then
+              rm -f ${WIREGUARD_CONFIG}
+            fi
+            if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+              rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
+            fi
             if [ "${DISTRO}" == "centos" ]; then
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
