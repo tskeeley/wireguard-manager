@@ -312,7 +312,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       3)
         read -rp "Custom Subnet: " -e -i "10.8.0.0/24" IPV4_SUBNET
-        if [ -z "$IPV4_SUBNET" ]; then
+        if [ -z "${IPV4_SUBNET}" ]; then
           IPV4_SUBNET="10.8.0.0/24"
         fi
         ;;
@@ -342,7 +342,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       3)
         read -rp "Custom Subnet: " -e -i "fd42:42:42::0/64" IPV6_SUBNET
-        if [ -z "$IPV6_SUBNET" ]; then
+        if [ -z "${IPV6_SUBNET}" ]; then
           IPV6_SUBNET="fd42:42:42::0/64"
         fi
         ;;
@@ -355,13 +355,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   if [ -f "${WIREGUARD_INTERFACE}" ]; then
     # Private Subnet Ipv4
-    PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"$IPV4_SUBNET"}
+    PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"${IPV4_SUBNET}"}
     # Private Subnet Mask IPv4
     PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
     # IPv4 Getaway
     GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}1"
     # Private Subnet Ipv6
-    PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"$IPV6_SUBNET"}
+    PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"${IPV6_SUBNET}"}
     # Private Subnet Mask IPv6
     PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
     # IPv6 Getaway
@@ -520,10 +520,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) 1280 (Recommended)"
       echo "  2) 1420"
       echo "  3) Custom (Advanced)"
-      until [[ "$MTU_CHOICE_SETTINGS" =~ ^[1-3]$ ]]; do
+      until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "MTU Choice [1-3]: " -e -i 1 MTU_CHOICE_SETTINGS
       done
-      case $MTU_CHOICE_SETTINGS in
+      case ${MTU_CHOICE_SETTINGS} in
       1)
         MTU_CHOICE="1280"
         ;;
@@ -587,10 +587,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) No (Recommended)"
       echo "  2) Disable IPV4"
       echo "  3) Disable IPV6"
-      until [[ "$DISABLE_HOST_SETTINGS" =~ ^[1-3]$ ]]; do
+      until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Disable Host Choice [1-3]: " -e -i 1 DISABLE_HOST_SETTINGS
       done
-      case $DISABLE_HOST_SETTINGS in
+      case ${DISABLE_HOST_SETTINGS} in
       1)
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
           echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
@@ -738,10 +738,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "20.10" ] || [ "$DISTRO_VERSION" == "20.04" ] || [ "$DISTRO_VERSION" == "19.10" ]; }; then
+        if [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "20.10" ] || [ "${DISTRO_VERSION}" == "20.04" ] || [ "${DISTRO_VERSION}" == "19.10" ]; }; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-        elif [ "${DISTRO}" == "ubuntu" ] && { [ "$DISTRO_VERSION" == "16.04" ] || [ "$DISTRO_VERSION" == "18.04" ]; }; then
+        elif [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "16.04" ] || [ "${DISTRO_VERSION}" == "18.04" ]; }; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
@@ -776,32 +776,32 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           pacman -Syu
           pacman -Syu --noconfirm --needed haveged qrencode iptables resolvconf
           pacman -Syu --noconfirm --needed wireguard-tools
-        elif [ "${DISTRO}" = "fedora" ] && [ "$DISTRO_VERSION" == "32" ]; then
+        elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" == "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" = "fedora" ] && { [ "$DISTRO_VERSION" == "30" ] || [ "$DISTRO_VERSION" == "31" ]; }; then
+        elif [ "${DISTRO}" = "fedora" ] && { [ "${DISTRO_VERSION}" == "30" ] || [ "${DISTRO_VERSION}" == "31" ]; }; then
           dnf update -y
           dnf copr enable jdoss/wireguard -y
           dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" == "centos" ] && { [ "$DISTRO_VERSION" == "8" ] || [ "$DISTRO_VERSION" == "8.1" ] || [ "$DISTRO_VERSION" == "8.2" ]; }; then
+        elif [ "${DISTRO}" == "centos" ] && { [ "${DISTRO_VERSION}" == "8" ] || [ "${DISTRO_VERSION}" == "8.1" ] || [ "${DISTRO_VERSION}" == "8.2" ]; }; then
           yum update -y
           yum install elrepo-release epel-release -y
           yum install kmod-wireguard wireguard-tools qrencode haveged -y
-        elif [ "${DISTRO}" == "centos" ] && [ "$DISTRO_VERSION" == "7" ]; then
+        elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION}" == "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
           fi
           yum update -y
           yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-        elif [ "${DISTRO}" == "rhel" ] && [ "$DISTRO_VERSION" == "8" ]; then
+        elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION}" == "8" ]; then
           yum update -y
           yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
           yum update -y
           subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
           yum copr enable jdoss/wireguard
           yum install epel-release wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
-        elif [ "${DISTRO}" == "rhel" ] && [ "$DISTRO_VERSION" == "7" ]; then
+        elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION}" == "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
@@ -1010,7 +1010,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function wireguard-setconf() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       SERVER_PRIVKEY=$(wg genkey)
-      SERVER_PUBKEY=$(echo "$SERVER_PRIVKEY" | wg pubkey)
+      SERVER_PUBKEY=$(echo "${SERVER_PRIVKEY}" | wg pubkey)
       CLIENT_PRIVKEY=$(wg genkey)
       CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
       CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}3"
@@ -1024,13 +1024,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 [Interface]
 Address = ${GATEWAY_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${GATEWAY_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 ListenPort = ${SERVER_PORT}
-PrivateKey = $SERVER_PRIVKEY
+PrivateKey = ${SERVER_PRIVKEY}
 PostUp = iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -A INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -A INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT
 PostDown = iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -D INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -D INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT
 SaveConfig = false
 # ${CLIENT_NAME} start
 [Peer]
-PublicKey = $CLIENT_PUBKEY
+PublicKey = ${CLIENT_PUBKEY}
 PresharedKey = ${PRESHARED_KEY}
 AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
 # ${CLIENT_NAME} end" >>${WIREGUARD_CONFIG}
@@ -1156,7 +1156,7 @@ else
           fi
           echo "# ${NEW_CLIENT_NAME} start
 [Peer]
-PublicKey = $CLIENT_PUBKEY
+PublicKey = ${CLIENT_PUBKEY}
 PresharedKey = ${PRESHARED_KEY}
 AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
 # ${NEW_CLIENT_NAME} end" >${WIREGUARD_ADD_PEER_CONFIG}
