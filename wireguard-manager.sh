@@ -1348,8 +1348,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
                 service pihole stop
               fi
               pihole uninstall
-              rm -rf ${PIHOLE_ROOT}
-              rm -f ${PIHOLE_MANAGER}
+              if [ -d "${PIHOLE_ROOT}" ]; then
+                rm -rf ${PIHOLE_ROOT}
+              fi
+              if [ -f "${PIHOLE_MANAGER}" ]; then
+                rm -f ${PIHOLE_MANAGER}
+              fi
             else
               pihole reconfigure
             fi
@@ -1546,7 +1550,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               pacman -Rs wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove wireguard qrencode haveged -y
-              rm -f /etc/yum.repos.d/wireguard.repo
+              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+                rm -f /etc/yum.repos.d/wireguard.repo
+              fi
             elif [ "${DISTRO}" == "rhel" ]; then
               yum remove wireguard qrencode haveged -y
               if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
