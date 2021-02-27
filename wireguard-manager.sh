@@ -1124,46 +1124,47 @@ else
         fi
         ;;
       5) # WireGuard add Peer
-        if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
-          if [ "${NEW_CLIENT_NAME}" == "" ]; then
-            echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
-            read -rp "New client peer: " -e NEW_CLIENT_NAME
-          fi
-          if [ -z "${NEW_CLIENT_NAME}" ]; then
-            NEW_CLIENT_NAME="$(openssl rand -hex 50)"
-          fi
-          CLIENT_PRIVKEY=$(wg genkey)
-          CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
-          PRESHARED_KEY=$(wg genpsk)
-          PEER_PORT=$(shuf -i1024-65535 -n1)
-          PRIVATE_SUBNET_V4=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
-          PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
-          PRIVATE_SUBNET_V6=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}')
-          PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
-          SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}')
-          SERVER_PUBKEY=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $5}')
-          CLIENT_DNS=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $6}')
-          MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $7}')
-          NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
-          CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
-          LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-          LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-          CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
-          CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
-          if [ "${LASTIPV4}" -ge "255" ]; then
-            echo "Error: You have ${LASTIPV4} peers the max is 255"
-            exit
-          fi
-          echo "# ${NEW_CLIENT_NAME} start
+        if [ -f "${WIREGUARD_MANAGER}" ]; then
+          if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
+            if [ "${NEW_CLIENT_NAME}" == "" ]; then
+              echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
+              read -rp "New client peer: " -e NEW_CLIENT_NAME
+            fi
+            if [ -z "${NEW_CLIENT_NAME}" ]; then
+              NEW_CLIENT_NAME="$(openssl rand -hex 50)"
+            fi
+            CLIENT_PRIVKEY=$(wg genkey)
+            CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
+            PRESHARED_KEY=$(wg genpsk)
+            PEER_PORT=$(shuf -i1024-65535 -n1)
+            PRIVATE_SUBNET_V4=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+            PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
+            PRIVATE_SUBNET_V6=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}')
+            PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
+            SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}')
+            SERVER_PUBKEY=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $5}')
+            CLIENT_DNS=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $6}')
+            MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $7}')
+            NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
+            CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
+            LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
+            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
+            if [ "${LASTIPV4}" -ge "255" ]; then
+              echo "Error: You have ${LASTIPV4} peers the max is 255"
+              exit
+            fi
+            echo "# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
 PresharedKey = ${PRESHARED_KEY}
 AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
 # ${NEW_CLIENT_NAME} end" >${WIREGUARD_ADD_PEER_CONFIG}
-          wg addconf ${WIREGUARD_PUB_NIC} ${WIREGUARD_ADD_PEER_CONFIG}
-          cat ${WIREGUARD_ADD_PEER_CONFIG} >>${WIREGUARD_CONFIG}
-          rm -f ${WIREGUARD_ADD_PEER_CONFIG}
-          echo "# ${WIREGUARD_WEBSITE_URL}
+            wg addconf ${WIREGUARD_PUB_NIC} ${WIREGUARD_ADD_PEER_CONFIG}
+            cat ${WIREGUARD_ADD_PEER_CONFIG} >>${WIREGUARD_CONFIG}
+            rm -f ${WIREGUARD_ADD_PEER_CONFIG}
+            echo "# ${WIREGUARD_WEBSITE_URL}
 [Interface]
 Address = ${CLIENT_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${CLIENT_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 DNS = ${CLIENT_DNS}
@@ -1176,29 +1177,32 @@ Endpoint = ${SERVER_HOST}${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
-          qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
-          echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
+            qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+            echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
+          fi
         fi
         ;;
       6) # Remove WireGuard Peer
-        if [ -x "$(command -v wg)" ]; then
-          echo "Which WireGuard user do you want to remove?"
-          # shellcheck disable=SC2002
-          cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
-          read -rp "Type in Client Name : " -e REMOVECLIENT
-          read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
-          if [[ $REPLY =~ ^[Yy]$ ]]; then
-            sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
-            rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
-            echo "Client ${REMOVECLIENT} has been removed."
-          elif [[ $REPLY =~ ^[Nn]$ ]]; then
-            exit
-          fi
-          # Restart WireGuard
-          if pgrep systemd-journal; then
-            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-          else
-            service wg-quick@${WIREGUARD_PUB_NIC} restart
+        if [ -f "${WIREGUARD_MANAGER}" ]; then
+          if [ -x "$(command -v wg)" ]; then
+            echo "Which WireGuard user do you want to remove?"
+            # shellcheck disable=SC2002
+            cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
+            read -rp "Type in Client Name : " -e REMOVECLIENT
+            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+              sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
+              rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
+              echo "Client ${REMOVECLIENT} has been removed."
+            elif [[ $REPLY =~ ^[Nn]$ ]]; then
+              exit
+            fi
+            # Restart WireGuard
+            if pgrep systemd-journal; then
+              systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+            else
+              service wg-quick@${WIREGUARD_PUB_NIC} restart
+            fi
           fi
         fi
         ;;
@@ -1369,19 +1373,25 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             chmod +x "${CURRENT_FILE_PATH}" || exit
           fi
         fi
-        if [ -x "$(command -v unbound)" ]; then
-          if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-            curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
+        if [ -f "${UNBOUND_MANAGER}" ]; then
+          if [ -x "$(command -v unbound)" ]; then
+            if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+              curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
+            fi
           fi
         fi
         ;;
       10) # Backup Wireguard Config
         if [ -x "$(command -v wg)" ]; then
           if [ -d "${WIREGUARD_PATH}" ]; then
-            rm -f ${WIREGUARD_CONFIG_BACKUP}
-            zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE}
-          else
-            exit
+            if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+              rm -f ${WIREGUARD_CONFIG_BACKUP}
+            fi
+            if [ -f "${WIREGUARD_MANAGER}" ]; then
+              zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE}
+            else
+              exit
+            fi
           fi
         fi
         ;;
@@ -1574,9 +1584,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
               rm -f ${WIREGUARD_CONFIG_BACKUP}
             fi
-            zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_PEER}
-          else
-            exit
+            if [ -f "${WIREGUARD_MANAGER}" ]; then
+              zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE}
+            else
+              exit
+            fi
           fi
         fi
         ;;
