@@ -1276,10 +1276,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               pacman -Rs wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove wireguard qrencode haveged -y
-              rm -f /etc/yum.repos.d/wireguard.repo
+              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+                rm -f /etc/yum.repos.d/wireguard.repo
+              fi
             elif [ "${DISTRO}" == "rhel" ]; then
               yum remove wireguard qrencode haveged -y
-              rm -f /etc/yum.repos.d/wireguard.repo
+              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+                rm -f /etc/yum.repos.d/wireguard.repo
+              fi
             elif [ "${DISTRO}" == "alpine" ]; then
               apk del wireguard-tools libqrencode haveged
             elif [ "${DISTRO}" == "freebsd" ]; then
@@ -1316,10 +1320,18 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "freebsd" ]; then
               pkg delete unbound
             fi
-            rm -rf ${UNBOUND_ROOT}
-            rm -f ${UNBOUND_ANCHOR}
-            rm -f ${UNBOUND_ROOT_HINTS}
-            rm -f ${UNBOUND_CONFIG}
+            if [ -d "${UNBOUND_ROOT}" ]; then
+              rm -rf ${UNBOUND_ROOT}
+            fi
+            if [ -f "${UNBOUND_ANCHOR}" ]; then
+              rm -f ${UNBOUND_ANCHOR}
+            fi
+            if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+              rm -f ${UNBOUND_ROOT_HINTS}
+            fi
+            if [ -f "${UNBOUND_CONFIG}" ]; then
+              rm -f ${UNBOUND_CONFIG}
+            fi
           fi
           # Uninstall Pihole
           if [ -x "$(command -v pihole)" ]; then
@@ -1494,8 +1506,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
               apt-get remove --purge wireguard qrencode -y
-              rm -f /etc/apt/sources.list.d/unstable.list
-              rm -f /etc/apt/preferences.d/limit-unstable
+              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
+                rm -f /etc/apt/sources.list.d/unstable.list
+              fi
+              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
+                rm -f /etc/apt/preferences.d/limit-unstable
+              fi
             elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
               apt-get remove --purge wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "ubuntu" ]; then
@@ -1510,8 +1526,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "raspbian" ]; then
               apt-key del 04EE7237B7D453EC
               apt-get remove --purge wireguard qrencode haveged dirmngr -y
-              rm -f /etc/apt/sources.list.d/unstable.list
-              rm -f /etc/apt/preferences.d/limit-unstable
+              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
+                rm -f /etc/apt/sources.list.d/unstable.list
+              fi
+              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
+                rm -f /etc/apt/preferences.d/limit-unstable
+              fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
               pacman -Rs wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "fedora" ]; then
@@ -1519,7 +1539,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               rm -f /etc/yum.repos.d/wireguard.repo
             elif [ "${DISTRO}" == "rhel" ]; then
               yum remove wireguard qrencode haveged -y
-              rm -f /etc/yum.repos.d/wireguard.repo
+              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+                rm -f /etc/yum.repos.d/wireguard.repo
+              fi
             elif [ "${DISTRO}" == "alpine" ]; then
               apk del wireguard-tools libqrencode haveged
             elif [ "${DISTRO}" == "freebsd" ]; then
