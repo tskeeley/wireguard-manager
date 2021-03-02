@@ -687,6 +687,59 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Ask To Install DNS
   ask-install-dns
 
+  # Use custom dns
+  function custom-dns() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      if [ "$CUSTOM_DNS" == "y" ]; then
+        echo "Which DNS do you want to use with the VPN?"
+        echo "  1) Google (Recommended)"
+        echo "  2) AdGuard"
+        echo "  3) NextDNS"
+        echo "  4) OpenDNS"
+        echo "  5) Cloudflare"
+        echo "  6) Verisign"
+        echo "  7) Quad9"
+        echo "  8) FDN"
+        echo "  9) Custom (Advanced)"
+        until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 9 ]; do
+          read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
+        done
+        case ${CLIENT_DNS_SETTINGS} in
+        1)
+          CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+          ;;
+        2)
+          CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
+          ;;
+        3)
+          CLIENT_DNS="45.90.28.167,45.90.30.167,2a07:a8c0::12:cf53,2a07:a8c1::12:cf53"
+          ;;
+        4)
+          CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
+          ;;
+        5)
+          CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+          ;;
+        6)
+          CLIENT_DNS="64.6.64.6,64.6.65.6,2620:74:1b::1:1,2620:74:1c::2:2"
+          ;;
+        7)
+          CLIENT_DNS="9.9.9.9,149.112.112.112,2620:fe::fe,2620:fe::9"
+          ;;
+        8)
+          CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
+          ;;
+        9)
+          read -rp "Custom DNS (IPv4 IPv6):" -e -i "8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844" CLIENT_DNS
+          ;;
+        esac
+      fi
+    fi
+  }
+
+  # use custom dns
+  custom-dns
+
   # What would you like to name your first WireGuard peer?
   function client-name() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
@@ -952,59 +1005,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # install pihole
   install-pihole
-
-  # Use custom dns
-  function custom-dns() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "$CUSTOM_DNS" == "y" ]; then
-        echo "Which DNS do you want to use with the VPN?"
-        echo "  1) Google (Recommended)"
-        echo "  2) AdGuard"
-        echo "  3) NextDNS"
-        echo "  4) OpenDNS"
-        echo "  5) Cloudflare"
-        echo "  6) Verisign"
-        echo "  7) Quad9"
-        echo "  8) FDN"
-        echo "  9) Custom (Advanced)"
-        until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 9 ]; do
-          read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
-        done
-        case ${CLIENT_DNS_SETTINGS} in
-        1)
-          CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
-          ;;
-        2)
-          CLIENT_DNS="176.103.130.130,176.103.130.131,2a00:5a60::ad1:0ff,2a00:5a60::ad2:0ff"
-          ;;
-        3)
-          CLIENT_DNS="45.90.28.167,45.90.30.167,2a07:a8c0::12:cf53,2a07:a8c1::12:cf53"
-          ;;
-        4)
-          CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
-          ;;
-        5)
-          CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
-          ;;
-        6)
-          CLIENT_DNS="64.6.64.6,64.6.65.6,2620:74:1b::1:1,2620:74:1c::2:2"
-          ;;
-        7)
-          CLIENT_DNS="9.9.9.9,149.112.112.112,2620:fe::fe,2620:fe::9"
-          ;;
-        8)
-          CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
-          ;;
-        9)
-          read -rp "Custom DNS (IPv4 IPv6):" -e -i "8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844" CLIENT_DNS
-          ;;
-        esac
-      fi
-    fi
-  }
-
-  # use custom dns
-  custom-dns
 
   # WireGuard Set Config
   function wireguard-setconf() {
