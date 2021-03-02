@@ -731,6 +731,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           ;;
         9)
           read -rp "Custom DNS (IPv4 IPv6):" -e -i "8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844" CLIENT_DNS
+          if [ -z "${CLIENT_DNS}" ]; then
+            CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+          fi
           ;;
         esac
       fi
