@@ -690,7 +690,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Use custom dns
   function custom-dns() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "$CUSTOM_DNS" == "y" ]; then
+      if [ "${CUSTOM_DNS}" == "y" ]; then
         echo "Which DNS do you want to use with the VPN?"
         echo "  1) Google (Recommended)"
         echo "  2) AdGuard"
