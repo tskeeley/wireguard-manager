@@ -83,6 +83,19 @@ function docker-check() {
 # Docker Check
 docker-check
 
+function system-memory-check() {
+  if [ "$(awk '/MemTotal/{print $2}' /proc/meminfo)" -lt "1048576" ]; then
+    echo "It is recommended that your system have more than 1GB of free RAM available."
+  fi
+  BLOCK_SIZE="$(cat /sys/block/vdb/size)"
+  DISK_SIZE=$((BLOCK_SIZE * 512))
+  if [ "$DISK_SIZE" -lt "1073741824" ]; then
+    echo "It is recommended that your system have more than 1GB of free disk capacity available."
+  fi
+}
+
+system-memory-check
+
 # Lets check the kernel version
 function kernel-check() {
   KERNEL_VERSION_LIMIT=3.1
