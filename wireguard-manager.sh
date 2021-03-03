@@ -73,7 +73,7 @@ function system-memory-check() {
   fi
   BLOCK_SIZE="$(cat /sys/block/vdb/size)"
   DISK_SIZE=$((BLOCK_SIZE * 512))
-  if [ "$DISK_SIZE" -lt "1073741824" ]; then
+  if [ "${DISK_SIZE}" -lt "1073741824" ]; then
     echo "It is recommended that your system have more than 1GB of free disk capacity available."
   fi
 }
