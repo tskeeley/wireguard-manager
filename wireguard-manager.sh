@@ -66,21 +66,6 @@ function virt-check() {
 # Virtualization Check
 virt-check
 
-# Memory Checks
-function system-memory-check() {
-  if [ "$(awk '/MemTotal/{print $2}' /proc/meminfo)" -lt "1048576" ]; then
-    echo "It is recommended that your system have more than 1GB of free RAM available."
-  fi
-  BLOCK_SIZE="$(cat /sys/block/vdb/size)"
-  DISK_SIZE=$((BLOCK_SIZE * 512))
-  if [ "${DISK_SIZE}" -lt "1073741824" ]; then
-    echo "It is recommended that your system have more than 1GB of free disk capacity available."
-  fi
-}
-
-# Check memory
-system-memory-check
-
 # Check for docker stuff
 function docker-check() {
   if [ -f /.dockerenv ]; then
