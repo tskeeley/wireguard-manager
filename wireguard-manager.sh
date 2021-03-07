@@ -256,7 +256,7 @@ function usage() {
         usage-guide
         ;;
       *)
-        echo "Invalid argument: $1"
+        echo "Invalid argument: ${1}"
         usage-guide
         exit
         ;;
