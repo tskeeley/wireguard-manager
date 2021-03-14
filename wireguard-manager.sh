@@ -28,17 +28,17 @@ dist-check
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ]; }; then
       if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl cron -y
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl -y
+        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl cron -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
+        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron
       elif [ "${DISTRO}" == "alpine" ]; then
-        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron
       elif [ "${DISTRO}" == "freebsd" ]; then
-        pkg update && pkg install curl jq zip unzip gawk openssl
+        pkg update && pkg install curl jq zip unzip gawk openssl cron
       fi
     fi
   else
@@ -121,6 +121,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+CRON_JOBS_PATH=""
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -661,6 +662,29 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   client-allowed-ip
 
   # Send real time notifications
+  function enable-automatic-updates() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to setup notifications?"
+      echo "  1) No (Recommended)"
+      echo "  2) Yes (Advanced)"
+      until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic Updates [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+      done
+      case ${AUTOMATIC_UPDATES_SETTINGS} in
+      1)
+        echo "Real-time Updates Disabled"
+        ;;
+      2)
+        echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        ;;
+      esac
+    fi
+  }
+
+  # Get the IPV4
+  enable-automatic-updates
+
+  # Send real time notifications
   function real-time-notifications() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to setup notifications?"
@@ -1067,7 +1091,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       # Set Wireguard settings for this host and first peer.
       echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
-${SENDGRID_API_KEY}
+${COMMUNICATION_KEYS}
 [Interface]
 Address = ${GATEWAY_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${GATEWAY_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 ListenPort = ${SERVER_PORT}
