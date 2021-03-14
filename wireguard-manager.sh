@@ -1074,7 +1074,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ ! -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
           if [ -d "${PIHOLE_ROOT}" ]; then
-            echo "PiHole: true" >>${PIHOLE_MANAGER}
+            if [ ! -f "${PIHOLE_MANAGER}" ]; then
+              echo "PiHole: true" >>${PIHOLE_MANAGER}
+            fi
           fi
         else
           pihole reconfigure
