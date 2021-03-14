@@ -713,7 +713,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${SENDGRID_TO_EMAIL}" ]; then
           SENDGRID_TO_EMAIL="$(openssl rand -hex 10)"
         fi
-        echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         ;;
@@ -734,7 +734,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
-        echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         ;;
