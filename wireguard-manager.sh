@@ -1182,6 +1182,7 @@ else
       echo "   9) Update this script"
       echo "   10) Backup WireGuard"
       echo "   11) Restore WireGuard"
+      echo "   12) Check WireGuard Status"
       until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 12 ]; do
         read -rp "Select an Option [1-12]: " -e -i 1 WIREGUARD_OPTIONS
       done
