@@ -1525,7 +1525,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -x "$(command -v wg)" ]; then
             if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
               if { [ -n "${SENDGRID_API_KEY}" ] && [ -n "${SENDGRID_FROM_EMAIL}" ] && [ -n "${SENDGRID_TO_EMAIL}" ]; }; then
-                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header 'Authorization: Bearer '"${SENDGRID_API_KEY}"'' --header 'Content-Type: application/json' --data '{"personalizations": [{"to": [{"email": '"${SENDGRID_TO_EMAIL}"'}]}],"from": {"email": '"${SENDGRID_FROM_EMAIL}"'},"subject": "WireGuard Down","content": [{"type": "text/plain", "value": "Hello, WireGuard has gone down ${SERVER_HOST}."}]}'
+                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header "Authorization: Bearer ${SENDGRID_API_KEY}" --header "Content-Type: application/json" --data "{\"personalizations\": [{\"to\": [{\"email\": \"${SENDGRID_TO_EMAIL}\"}]}],\"from\": {\"email\": \"${SENDGRID_FROM_EMAIL}\"},\"subject\": \"WireGuard Down\",\"content\": [{\"type\": \"text/plain\", \"value\": \"Hello, WireGuard has gone down ${SERVER_HOST}.\"}]}"
               fi
               if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
                 curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
