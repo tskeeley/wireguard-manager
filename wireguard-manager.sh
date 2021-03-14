@@ -692,13 +692,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function real-time-notifications() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to setup notifications?"
-      echo "  1) Twilio (Recommended)"
-      echo "  2) No (Advanced)"
+      echo "  1) No (Recommended)"
+      echo "  2) Twilio (Advanced)"
       until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
         read -rp "Notifications setup [1-2]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
       done
       case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
       1)
+        echo "Real-time Notifications Disabled"
+        ;;
+      2)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
         if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
           TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
@@ -718,9 +721,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
-        ;;
-      2)
-        echo "Real-time Notifications Disabled"
         ;;
       esac
     fi
@@ -1103,7 +1103,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       # Set Wireguard settings for this host and first peer.
       echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
-# ${SENDGRID_API_KEY} ${SENDGRID_FROM_EMAIL} ${SENDGRID_TO_EMAIL} ${TWILIO_ACCOUNT_SID} ${TWILIO_AUTH_TOKEN} ${TWILIO_FROM_NUMBER} ${TWILIO_TO_NUMBER}
+# ${TWILIO_ACCOUNT_SID} ${TWILIO_AUTH_TOKEN} ${TWILIO_FROM_NUMBER} ${TWILIO_TO_NUMBER}
 [Interface]
 Address = ${GATEWAY_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${GATEWAY_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 ListenPort = ${SERVER_PORT}
