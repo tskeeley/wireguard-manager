@@ -692,31 +692,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function real-time-notifications() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to setup notifications?"
-      echo "  1) SendGrid (Recommended)"
-      echo "  2) Twilio (Recommended)"
-      echo "  3) No (Advanced)"
-      until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Notifications setup [1-3]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
+      echo "  1) Twilio (Recommended)"
+      echo "  2) No (Advanced)"
+      until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Notifications setup [1-2]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
       done
       case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
       1)
-        read -rp "SendGrid API Key: " -e -i "" SENDGRID_API_KEY
-        if [ -z "${SENDGRID_API_KEY}" ]; then
-          SENDGRID_API_KEY="$(openssl rand -hex 10)"
-        fi
-        read -rp "SendGrid From Email: " -e -i "" SENDGRID_FROM_EMAIL
-        if [ -z "${SENDGRID_FROM_EMAIL}" ]; then
-          SENDGRID_FROM_EMAIL="$(openssl rand -hex 10)"
-        fi
-        read -rp "SendGrid To Email: " -e -i "" SENDGRID_TO_EMAIL
-        if [ -z "${SENDGRID_TO_EMAIL}" ]; then
-          SENDGRID_TO_EMAIL="$(openssl rand -hex 10)"
-        fi
-        echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
-        crontab ${CRON_JOBS_PATH}
-        rm -f ${CRON_JOBS_PATH}
-        ;;
-      2)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
         if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
           TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
@@ -737,7 +719,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         ;;
-      3)
+      2)
         echo "Real-time Notifications Disabled"
         ;;
       esac
@@ -1521,18 +1503,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       12)
         if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-          SENDGRID_API_KEY=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
-          SENDGRID_FROM_EMAIL=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
-          SENDGRID_TO_EMAIL=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
-          TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
-          TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $5}')
-          TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $6}')
-          TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $7}')
+          TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
+          TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
+          TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
+          TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
           if [ -x "$(command -v wg)" ]; then
             if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
-              if { [ -n "${SENDGRID_API_KEY}" ] && [ -n "${SENDGRID_FROM_EMAIL}" ] && [ -n "${SENDGRID_TO_EMAIL}" ]; }; then
-                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header "Authorization: Bearer ${SENDGRID_API_KEY}" --header "Content-Type: application/json" --data "{\"personalizations\": [{\"to\": [{\"email\": \"${SENDGRID_TO_EMAIL}\"}]}],\"from\": {\"email\": \"${SENDGRID_FROM_EMAIL}\"},\"subject\": \"WireGuard Down\",\"content\": [{\"type\": \"text/plain\", \"value\": \"Hello, WireGuard has gone down ${SERVER_HOST}.\"}]}"
-              fi
               if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
                 curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
               fi
