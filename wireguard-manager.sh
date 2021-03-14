@@ -121,7 +121,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-CRON_JOBS_PATH="/etc/crontab"
+CRON_JOBS_PATH="${WIREGUARD_PATH}/crontab-add"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -664,7 +664,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Send real time notifications
   function enable-automatic-updates() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      echo "Would you like to setup notifications?"
+      echo "Would you like to setup real-time updates?"
       echo "  1) No (Recommended)"
       echo "  2) Yes (Advanced)"
       until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
@@ -676,6 +676,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       2)
         echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        crontab ${CRON_JOBS_PATH}
+        rm -f ${CRON_JOBS_PATH}
         ;;
       esac
     fi
@@ -712,6 +714,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           SENDGRID_TO_EMAIL="$(openssl rand -hex 10)"
         fi
         echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        crontab ${CRON_JOBS_PATH}
+        rm -f ${CRON_JOBS_PATH}
         ;;
       3)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
@@ -731,6 +735,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
         echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        crontab ${CRON_JOBS_PATH}
+        rm -f ${CRON_JOBS_PATH}
         ;;
       esac
     fi
