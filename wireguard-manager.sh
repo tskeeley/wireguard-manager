@@ -655,6 +655,38 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Traffic Forwarding
   client-allowed-ip
+  
+  # Send real time notifications
+  function real-time-notifications() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to setup notifications?"
+      echo "  1) No (Recommended)"
+      echo "  2) SendGrid (Advanced)"
+      echo "  3) Twilio (Advanced)"
+      until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Notifications setup [1-3]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
+      done
+      case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
+      1)
+        echo "Real-time Notifications Disabled"
+        ;;
+      2)
+        read -rp "SendGrid API Key: " -e -i "" SENDGRID_API_KEY
+        read -rp "SendGrid From Email: " -e -i "" SENDGRID_FROM_EMAIL
+        read -rp "SendGrid To Email: " -e -i "" SENDGRID_TO_EMAIL
+        ;;
+      3)
+        read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
+        read -rp "Twilio Auth Token: " -e -i "" TWILIO_AUTH_TOKEN
+        read -rp "Twilio From Number: " -e -i "" TWILIO_FROM_NUMBER
+        read -rp "Twilio To Number: " -e -i "" TWILIO_TO_NUMBER
+        ;;
+      esac
+    fi
+  }
+
+  # Get the IPV4
+  real-time-notifications
 
   # Would you like to install Unbound.
   function ask-install-dns() {
