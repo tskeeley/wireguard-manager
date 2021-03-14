@@ -700,14 +700,35 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       2)
         read -rp "SendGrid API Key: " -e -i "" SENDGRID_API_KEY
+        if [ -z "${SENDGRID_API_KEY}" ]; then
+          SENDGRID_API_KEY="$(openssl rand -hex 10)"
+        fi
         read -rp "SendGrid From Email: " -e -i "" SENDGRID_FROM_EMAIL
+        if [ -z "${SENDGRID_FROM_EMAIL}" ]; then
+          SENDGRID_FROM_EMAIL="$(openssl rand -hex 10)"
+        fi
         read -rp "SendGrid To Email: " -e -i "" SENDGRID_TO_EMAIL
+        if [ -z "${SENDGRID_TO_EMAIL}" ]; then
+          SENDGRID_TO_EMAIL="$(openssl rand -hex 10)"
+        fi
         ;;
       3)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
+        if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
+          TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
+        fi
         read -rp "Twilio Auth Token: " -e -i "" TWILIO_AUTH_TOKEN
+        if [ -z "${TWILIO_AUTH_TOKEN}" ]; then
+          TWILIO_AUTH_TOKEN="$(openssl rand -hex 10)"
+        fi
         read -rp "Twilio From Number: " -e -i "" TWILIO_FROM_NUMBER
+        if [ -z "${TWILIO_FROM_NUMBER}" ]; then
+          TWILIO_FROM_NUMBER="$(openssl rand -hex 10)"
+        fi
         read -rp "Twilio To Number: " -e -i "" TWILIO_TO_NUMBER
+        if [ -z "${TWILIO_TO_NUMBER}" ]; then
+          TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
+        fi
         ;;
       esac
     fi
