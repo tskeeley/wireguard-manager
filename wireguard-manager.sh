@@ -1488,11 +1488,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -d "${WIREGUARD_PATH}" ]; then
             rm -rf ${WIREGUARD_PATH}
           fi
-        if [ -x "$(command -v wg)" ]; then
-          unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
-        else
-          exit
-        fi
+          if [ -x "$(command -v wg)" ]; then
+            unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
+          else
+            exit
+          fi
           # Restart Wireguard
           if pgrep systemd-journal; then
             systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
