@@ -288,6 +288,8 @@ function headless-install() {
     SERVER_HOST_SETTINGS=${SERVER_HOST_SETTINGS:-1}
     DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS:-1}
     CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
+    AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS:-1}
+    NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-client}
   fi
@@ -690,17 +692,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function real-time-notifications() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to setup notifications?"
-      echo "  1) No (Recommended)"
-      echo "  2) SendGrid (Advanced)"
-      echo "  3) Twilio (Advanced)"
+      echo "  1) SendGrid (Recommended)"
+      echo "  2) Twilio (Recommended)"
+      echo "  3) No (Advanced)"
       until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Notifications setup [1-3]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
       done
       case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
       1)
-        echo "Real-time Notifications Disabled"
-        ;;
-      2)
         read -rp "SendGrid API Key: " -e -i "" SENDGRID_API_KEY
         if [ -z "${SENDGRID_API_KEY}" ]; then
           SENDGRID_API_KEY="$(openssl rand -hex 10)"
@@ -717,7 +716,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         ;;
-      3)
+      2)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
         if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
           TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
@@ -737,6 +736,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
+        ;;
+      3)
+        echo "Real-time Notifications Disabled"
         ;;
       esac
     fi
