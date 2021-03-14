@@ -665,19 +665,19 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function enable-automatic-updates() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to setup real-time updates?"
-      echo "  1) No (Recommended)"
-      echo "  2) Yes (Advanced)"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No (Advanced)"
       until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Automatic Updates [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
-        echo "Real-time Updates Disabled"
-        ;;
-      2)
         echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
+        ;;
+      2)
+        echo "Real-time Updates Disabled"
         ;;
       esac
     fi
