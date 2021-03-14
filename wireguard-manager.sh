@@ -711,6 +711,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${SENDGRID_TO_EMAIL}" ]; then
           SENDGRID_TO_EMAIL="$(openssl rand -hex 10)"
         fi
+        echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         ;;
       3)
         read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
@@ -729,6 +730,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
+        echo "* * * * * ./wireguard-manager.sh --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         ;;
       esac
     fi
@@ -1513,14 +1515,20 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       12)
         if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-          PRIVATE_SUBNET_V4=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+          SENDGRID_API_KEY=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
+          SENDGRID_FROM_EMAIL=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
+          SENDGRID_TO_EMAIL=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
+          TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
+          TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $5}')
+          TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $6}')
+          TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $7}')
           if [ -x "$(command -v wg)" ]; then
             if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
               if { [ -n "${SENDGRID_API_KEY}" ] && [ -n "${SENDGRID_FROM_EMAIL}" ] && [ -n "${SENDGRID_TO_EMAIL}" ]; }; then
-                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header 'Authorization: Bearer '"${SENDGRID_API_KEY}"'' --header 'Content-Type: application/json' --data '{"personalizations": [{"to": [{"email": '"${SENDGRID_TO_EMAIL}"'}]}],"from": {"email": '"${SENDGRID_FROM_EMAIL}"'},"subject": "Hello, World!","content": [{"type": "text/plain", "value": "Heya!"}]}'
+                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header 'Authorization: Bearer '"${SENDGRID_API_KEY}"'' --header 'Content-Type: application/json' --data '{"personalizations": [{"to": [{"email": '"${SENDGRID_TO_EMAIL}"'}]}],"from": {"email": '"${SENDGRID_FROM_EMAIL}"'},"subject": "WireGuard Down","content": [{"type": "text/plain", "value": "Hello, WireGuard has gone down ${SERVER_HOST}."}]}'
               fi
               if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
-                curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=This is the ship that made the Kessel Run in fourteen parsecs?" --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
+                curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
               fi
             fi
           fi
