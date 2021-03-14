@@ -655,7 +655,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Traffic Forwarding
   client-allowed-ip
-  
+
   # Send real time notifications
   function real-time-notifications() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
@@ -1037,21 +1037,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # install pihole
   install-pihole
-  
-function send-notifications() {
-    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
-            if { [ -n "${SENDGRID_API_KEY}" ] && [ -n "${SENDGRID_FROM_EMAIL}" ] && [ -n "${SENDGRID_TO_EMAIL}" ]; }; then
-                curl --request POST --url https://api.sendgrid.com/v3/mail/send --header 'Authorization: Bearer '"${SENDGRID_API_KEY}"'' --header 'Content-Type: application/json' --data '{"personalizations": [{"to": [{"email": '"${SENDGRID_TO_EMAIL}"'}]}],"from": {"email": '"${SENDGRID_FROM_EMAIL}"'},"subject": "Hello, World!","content": [{"type": "text/plain", "value": "Heya!"}]}'
-            fi
-            if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
-                curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=This is the ship that made the Kessel Run in fourteen parsecs?" --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
-            fi
-        fi
-    fi
-}
 
-send-notifications
+  function send-notifications() {
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
+      if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
+        if { [ -n "${SENDGRID_API_KEY}" ] && [ -n "${SENDGRID_FROM_EMAIL}" ] && [ -n "${SENDGRID_TO_EMAIL}" ]; }; then
+          curl --request POST --url https://api.sendgrid.com/v3/mail/send --header 'Authorization: Bearer '"${SENDGRID_API_KEY}"'' --header 'Content-Type: application/json' --data '{"personalizations": [{"to": [{"email": '"${SENDGRID_TO_EMAIL}"'}]}],"from": {"email": '"${SENDGRID_FROM_EMAIL}"'},"subject": "Hello, World!","content": [{"type": "text/plain", "value": "Heya!"}]}'
+        fi
+        if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
+          curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=This is the ship that made the Kessel Run in fourteen parsecs?" --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
+        fi
+      fi
+    fi
+  }
+
+  send-notifications
 
   # WireGuard Set Config
   function wireguard-setconf() {
