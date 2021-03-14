@@ -1153,7 +1153,7 @@ else
 
   # Already installed what next?
   function wireguard-next-questions-interface() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard"
       echo "   2) Start WireGuard"
