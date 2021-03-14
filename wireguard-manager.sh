@@ -28,17 +28,17 @@ dist-check
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ]; }; then
       if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl cron -y
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl -y
+        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl cron -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
+        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron
       elif [ "${DISTRO}" == "alpine" ]; then
-        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron
       elif [ "${DISTRO}" == "freebsd" ]; then
-        pkg update && pkg install curl jq zip unzip gawk openssl
+        pkg update && pkg install curl jq zip unzip gawk openssl cron
       fi
     fi
   else
@@ -121,6 +121,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+CRON_JOBS_PATH="${WIREGUARD_PATH}/crontab-add"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -251,6 +252,10 @@ function usage() {
         shift
         WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
         ;;
+      --notification)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
+        ;;
       --help)
         shift
         usage-guide
@@ -283,6 +288,8 @@ function headless-install() {
     SERVER_HOST_SETTINGS=${SERVER_HOST_SETTINGS:-1}
     DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS:-1}
     CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
+    AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS:-1}
+    NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-client}
   fi
@@ -656,6 +663,72 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Traffic Forwarding
   client-allowed-ip
 
+  # Send real time notifications
+  function enable-automatic-updates() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to setup real-time updates?"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No (Advanced)"
+      until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic Updates [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+      done
+      case ${AUTOMATIC_UPDATES_SETTINGS} in
+      1)
+        echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        crontab ${CRON_JOBS_PATH}
+        rm -f ${CRON_JOBS_PATH}
+        ;;
+      2)
+        echo "Real-time Updates Disabled"
+        ;;
+      esac
+    fi
+  }
+
+  # Get the IPV4
+  enable-automatic-updates
+
+  # Send real time notifications
+  function real-time-notifications() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to setup notifications?"
+      echo "  1) No (Recommended)"
+      echo "  2) Twilio (Advanced)"
+      until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Notifications setup [1-2]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
+      done
+      case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
+      1)
+        echo "Real-time Notifications Disabled"
+        ;;
+      2)
+        read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
+        if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
+          TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
+        fi
+        read -rp "Twilio Auth Token: " -e -i "" TWILIO_AUTH_TOKEN
+        if [ -z "${TWILIO_AUTH_TOKEN}" ]; then
+          TWILIO_AUTH_TOKEN="$(openssl rand -hex 10)"
+        fi
+        read -rp "Twilio From Number: " -e -i "" TWILIO_FROM_NUMBER
+        if [ -z "${TWILIO_FROM_NUMBER}" ]; then
+          TWILIO_FROM_NUMBER="$(openssl rand -hex 10)"
+        fi
+        read -rp "Twilio To Number: " -e -i "" TWILIO_TO_NUMBER
+        if [ -z "${TWILIO_TO_NUMBER}" ]; then
+          TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
+        fi
+        echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        crontab ${CRON_JOBS_PATH}
+        rm -f ${CRON_JOBS_PATH}
+        ;;
+      esac
+    fi
+  }
+
+  # Get the IPV4
+  real-time-notifications
+
   # Would you like to install Unbound.
   function ask-install-dns() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
@@ -993,7 +1066,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ ! -x "$(command -v pihole)" ]; then
           curl -sSL https://install.pi-hole.net | bash
           if [ -d "${PIHOLE_ROOT}" ]; then
-            echo "PiHole: true" >>${PIHOLE_MANAGER}
+            if [ ! -f "${PIHOLE_MANAGER}" ]; then
+              echo "PiHole: true" >>${PIHOLE_MANAGER}
+            fi
           fi
         else
           pihole reconfigure
@@ -1028,6 +1103,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       # Set Wireguard settings for this host and first peer.
       echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
+# ${TWILIO_ACCOUNT_SID} ${TWILIO_AUTH_TOKEN} ${TWILIO_FROM_NUMBER} ${TWILIO_TO_NUMBER}
 [Interface]
 Address = ${GATEWAY_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${GATEWAY_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 DNS = ${CLIENT_DNS}
@@ -1079,7 +1155,7 @@ else
 
   # Already installed what next?
   function wireguard-next-questions-interface() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       echo "What do you want to do?"
       echo "   1) Show WireGuard"
       echo "   2) Start WireGuard"
@@ -1092,8 +1168,9 @@ else
       echo "   9) Update this script"
       echo "   10) Backup WireGuard"
       echo "   11) Restore WireGuard"
-      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 11 ]; do
-        read -rp "Select an Option [1-11]: " -e -i 1 WIREGUARD_OPTIONS
+      echo "   12) Check WireGuard Status"
+      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 12 ]; do
+        read -rp "Select an Option [1-12]: " -e -i 1 WIREGUARD_OPTIONS
       done
       case ${WIREGUARD_OPTIONS} in
       1) # WG Show
@@ -1133,7 +1210,7 @@ else
         fi
         ;;
       5) # WireGuard add Peer
-        if [ -f "${WIREGUARD_MANAGER}" ]; then
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
             if [ "${NEW_CLIENT_NAME}" == "" ]; then
               echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
@@ -1192,7 +1269,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       6) # Remove WireGuard Peer
-        if [ -f "${WIREGUARD_MANAGER}" ]; then
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if [ -x "$(command -v wg)" ]; then
             echo "Which WireGuard user do you want to remove?"
             # shellcheck disable=SC2002
@@ -1233,8 +1310,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       8) # Uninstall Wireguard and purging files
-        if [ -x "$(command -v wg)" ]; then
-          if [ -f "${WIREGUARD_MANAGER}" ]; then
+        if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
+          if [ -x "$(command -v wg)" ]; then
             if pgrep systemd-journal; then
               systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
               wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1305,8 +1382,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
         fi
         # Uninstall Unbound
-        if [ -x "$(command -v unbound)" ]; then
-          if [ -f "${UNBOUND_MANAGER}" ]; then
+        if [ -f "${UNBOUND_MANAGER}" ]; then
+          if [ -x "$(command -v unbound)" ]; then
             if pgrep systemd-journal; then
               systemctl disable unbound
               systemctl stop unbound
@@ -1347,8 +1424,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             fi
           fi
           # Uninstall Pihole
-          if [ -x "$(command -v pihole)" ]; then
-            if [ -f "${PIHOLE_MANAGER}" ]; then
+          if [ -f "${PIHOLE_MANAGER}" ]; then
+            if [ -x "$(command -v pihole)" ]; then
               if pgrep systemd-journal; then
                 systemctl disable pihole
                 systemctl stop pihole
@@ -1409,11 +1486,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       11) # Restore Wireguard Config
-        if [ -d "${WIREGUARD_PATH}" ]; then
-          rm -rf ${WIREGUARD_PATH}
-        fi
-        if [ -x "$(command -v wg)" ]; then
-          if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+        if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+          if [ -d "${WIREGUARD_PATH}" ]; then
+            rm -rf ${WIREGUARD_PATH}
+          fi
+          if [ -x "$(command -v wg)" ]; then
             unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
           else
             exit
@@ -1426,212 +1503,26 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
         fi
         ;;
+      12)
+        if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
+          TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
+          TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
+          TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
+          TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
+          if [ -x "$(command -v wg)" ]; then
+            if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
+              if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
+                curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
+              fi
+            fi
+          fi
+        fi
+        ;;
       esac
     fi
   }
 
   # Running Questions Command
   wireguard-next-questions-interface
-
-  function wireguard-next-questions-peer() {
-    if [ -f "${WIREGUARD_PEER}" ]; then
-      echo "What do you want to do?"
-      echo "   1) Show WireGuard"
-      echo "   2) Start WireGuard"
-      echo "   3) Stop WireGuard"
-      echo "   4) Restart WireGuard"
-      echo "   5) Reinstall WireGuard"
-      echo "   6) Uninstall WireGuard"
-      echo "   7) Update this script"
-      echo "   8) Backup WireGuard"
-      echo "   9) Restore WireGuard"
-      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 9 ]; do
-        read -rp "Select an Option [1-9]: " -e -i 1 WIREGUARD_OPTIONS
-      done
-      case ${WIREGUARD_OPTIONS} in
-      1) # WG Show
-        if [ -x "$(command -v wg)" ]; then
-          wg show
-        fi
-        ;;
-      2) # Enable & Start Wireguard
-        if [ -x "$(command -v wg)" ]; then
-          if pgrep systemd-journal; then
-            systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-            systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-          else
-            service wg-quick@${WIREGUARD_PUB_NIC} enable
-            service wg-quick@${WIREGUARD_PUB_NIC} start
-          fi
-        fi
-        ;;
-      3) # Disable & Stop WireGuard
-        if [ -x "$(command -v wg)" ]; then
-          if pgrep systemd-journal; then
-            systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-            systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-          else
-            service wg-quick@${WIREGUARD_PUB_NIC} disable
-            service wg-quick@${WIREGUARD_PUB_NIC} stop
-          fi
-        fi
-        ;;
-      4) # Restart WireGuard
-        if [ -x "$(command -v wg)" ]; then
-          if pgrep systemd-journal; then
-            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-          else
-            service wg-quick@${WIREGUARD_PUB_NIC} restart
-          fi
-        fi
-        ;;
-      5) # Reinstall Wireguard
-        if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
-          dpkg-reconfigure wireguard-dkms
-          modprobe wireguard
-          systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-        elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
-          yum reinstall wireguard-dkms -y
-          service wg-quick@${WIREGUARD_PUB_NIC} restart
-        elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Rs --noconfirm wireguard-tools
-          service wg-quick@${WIREGUARD_PUB_NIC} restart
-        elif [ "${DISTRO}" == "alpine" ]; then
-          apk fix wireguard-tools
-        elif [ "${DISTRO}" == "freebsd" ]; then
-          pkg check wireguard
-        fi
-        ;;
-      6) # Uninstall Wireguard and purging files
-        if [ -f "${WIREGUARD_MANAGER}" ]; then
-          if [ -x "$(command -v wg)" ]; then
-            if pgrep systemd-journal; then
-              systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-              wg-quick down ${WIREGUARD_PUB_NIC}
-            else
-              service wg-quick@${WIREGUARD_PUB_NIC} disable
-              wg-quick down ${WIREGUARD_PUB_NIC}
-            fi
-            # Removing Wireguard Files
-            if [ -d "${WIREGUARD_PATH}" ]; then
-              rm -rf ${WIREGUARD_PATH}
-            fi
-            if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
-              rm -rf ${WIREGUARD_CLIENT_PATH}
-            fi
-            if [ -f "${WIREGUARD_CONFIG}" ]; then
-              rm -f ${WIREGUARD_CONFIG}
-            fi
-            if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-              rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-            fi
-            if [ "${DISTRO}" == "centos" ]; then
-              yum remove wireguard qrencode haveged -y
-            elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
-              apt-get remove --purge wireguard qrencode -y
-              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
-                rm -f /etc/apt/sources.list.d/unstable.list
-              fi
-              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
-                rm -f /etc/apt/preferences.d/limit-unstable
-              fi
-            elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
-              apt-get remove --purge wireguard qrencode haveged -y
-            elif [ "${DISTRO}" == "ubuntu" ]; then
-              apt-get remove --purge wireguard qrencode haveged -y
-              if pgrep systemd-journal; then
-                systemctl enable systemd-resolved
-                systemctl restart systemd-resolved
-              else
-                service systemd-resolved enable
-                service systemd-resolved restart
-              fi
-            elif [ "${DISTRO}" == "raspbian" ]; then
-              apt-key del 04EE7237B7D453EC
-              apt-get remove --purge wireguard qrencode haveged dirmngr -y
-              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
-                rm -f /etc/apt/sources.list.d/unstable.list
-              fi
-              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
-                rm -f /etc/apt/preferences.d/limit-unstable
-              fi
-            elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-              pacman -Rs wireguard qrencode haveged -y
-            elif [ "${DISTRO}" == "fedora" ]; then
-              dnf remove wireguard qrencode haveged -y
-              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
-                rm -f /etc/yum.repos.d/wireguard.repo
-              fi
-            elif [ "${DISTRO}" == "rhel" ]; then
-              yum remove wireguard qrencode haveged -y
-              if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
-                rm -f /etc/yum.repos.d/wireguard.repo
-              fi
-            elif [ "${DISTRO}" == "alpine" ]; then
-              apk del wireguard-tools libqrencode haveged
-            elif [ "${DISTRO}" == "freebsd" ]; then
-              pkg delete wireguard libqrencode
-            fi
-          fi
-        fi
-        # Delete wireguard Backup
-        if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
-          if [[ $REPLY =~ ^[Yy]$ ]]; then
-            rm -f ${WIREGUARD_CONFIG_BACKUP}
-          elif [[ $REPLY =~ ^[Nn]$ ]]; then
-            exit
-          fi
-        fi
-        ;;
-      7) # Update the script
-        if [ -x "$(command -v wg)" ]; then
-          CURRENT_FILE_PATH="$(realpath "$0")"
-          if [ -f "${CURRENT_FILE_PATH}" ]; then
-            curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
-            chmod +x "${CURRENT_FILE_PATH}" || exit
-          fi
-        fi
-        ;;
-      8) # Backup Wireguard Config
-        if [ -x "$(command -v wg)" ]; then
-          if [ -d "${WIREGUARD_PATH}" ]; then
-            if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-              rm -f ${WIREGUARD_CONFIG_BACKUP}
-            fi
-            if [ -f "${WIREGUARD_MANAGER}" ]; then
-              zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE}
-            else
-              exit
-            fi
-          fi
-        fi
-        ;;
-      9) # Restore Wireguard Config
-        if [ -x "$(command -v wg)" ]; then
-          if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-            if [ -d "${WIREGUARD_PATH}" ]; then
-              rm -rf ${WIREGUARD_PATH}
-            fi
-            if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-              unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
-            else
-              exit
-            fi
-            # Restart Wireguard
-            if pgrep systemd-journal; then
-              systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-            else
-              service wg-quick@${WIREGUARD_PUB_NIC} restart
-            fi
-          fi
-        fi
-        ;;
-      esac
-    fi
-  }
-
-  # Running Questions Command
-  wireguard-next-questions-peer
 
 fi
