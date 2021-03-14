@@ -121,7 +121,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-CRON_JOBS_PATH=""
+CRON_JOBS_PATH="/etc/crontab"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
