@@ -674,7 +674,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
-        echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        echo "0 0 * * * $(realpath "$0") --update" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         if pgrep systemd-journal; then
@@ -725,7 +725,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
-        echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
+        echo "* * * * * $(realpath "$0") --notification" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
         if pgrep systemd-journal; then
