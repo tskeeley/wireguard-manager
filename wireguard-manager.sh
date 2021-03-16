@@ -665,7 +665,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Send real time notifications
   function enable-automatic-updates() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       echo "Would you like to setup real-time updates?"
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
@@ -677,6 +677,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ./$(realpath "$0") --update >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl restart cron
+        else
+          service cron enable
+          service cron restart
+        fi
         ;;
       2)
         echo "Real-time Updates Disabled"
@@ -690,7 +697,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Send real time notifications
   function real-time-notifications() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       echo "Would you like to setup notifications?"
       echo "  1) No (Recommended)"
       echo "  2) Twilio (Advanced)"
@@ -721,6 +728,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "* * * * * .$(realpath "$0") --notification >/dev/null 2>&1" >>"${CRON_JOBS_PATH}"
         crontab ${CRON_JOBS_PATH}
         rm -f ${CRON_JOBS_PATH}
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl restart cron
+        else
+          service cron enable
+          service cron restart
+        fi
         ;;
       esac
     fi
