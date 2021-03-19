@@ -598,7 +598,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${DISABLE_HOST_SETTINGS} in
       1)
-        if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+        if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
@@ -608,7 +608,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       2)
-        if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+        if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
@@ -617,7 +617,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+        if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
