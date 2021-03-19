@@ -121,7 +121,6 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-CRON_JOBS_PATH="${WIREGUARD_PATH}/crontab-add"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -674,9 +673,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
-        echo "0 0 * * * $(realpath "$0") --update" >>"${CRON_JOBS_PATH}"
-        crontab ${CRON_JOBS_PATH}
-        rm -f ${CRON_JOBS_PATH}
+        crontab -l | { cat; echo "0 0 * * * $(realpath "$0") --update"; } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
           systemctl restart cron
@@ -725,9 +722,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
-        echo "* * * * * $(realpath "$0") --notification" >>"${CRON_JOBS_PATH}"
-        crontab ${CRON_JOBS_PATH}
-        rm -f ${CRON_JOBS_PATH}
+        crontab -l | { cat; echo "* * * * * $(realpath "$0") --notification"; } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
           systemctl restart cron
