@@ -1146,9 +1146,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       if pgrep systemd-journal; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable ntpd
+        systemctl restart ntpd
       else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
+        service ntpd enable
+        service ntpd restart
       fi
       # Generate QR Code
       qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
