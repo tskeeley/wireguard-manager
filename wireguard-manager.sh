@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # https://github.com/complexorganizations/wireguard-manager
 
 # Require script to be run as root
@@ -137,7 +137,7 @@ previous-wireguard-installation
 # Which would you like to install interface or peer?
 function interface-or-peer() {
   if [ ! -f "${WIREGUARD_MANAGER}" ]; then
-    echo "Do you want the interface or peer to be installed?"
+    echo "Do you want the interface (server) or peer (client) to be installed?"
     echo "  1) Interface"
     echo "  2) Peer"
     until [[ "${INTERFACE_OR_PEER}" =~ ^[1-2]$ ]]; do
@@ -299,15 +299,15 @@ headless-install
 
 if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
-  # Custom ipv4 subnet
+  # Custom IPv4 subnet
   function set-ipv4-subnet() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      echo "What ipv4 subnet do you want to use?"
+      echo "What IPv4 subnet do you want to use?"
       echo "  1) 10.8.0.0/24 (Recommended)"
       echo "  2) 10.0.0.0/24"
       echo "  3) Custom (Advanced)"
       until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
+        read -rp "Subnet Choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
       done
       case ${IPV4_SUBNET_SETTINGS} in
       1)
@@ -326,18 +326,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Custom ipv4 Subnet
+  # Custom IPv4 Subnet
   set-ipv4-subnet
 
-  # Custom ipv6 subnet
+  # Custom IPv6 subnet
   function set-ipv6-subnet() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      echo "What ipv6 subnet do you want to use?"
+      echo "What IPv6 subnet do you want to use?"
       echo "  1) fd42:42:42::0/64 (Recommended)"
       echo "  2) fd86:ea04:1115::0/64"
       echo "  3) Custom (Advanced)"
       until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnetwork Choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
+        read -rp "Subnet Choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
       done
       case ${IPV6_SUBNET_SETTINGS} in
       1)
@@ -356,7 +356,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Custom ipv6 Subnet
+  # Custom IPv6 Subnet
   set-ipv6-subnet
 
   if [ -f "${WIREGUARD_INTERFACE}" ]; then
@@ -374,7 +374,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}1"
   fi
 
-  # Get the IPV4
+  # Get the IPv4
   function test-connectivity-v4() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "How would you like to detect IPv4?"
@@ -401,10 +401,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPV4
+  # Get the IPv4
   test-connectivity-v4
 
-  # Determine ipv6
+  # Determine IPv6
   function test-connectivity-v6() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "How would you like to detect IPv6?"
@@ -431,10 +431,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPV6
+  # Get the IPv6
   test-connectivity-v6
 
-  # Determine public nic
+  # Determine public NIC
   function server-pub-nic() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "How would you like to detect NIC?"
@@ -457,7 +457,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Determine public nic
+  # Determine public NIC
   server-pub-nic
 
   # Determine host port
@@ -487,7 +487,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Set Port
+  # Set port
   set-port
 
   # Determine Keepalive interval.
@@ -548,10 +548,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Set MTU
   mtu-set
 
-  # What ip version would you like to be available on this VPN?
+  # What IP version would you like to be available on this WireGuard server?
   function ipvx-select() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      echo "What IPv do you want to use to connect to WireGuard server?"
+      echo "What IPv do you want to use to connect to the WireGuard server?"
       echo "  1) IPv4 (Recommended)"
       echo "  2) IPv6"
       echo "  3) Custom (Advanced)"
@@ -591,8 +591,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Do you want to disable IPv4 or IPv6 on the server?"
       echo "  1) No (Recommended)"
-      echo "  2) Disable IPV4"
-      echo "  3) Disable IPV6"
+      echo "  2) Disable IPv4"
+      echo "  3) Disable IPv6"
       until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Disable Host Choice [1-3]: " -e -i 1 DISABLE_HOST_SETTINGS
       done
@@ -612,16 +612,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-          echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
+          echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
           sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         ;;
       3)
-        if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+       if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-          echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
+          echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
           sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         ;;
@@ -629,13 +629,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Disable Ipv4 or Ipv6
+  # Disable IPv4 or IPv6
   disable-ipvx
 
   # Would you like to allow connections to your LAN neighbors?
   function client-allowed-ip() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      echo "What traffic do you want the client to forward to wireguard?"
+      echo "What traffic do you want the client to forward through WireGuard?"
       echo "  1) Everything (Recommended)"
       echo "  2) Exclude Private IPs"
       echo "  3) Custom (Advanced)"
@@ -689,7 +689,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPV4
+  # Get the IPv4
   enable-automatic-updates
 
   # Send real time notifications
@@ -735,7 +735,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPV4
+  # Get the IPv4
   real-time-notifications
 
   # Would you like to install Unbound.
@@ -769,7 +769,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function custom-dns() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ "${CUSTOM_DNS}" == "y" ]; then
-        echo "Which DNS do you want to use with the VPN?"
+        echo "Which DNS do you want to use with the WireGuard connection?"
         echo "  1) Google (Recommended)"
         echo "  2) AdGuard"
         echo "  3) NextDNS"
@@ -825,7 +825,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function client-name() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ "${CLIENT_NAME}" == "" ]; then
-        echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
+        echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
         read -rp "Client name: " -e CLIENT_NAME
       fi
       if [ -z "${CLIENT_NAME}" ]; then
@@ -956,7 +956,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   install-wireguard-server
 
-  # Install wireguard manager config
+  # Install WireGuard manager config
   function install-wireguard-manager-file() {
     if [ -d "${WIREGUARD_PATH}" ]; then
       if [ ! -f "${WIREGUARD_MANAGER}" ]; then
@@ -965,10 +965,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # wireguard manager config
+  # WireGuard manager config
   install-wireguard-manager-file
 
-  # Function to install unbound
+  # Function to install Unbound
   function install-unbound() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ "${INSTALL_UNBOUND}" = "y" ]; then
@@ -1068,7 +1068,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Running Install Unbound
   install-unbound
 
-  # Install pihole
+  # Install Pihole
   function install-pihole() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ "${INSTALL_PIHOLE}" = "y" ]; then
@@ -1087,7 +1087,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # install pihole
+  # install Pihole
   install-pihole
 
   # WireGuard Set Config
@@ -1110,7 +1110,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE"
         IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE"
       fi
-      # Set Wireguard settings for this host and first peer.
+      # Set WireGuard settings for this host and first peer.
       echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
 # ${TWILIO_ACCOUNT_SID} ${TWILIO_AUTH_TOKEN} ${TWILIO_FROM_NUMBER} ${TWILIO_TO_NUMBER}
 [Interface]
@@ -1156,7 +1156,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     fi
   }
 
-  # Setting Up Wireguard Config
+  # Setting Up WireGuard Config
   wireguard-setconf
 
 # After WireGuard Install
@@ -1187,7 +1187,7 @@ else
           wg show
         fi
         ;;
-      2) # Enable & Start Wireguard
+      2) # Enable & Start WireGuard
         if [ -x "$(command -v wg)" ]; then
           if pgrep systemd-journal; then
             systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
@@ -1222,7 +1222,7 @@ else
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
             if [ "${NEW_CLIENT_NAME}" == "" ]; then
-              echo "Lets name the WireGuard Peer, Use one word only, no special characters. (No Spaces)"
+              echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
               read -rp "New client peer: " -e NEW_CLIENT_NAME
             fi
             if [ -z "${NEW_CLIENT_NAME}" ]; then
@@ -1247,7 +1247,7 @@ else
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
             if [ "${LASTIPV4}" -ge "255" ]; then
-              echo "Error: You have ${LASTIPV4} peers the max is 255"
+              echo "Error: You have ${LASTIPV4} peers. The max is 255."
               exit
             fi
             echo "# ${NEW_CLIENT_NAME} start
@@ -1280,7 +1280,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       6) # Remove WireGuard Peer
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if [ -x "$(command -v wg)" ]; then
-            echo "Which WireGuard user do you want to remove?"
+            echo "Which WireGuard client do you want to remove?"
             # shellcheck disable=SC2002
             cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
             read -rp "Type in Client Name : " -e REMOVECLIENT
@@ -1301,7 +1301,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
         fi
         ;;
-      7) # Reinstall Wireguard
+      7) # Reinstall WireGuard
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
           dpkg-reconfigure wireguard-dkms
           modprobe wireguard
@@ -1318,7 +1318,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           pkg check wireguard
         fi
         ;;
-      8) # Uninstall Wireguard and purging files
+      8) # Uninstall WireGuard and purging files
         if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
           if [ -x "$(command -v wg)" ]; then
             if pgrep systemd-journal; then
@@ -1454,9 +1454,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             fi
           fi
         fi
-        # Delete wireguard Backup
+        # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Do you really want to remove Wireguard Backup? (y/n): " -n 1 -r
+          read -rp "Do you really want to remove the WireGuard Backup? (y/n): " -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]]; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
           elif [[ $REPLY =~ ^[Nn]$ ]]; then
@@ -1480,7 +1480,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
         fi
         ;;
-      10) # Backup Wireguard Config
+      10) # Backup WireGuard Config
         if [ -x "$(command -v wg)" ]; then
           if [ -d "${WIREGUARD_PATH}" ]; then
             if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
@@ -1494,7 +1494,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
         fi
         ;;
-      11) # Restore Wireguard Config
+      11) # Restore WireGuard Config
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
           if [ -d "${WIREGUARD_PATH}" ]; then
             rm -rf ${WIREGUARD_PATH}
@@ -1504,7 +1504,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           else
             exit
           fi
-          # Restart Wireguard
+          # Restart WireGuard
           if pgrep systemd-journal; then
             systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
           else
