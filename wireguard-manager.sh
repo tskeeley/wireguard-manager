@@ -612,7 +612,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-          echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
+          echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
           sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         ;;
@@ -621,7 +621,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-          echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
+          echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
           sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
         fi
         ;;
