@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM ubuntu:latest
 LABEL maintainer="Prajwal Koirala <prajwalkoirala23@protonmail.com>"
 EXPOSE 51820/udp
 EXPOSE 53/tcp
