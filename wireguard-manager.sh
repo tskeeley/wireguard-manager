@@ -273,7 +273,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [ "${HEADLESS_INSTALL}" == "y" ]; then
+  if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -1289,11 +1289,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
             read -rp "Type in Client Name : " -e REMOVECLIENT
             read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+            if [[ ${REPLY} =~ ^[Yy]$ ]]; then
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
               echo "Client ${REMOVECLIENT} has been removed."
-            elif [[ $REPLY =~ ^[Nn]$ ]]; then
+            elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
               exit
             fi
             # Restart WireGuard
@@ -1461,9 +1461,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
           read -rp "Do you really want to remove the WireGuard Backup? (y/n): " -n 1 -r
-          if [[ $REPLY =~ ^[Yy]$ ]]; then
+          if [[ ${REPLY} =~ ^[Yy]$ ]]; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
-          elif [[ $REPLY =~ ^[Nn]$ ]]; then
+          elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
             exit
           fi
         fi
