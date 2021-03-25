@@ -202,7 +202,7 @@ function usage-guide() {
 function usage() {
   if [ -f "${WIREGUARD_INTERFACE}" ]; then
     while [ $# -ne 0 ]; do
-      case "${1}" in
+      case ${1} in
       --install)
         shift
         HEADLESS_INSTALL=${HEADLESS_INSTALL:-y}
@@ -265,7 +265,6 @@ function usage() {
         exit
         ;;
       esac
-      shift
     done
   fi
 }
