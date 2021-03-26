@@ -25,7 +25,7 @@
 A Virtual Private Network (VPN) allows users to send and receive data through shared or public networks as if their computing devices were directly connected to the private network. Thus, applications running on an end-system (PC, smartphone, etc.) over a VPN may benefit from individual network features, protection, and management. Encryption is a standard aspect of a VPN connection but not an intrinsic one.
 
 ### 📶 What is WireGuard❓
-WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-the-art cryptography. It aims to be faster, simpler, leaner, and more useful than IPsec while avoiding the massive headache. It intends to be considerably more performant than OpenVPN. WireGuard is designed as a general-purpose VPN for running on embedded interfaces and super computers alike, fit for many different circumstances. Initially released for the Linux kernel, it is now cross-platform (Windows, macOS, BSD, iOS, Android) and widely deployable. It is currently under a massive development, but it already might be regarded as the most secure, most comfortable to use, and the simplest VPN solution in the industry.
+WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-the-art cryptography. It aims to be faster, simpler, leaner, and more useful than IPsec while avoiding the massive headache. It intends to be considerably more performant than OpenVPN. WireGuard is designed as a general-purpose VPN for running on embedded interfaces and super computers alike, fit for many circumstances. Initially released for the Linux kernel, it is now cross-platform (Windows, macOS, BSD, iOS, Android) and widely deployable. It is currently under a massive development, but it already might be regarded as the most secure, most comfortable to use, and the simplest VPN solution in the industry.
 
 ### ⛳ Goals
  - robust and modern security by default
@@ -104,7 +104,7 @@ usage: ./wireguard-manager.sh <command>
 - Variety of Public DNS to be pushed to the peers
 - Choice to use a self-hosted resolver with Unbound **Prevent DNS Leaks, DNSSEC Supported**
 - Iptables rules and forwarding managed in a seamless way
-- Remove & Unistall WireGuard Interface
+- Remove & Uninstall WireGuard Interface
 - Preshared-key for an extra layer of security. **Required**
 - Many other little things!
 
