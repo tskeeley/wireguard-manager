@@ -71,8 +71,8 @@ function docker-check() {
   if [ -f /.dockerenv ]; then
     DOCKER_KERNEL_VERSION_LIMIT=5.6
     DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-    if (($(echo "${KERNEL_CURRENT_VERSION} >= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
-      echo "Correct: Kernel ${KERNEL_CURRENT_VERSION} supported." >>/dev/null
+    if (($(echo "${DOCKER_KERNEL_CURRENT_VERSION} >= ${DOCKER_KERNEL_VERSION_LIMIT}" | bc -l))); then
+      echo "Correct: Kernel ${DOCKER_KERNEL_CURRENT_VERSION} supported." >>/dev/null
     else
       echo "Error: Kernel ${DOCKER_KERNEL_CURRENT_VERSION} not supported, please update to ${DOCKER_KERNEL_VERSION_LIMIT}"
       exit
@@ -838,9 +838,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-      KERNEL_VERSION_LIMIT=5.6
-      KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
-      if (($(echo "${KERNEL_CURRENT_VERSION} <= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
+      LINUX_HEADER_KERNEL_VERSION_LIMIT=5.6
+      LINUX_HEADER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+      if (($(echo "${LINUX_HEADER_KERNEL_CURRENT_VERSION} <= ${LINUX_HEADER_KERNEL_VERSION_LIMIT}" | bc -l))); then
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
           apt-get update
           apt-get install linux-headers-"$(uname -r)" -y
