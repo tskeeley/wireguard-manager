@@ -822,7 +822,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # What would you like to name your first WireGuard peer?
   function client-name() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${CLIENT_NAME}" == "" ]; then
+      if [ -z "${CLIENT_NAME}" ]; then
         echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
         read -rp "Client name: " -e CLIENT_NAME
       fi
@@ -1224,7 +1224,7 @@ else
       5) # WireGuard add Peer
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
-            if [ "${NEW_CLIENT_NAME}" == "" ]; then
+            if [ -z "${NEW_CLIENT_NAME}" ]; then
               echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
               read -rp "New client peer: " -e NEW_CLIENT_NAME
             fi
