@@ -1275,6 +1275,7 @@ Endpoint = ${SERVER_HOST}${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
             qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
             echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
           fi
@@ -1289,18 +1290,15 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             read -rp "Type in Client Name : " -e REMOVECLIENT
             read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
             if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+              CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey |  awk ' { print $3 } ')
+              wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
               echo "Client ${REMOVECLIENT} has been removed."
             elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
               exit
             fi
-            # Restart WireGuard
-            if pgrep systemd-journal; then
-              systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-            else
-              service wg-quick@${WIREGUARD_PUB_NIC} restart
-            fi
+	    wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
           fi
         fi
         ;;
