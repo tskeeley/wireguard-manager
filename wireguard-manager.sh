@@ -1297,7 +1297,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
 	      # Get the user's public key
 	      CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey |  awk ' { print $3 } ')
 	      # Drops the client's current session.
-    	      wg set ${WIREGUARD_PUB_NIC} peer ${CLIENTKEY} remove
+    	      wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
 
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
