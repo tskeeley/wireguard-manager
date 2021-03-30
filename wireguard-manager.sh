@@ -671,7 +671,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
-        crontab -l | { cat; echo "0 0 * * * $(realpath "$0") --update"; } | crontab -
+        crontab -l | {
+          cat
+          echo "0 0 * * * $(realpath "$0") --update"
+        } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
           systemctl restart cron
@@ -720,7 +723,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
-        crontab -l | { cat; echo "* * * * * $(realpath "$0") --notification"; } | crontab -
+        crontab -l | {
+          cat
+          echo "* * * * * $(realpath "$0") --notification"
+        } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
           systemctl restart cron
@@ -1290,7 +1296,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             read -rp "Type in Client Name : " -e REMOVECLIENT
             read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
             if [[ ${REPLY} =~ ^[Yy]$ ]]; then
-              CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey |  awk ' { print $3 } ')
+              CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
@@ -1298,7 +1304,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
               exit
             fi
-	    wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
           fi
         fi
         ;;
