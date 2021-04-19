@@ -205,6 +205,9 @@ How do I install a wireguard without the questions? (Headless Install)
 Is there any alternative to wireguard?
 - [ShadowSocks](https://github.com/complexorganizations/shadowsocks-manager)
 
+Are there any good alternative to self-hosting vpn?
+- [CloudFlare Wrap](https://1.1.1.1/)
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
