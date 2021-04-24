@@ -1330,9 +1330,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -x "$(command -v wg)" ]; then
             if pgrep systemd-journal; then
               systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+              systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
               wg-quick down ${WIREGUARD_PUB_NIC}
             else
               service wg-quick@${WIREGUARD_PUB_NIC} disable
+              service wg-quick@${WIREGUARD_PUB_NIC} stop
               wg-quick down ${WIREGUARD_PUB_NIC}
             fi
             # Removing Wireguard Files
