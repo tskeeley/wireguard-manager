@@ -1317,8 +1317,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           yum reinstall wireguard-tools -y
           service wg-quick@${WIREGUARD_PUB_NIC} restart
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Rs --noconfirm wireguard-tools
-          service wg-quick@${WIREGUARD_PUB_NIC} restart
+          pacman -S --noconfirm wireguard-tools
+          systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         elif [ "${DISTRO}" == "alpine" ]; then
           apk fix wireguard-tools
         elif [ "${DISTRO}" == "freebsd" ]; then
