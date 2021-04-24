@@ -677,10 +677,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
-          systemctl restart cron
+          systemctl start cron
         else
           service cron enable
-          service cron restart
+          service cron start
         fi
         ;;
       2)
@@ -729,10 +729,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
-          systemctl restart cron
+          systemctl start cron
         else
           service cron enable
-          service cron restart
+          service cron start
         fi
         ;;
       esac
@@ -1057,7 +1057,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           echo "Unbound: true" >>${UNBOUND_MANAGER}
           # restart unbound
           if pgrep systemd-journal; then
-            systemctl enable unbound
+            systemctl reenable unbound
             systemctl restart unbound
           else
             service unbound enable
@@ -1149,14 +1149,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       # Service Restart
       if pgrep systemd-journal; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
         systemctl enable ntp
-        systemctl restart ntp
+        systemctl start ntp
       else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
-        service wg-quick@${WIREGUARD_PUB_NIC} restart
+        service wg-quick@${WIREGUARD_PUB_NIC} start
         service ntp enable
-        service ntp restart
+        service ntp start
       fi
       ntpq -p
       # Generate QR Code
@@ -1221,9 +1221,9 @@ else
       4) # Restart WireGuard
         if [ -x "$(command -v wg)" ]; then
           if pgrep systemd-journal; then
-            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+            systemctl start wg-quick@${WIREGUARD_PUB_NIC}
           else
-            service wg-quick@${WIREGUARD_PUB_NIC} restart
+            service wg-quick@${WIREGUARD_PUB_NIC} start
           fi
         fi
         ;;
@@ -1312,12 +1312,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
           dpkg-reconfigure wireguard-dkms
           modprobe wireguard
+          systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
           systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
           yum reinstall wireguard-tools -y
           service wg-quick@${WIREGUARD_PUB_NIC} restart
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
           pacman -S --noconfirm wireguard-tools
+          systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
           systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         elif [ "${DISTRO}" == "alpine" ]; then
           apk fix wireguard-tools
@@ -1365,7 +1367,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "ubuntu" ]; then
               apt-get remove --purge wireguard qrencode haveged -y
               if pgrep systemd-journal; then
-                systemctl enable systemd-resolved
+                systemctl reenable systemd-resolved
                 systemctl restart systemd-resolved
               else
                 service systemd-resolved enable
@@ -1515,8 +1517,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
           # Restart WireGuard
           if pgrep systemd-journal; then
+            systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
             systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
           else
+            service wg-quick@${WIREGUARD_PUB_NIC} enable
             service wg-quick@${WIREGUARD_PUB_NIC} restart
           fi
         fi
