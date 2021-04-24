@@ -1148,15 +1148,15 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       # Service Restart
       if pgrep systemd-journal; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl enable ntp
-        systemctl start ntp
+        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl reenable ntp
+        systemctl restart ntp
       else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
-        service wg-quick@${WIREGUARD_PUB_NIC} start
+        service wg-quick@${WIREGUARD_PUB_NIC} restart
         service ntp enable
-        service ntp start
+        service ntp restart
       fi
       ntpq -p
       # Generate QR Code
