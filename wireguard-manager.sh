@@ -1379,7 +1379,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
                 rm -f /etc/apt/preferences.d/limit-unstable
               fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-              pacman -Rs wireguard-tools qrencode haveged -y
+              pacman -Rs --noconfirm wireguard-tools qrencode haveged
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove wireguard qrencode haveged -y
               if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
@@ -1418,7 +1418,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
               apt-get remove --purge unbound unbound-host -y
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-              pacman -Rs unbound unbound-host -y
+              pacman -Rs --noconfirm unbound unbound-host
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove unbound -y
             elif [ "${DISTRO}" == "alpine" ]; then
