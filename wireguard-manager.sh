@@ -854,7 +854,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get update
           apt-get install raspberrypi-kernel-headers -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu
           pacman -Syu --noconfirm --needed linux-headers
         elif [ "${DISTRO}" == "fedora" ]; then
           dnf update -y
@@ -911,9 +910,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu
-          pacman -Syu --noconfirm --needed haveged qrencode openresolv
-          pacman -Syu --noconfirm --needed wireguard-tools
+          pacman -Syu --noconfirm --needed haveged qrencode openresolv wireguard-tools
         elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" == "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
