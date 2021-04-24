@@ -34,7 +34,7 @@ function installing-system-requirements() {
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
         yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl cron ntp -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron ntp
+        pacman -Syu --noconfirm --needed bc jq zip unzip cronie ntp
       elif [ "${DISTRO}" == "alpine" ]; then
         apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron ntp
       elif [ "${DISTRO}" == "freebsd" ]; then
@@ -677,10 +677,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
-          systemctl restart cron
+          systemctl start cron
         else
           service cron enable
-          service cron restart
+          service cron start
         fi
         ;;
       2)
@@ -729,10 +729,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
-          systemctl restart cron
+          systemctl start cron
         else
           service cron enable
-          service cron restart
+          service cron start
         fi
         ;;
       esac
@@ -854,7 +854,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get update
           apt-get install raspberrypi-kernel-headers -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu
           pacman -Syu --noconfirm --needed linux-headers
         elif [ "${DISTRO}" == "fedora" ]; then
           dnf update -y
@@ -911,9 +910,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu
-          pacman -Syu --noconfirm --needed haveged qrencode iptables resolvconf
-          pacman -Syu --noconfirm --needed wireguard-tools
+          pacman -Syu --noconfirm --needed haveged qrencode openresolv wireguard-tools
         elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" == "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
@@ -1057,7 +1054,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           echo "Unbound: true" >>${UNBOUND_MANAGER}
           # restart unbound
           if pgrep systemd-journal; then
-            systemctl enable unbound
+            systemctl reenable unbound
             systemctl restart unbound
           else
             service unbound enable
@@ -1148,9 +1145,9 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       # Service Restart
       if pgrep systemd-journal; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl enable ntp
+        systemctl reenable ntp
         systemctl restart ntp
       else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
@@ -1221,9 +1218,9 @@ else
       4) # Restart WireGuard
         if [ -x "$(command -v wg)" ]; then
           if pgrep systemd-journal; then
-            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+            systemctl start wg-quick@${WIREGUARD_PUB_NIC}
           else
-            service wg-quick@${WIREGUARD_PUB_NIC} restart
+            service wg-quick@${WIREGUARD_PUB_NIC} start
           fi
         fi
         ;;
@@ -1312,13 +1309,15 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
           dpkg-reconfigure wireguard-dkms
           modprobe wireguard
+          systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
           systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
           yum reinstall wireguard-tools -y
           service wg-quick@${WIREGUARD_PUB_NIC} restart
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Rs --noconfirm wireguard-tools
-          service wg-quick@${WIREGUARD_PUB_NIC} restart
+          pacman -S --noconfirm wireguard-tools
+          systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+          systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         elif [ "${DISTRO}" == "alpine" ]; then
           apk fix wireguard-tools
         elif [ "${DISTRO}" == "freebsd" ]; then
@@ -1330,9 +1329,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -x "$(command -v wg)" ]; then
             if pgrep systemd-journal; then
               systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+              systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
               wg-quick down ${WIREGUARD_PUB_NIC}
             else
               service wg-quick@${WIREGUARD_PUB_NIC} disable
+              service wg-quick@${WIREGUARD_PUB_NIC} stop
               wg-quick down ${WIREGUARD_PUB_NIC}
             fi
             # Removing Wireguard Files
@@ -1363,7 +1364,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "ubuntu" ]; then
               apt-get remove --purge wireguard qrencode haveged -y
               if pgrep systemd-journal; then
-                systemctl enable systemd-resolved
+                systemctl reenable systemd-resolved
                 systemctl restart systemd-resolved
               else
                 service systemd-resolved enable
@@ -1379,7 +1380,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
                 rm -f /etc/apt/preferences.d/limit-unstable
               fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-              pacman -Rs wireguard qrencode haveged -y
+              pacman -Rs --noconfirm wireguard-tools qrencode haveged
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove wireguard qrencode haveged -y
               if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
@@ -1418,7 +1419,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
               apt-get remove --purge unbound unbound-host -y
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-              pacman -Rs unbound unbound-host -y
+              pacman -Rs --noconfirm unbound unbound-host
             elif [ "${DISTRO}" == "fedora" ]; then
               dnf remove unbound -y
             elif [ "${DISTRO}" == "alpine" ]; then
@@ -1513,8 +1514,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
           # Restart WireGuard
           if pgrep systemd-journal; then
+            systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
             systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
           else
+            service wg-quick@${WIREGUARD_PUB_NIC} enable
             service wg-quick@${WIREGUARD_PUB_NIC} restart
           fi
         fi
