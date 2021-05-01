@@ -875,7 +875,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "20.10" ] || [ "${DISTRO_VERSION}" == "20.04" ] || [ "${DISTRO_VERSION}" == "19.10" ]; }; then
+        if [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "21.10" ] || [ "${DISTRO_VERSION}" == "21.04" ] || [ "${DISTRO_VERSION}" == "20.10" ] || [ "${DISTRO_VERSION}" == "20.04" ] || [ "${DISTRO_VERSION}" == "19.10" ]; }; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "16.04" ] || [ "${DISTRO_VERSION}" == "18.04" ]; }; then
