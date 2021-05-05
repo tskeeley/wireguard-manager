@@ -1,4 +1,4 @@
-<h1 align="center">WireGuard Manager 👋</h1>
+<h1 align="center">WireGuard-Manager 👋</h1>
 <p align="center">
 	<a href="https://github.com/complexorganizations/wireguard-manager/releases">
 		<img alt="Release" src="https://img.shields.io/github/v/release/complexorganizations/wireguard-manager" target="_blank" />
