@@ -42,7 +42,7 @@ function installing-system-requirements() {
       fi
     fi
   else
-    echo "Error: ${DISTRO} not supported."
+    echo "Error: ${DISTRO} is not supported."
     exit
   fi
 }
@@ -1176,8 +1176,8 @@ else
       echo "   2) Start WireGuard"
       echo "   3) Stop WireGuard"
       echo "   4) Restart WireGuard"
-      echo "   5) Add WireGuard Peer"
-      echo "   6) Remove WireGuard Peer"
+      echo "   5) Add WireGuard Peer (client)"
+      echo "   6) Remove WireGuard Peer (client)"
       echo "   7) Reinstall WireGuard"
       echo "   8) Uninstall WireGuard"
       echo "   9) Update this script"
