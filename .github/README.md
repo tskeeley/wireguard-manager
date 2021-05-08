@@ -208,6 +208,9 @@ Is there any alternative to wireguard?
 Are there any good alternative to self-hosting vpn?
 - [CloudFlare Warp](https://1.1.1.1/)
 
+Why is all the code in one place?
+- Consider a remote, you can have thirty separate remotes each doing one thing, or you can have a single remote that does everything.
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
