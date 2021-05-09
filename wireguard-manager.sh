@@ -1501,6 +1501,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           read -rp "Are you sure you want to remove WireGuard backup? (y/n): " -n 1 -r
           if [[ ${REPLY} =~ ^[Yy]$ ]]; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
+            if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
+              rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
+            fi
           elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
             exit
           fi
