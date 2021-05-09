@@ -704,6 +704,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
+      # having the password in the cron file is a bad idea, find a different methord.
+      AUTO_BACKUP_PASSWORD="$(openssl rand -hex 50)"
         crontab -l | {
           cat
           echo "0 0 * * * $(realpath "$0") --update"
