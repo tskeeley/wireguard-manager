@@ -1044,7 +1044,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
             NPROC=$(nproc)
             echo "server:
-    num-threads: $NPROC
+    num-threads: ${NPROC}
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
     auto-trust-anchor-file: ${UNBOUND_ANCHOR}
