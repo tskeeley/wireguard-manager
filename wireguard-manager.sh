@@ -1529,7 +1529,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             fi
             if [ -f "${WIREGUARD_MANAGER}" ]; then
               BACKUP_PASSWORD="$(openssl rand -hex 100)"
-              zip -P ${BACKUP_PASSWORD} -r ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
+              zip -P "${BACKUP_PASSWORD}" -r ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
             else
               exit
             fi
