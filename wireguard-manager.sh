@@ -692,6 +692,39 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # real-time updates
   enable-automatic-updates
+  
+  # real-time backup
+  function enable-automatic-backup() {
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
+      echo "Would you like to setup real-time backup?"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No (Advanced)"
+      until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+      done
+      case ${AUTOMATIC_UPDATES_SETTINGS} in
+      1)
+        crontab -l | {
+          cat
+          echo "0 0 * * * $(realpath "$0") --update"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      2)
+        echo "Real-time Backup Disabled"
+        ;;
+      esac
+    fi
+  }
+
+  # real-time backup
+  enable-automatic-backup
 
   # Send real time notifications
   function real-time-notifications() {
