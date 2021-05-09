@@ -699,16 +699,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Would you like to setup real-time backup?"
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
-      until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+      until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_BACKUP_SETTINGS
       done
-      case ${AUTOMATIC_UPDATES_SETTINGS} in
+      case ${AUTOMATIC_BACKUP_SETTINGS} in
       1)
       # having the password in the cron file is a bad idea, find a different methord.
-      AUTO_BACKUP_PASSWORD="$(openssl rand -hex 50)"
+      # AUTO_BACKUP_PASSWORD="$(openssl rand -hex 50)"
         crontab -l | {
           cat
-          echo "0 0 * * * $(realpath "$0") --update"
+          echo "0 0 * * * $(realpath "$0") --backup"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
