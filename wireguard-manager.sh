@@ -660,7 +660,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Traffic Forwarding
   client-allowed-ip
 
-  # Send real time notifications
+  # real-time updates
   function enable-automatic-updates() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       echo "Would you like to setup real-time updates?"
@@ -690,7 +690,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPv4
+  # real-time updates
   enable-automatic-updates
 
   # Send real time notifications
@@ -739,7 +739,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
-  # Get the IPv4
+  # real time notifications updates
   real-time-notifications
 
   # Would you like to install Unbound.
