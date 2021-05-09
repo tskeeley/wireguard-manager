@@ -693,7 +693,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # real-time updates
   enable-automatic-updates
-  
+
   # real-time backup
   function enable-automatic-backup() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
@@ -1529,11 +1529,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               rm -f ${WIREGUARD_CONFIG_BACKUP}
             fi
             if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-              rm -f ${WIREGUARD_BACKUP_PASSWORD_PATH}
+              rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
             fi
             if [ -f "${WIREGUARD_MANAGER}" ]; then
               BACKUP_PASSWORD="$(openssl rand -hex 100)"
-              echo "${BACKUP_PASSWORD}" >> ${WIREGUARD_BACKUP_PASSWORD_PATH}
+              echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
               zip -P "${BACKUP_PASSWORD}" -r ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
             else
               exit
