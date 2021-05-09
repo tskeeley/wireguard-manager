@@ -704,8 +704,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${AUTOMATIC_BACKUP_SETTINGS} in
       1)
-      # having the password in the cron file is a bad idea, find a different methord.
-      # AUTO_BACKUP_PASSWORD="$(openssl rand -hex 50)"
         crontab -l | {
           cat
           echo "0 0 * * * $(realpath "$0") --backup"
@@ -1530,6 +1528,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               rm -f ${WIREGUARD_CONFIG_BACKUP}
             fi
             if [ -f "${WIREGUARD_MANAGER}" ]; then
+              # BACKUP_PASSWORD="$(openssl rand -hex 50)"
               zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
             else
               exit
