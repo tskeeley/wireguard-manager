@@ -110,6 +110,7 @@ WIREGUARD_INTERFACE="${WIREGUARD_PATH}/wireguard-interface"
 WIREGUARD_PEER="${WIREGUARD_PATH}/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
+WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_ROOT="/etc/pihole"
 PIHOLE_MANAGER="${PIHOLE_ROOT}/wireguard-manager"
@@ -692,6 +693,39 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # real-time updates
   enable-automatic-updates
+
+  # real-time backup
+  function enable-automatic-backup() {
+    if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
+      echo "Would you like to setup real-time backup?"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No (Advanced)"
+      until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_BACKUP_SETTINGS
+      done
+      case ${AUTOMATIC_BACKUP_SETTINGS} in
+      1)
+        crontab -l | {
+          cat
+          echo "0 0 * * * $(realpath "$0") --backup"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      2)
+        echo "Real-time Backup Disabled"
+        ;;
+      esac
+    fi
+  }
+
+  # real-time backup
+  enable-automatic-backup
 
   # Send real time notifications
   function real-time-notifications() {
@@ -1464,7 +1498,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Do you really want to remove the WireGuard Backup? (y/n): " -n 1 -r
+          read -rp "Are you sure you want to remove WireGuard backup? (y/n): " -n 1 -r
           if [[ ${REPLY} =~ ^[Yy]$ ]]; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
           elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
@@ -1494,8 +1528,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
               rm -f ${WIREGUARD_CONFIG_BACKUP}
             fi
+            if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
+              rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
+            fi
             if [ -f "${WIREGUARD_MANAGER}" ]; then
-              zip -rej ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
+              BACKUP_PASSWORD="$(openssl rand -hex 25)"
+              echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
+              zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
             else
               exit
             fi
