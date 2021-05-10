@@ -1508,6 +1508,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             exit
           fi
         fi
+        # Delete crontab
+        if [ -x "$(command -v cron)" ]; then
+          crontab -r
+        fi
         ;;
       9) # Update the script
         if [ -x "$(command -v wg)" ]; then
