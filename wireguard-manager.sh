@@ -109,7 +109,8 @@ WIREGUARD_MANAGER="${WIREGUARD_PATH}/wireguard-manager"
 WIREGUARD_INTERFACE="${WIREGUARD_PATH}/wireguard-interface"
 WIREGUARD_PEER="${WIREGUARD_PATH}/wireguard-peer"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
-WIREGUARD_CONFIG_BACKUP="/var/backups/wireguard-manager.zip"
+SYSTEM_BACKUP_PATH="/var/backups"
+WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 PIHOLE_ROOT="/etc/pihole"
@@ -147,6 +148,7 @@ function interface-or-peer() {
     case ${INTERFACE_OR_PEER} in
     1)
       if [ -d "${WIREGUARD_PATH}" ]; then
+        cp -R ${WIREGUARD_PATH} "${SYSTEM_BACKUP_PATH}/OLD_WIREGUARD_FILES"
         if [ -f "${WIREGUARD_PEER}" ]; then
           rm -rf ${WIREGUARD_PATH}
         fi
@@ -160,6 +162,7 @@ function interface-or-peer() {
       ;;
     2)
       if [ -d "${WIREGUARD_PATH}" ]; then
+      cp -R ${WIREGUARD_PATH} "${SYSTEM_BACKUP_PATH}/OLD_WIREGUARD_FILES"
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           rm -rf ${WIREGUARD_PATH}
         fi
