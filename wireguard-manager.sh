@@ -704,7 +704,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Would you like to setup real-time backup?"
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
-      until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-3]$ ]]; do
+      until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-2]$ ]]; do
         read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_BACKUP_SETTINGS
       done
       case ${AUTOMATIC_BACKUP_SETTINGS} in
