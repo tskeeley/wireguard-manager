@@ -163,7 +163,7 @@ function interface-or-peer() {
       ;;
     2)
       if [ -d "${WIREGUARD_PATH}" ]; then
-      cp -R ${WIREGUARD_PATH} ${WIREGUARD_OLD_BACKUP}
+        cp -R ${WIREGUARD_PATH} ${WIREGUARD_OLD_BACKUP}
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           rm -rf ${WIREGUARD_PATH}
         fi
@@ -785,19 +785,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Which DNS provider would you like to use?"
       echo "  1) Unbound (Recommended)"
-      echo "  2) PiHole"
-      echo "  3) Custom (Advanced)"
-      until [[ "${DNS_PROVIDER_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "DNS provider [1-3]: " -e -i 1 DNS_PROVIDER_SETTINGS
+      echo "  2) Custom (Advanced)"
+      until [[ "${DNS_PROVIDER_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "DNS provider [1-2]: " -e -i 1 DNS_PROVIDER_SETTINGS
       done
       case ${DNS_PROVIDER_SETTINGS} in
       1)
         INSTALL_UNBOUND="y"
+        if [ "${INSTALL_UNBOUND}" = "y" ]; then
+          read -rp "Do you want to use ComplexOrganizations block list? (y/n): " -n 1 -r
+          if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+            echo "do something"
+          fi
+        fi
         ;;
       2)
-        INSTALL_PIHOLE="y"
-        ;;
-      3)
         CUSTOM_DNS="y"
         ;;
       esac
@@ -1106,28 +1108,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Running Install Unbound
   install-unbound
-
-  # Install Pihole
-  function install-pihole() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${INSTALL_PIHOLE}" = "y" ]; then
-        if [ ! -x "$(command -v pihole)" ]; then
-          curl -sSL https://install.pi-hole.net | bash
-          if [ -d "${PIHOLE_ROOT}" ]; then
-            if [ ! -f "${PIHOLE_MANAGER}" ]; then
-              echo "PiHole: true" >>${PIHOLE_MANAGER}
-            fi
-          fi
-        else
-          pihole reconfigure
-        fi
-        CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
-      fi
-    fi
-  }
-
-  # install Pihole
-  install-pihole
 
   # WireGuard Set Config
   function wireguard-setconf() {
