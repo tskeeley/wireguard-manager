@@ -121,8 +121,6 @@ usage: ./wireguard-manager.sh <command>
 * `NAT_CHOICE` - Keep sending packets to keep the tunnel alive `25`
 * `INSTALL_UNBOUND` - Install unbound with a basic `y/n`
 * `UNINSTALL_UNBOUND` - Uninstall unbound with `y/n`
-* `INSTALL_PIHOLE` - Install PiHole with a `y/n`
-* `UNINSTALL_PIHOLE` - Uninstall PiHole with `y/n`
 * `REMOVE_WIREGUARD` - Uninstall WireGuard with `y/n`
 * `DNS_CHOICE` - Without Unbound you have to use a public dns like `8.8.8.8`
 * `CLIENT_NAME` - Name the first peer from wireguard
@@ -209,7 +207,7 @@ Are there any good alternative to self-hosting vpn?
 - [CloudFlare Warp](https://1.1.1.1/)
 
 Why is all the code in one place?
-- Consider a remote, you can have thirty separate remotes each doing one thing, or you can have a single remote that does everything.
+- Consider a remote control, you can have thirty different remotes each doing a different job, or you may have a single remote that does everything.
 
 Official Links
 - Homepage: https://www.wireguard.com
