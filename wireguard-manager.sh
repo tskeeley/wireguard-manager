@@ -1492,15 +1492,25 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         # Update the unbound configs
         if [ -f "${UNBOUND_MANAGER}" ]; then
           if [ -x "$(command -v unbound)" ]; then
+            # Refresh the root hints
             if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
               curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
             fi
+            # The block list should be updated.
             if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
               rm -f ${UNBOUND_CONFIG_HOST}
               curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
               sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
               grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
               rm -f ${UNBOUND_CONFIG_HOST_TMP}
+            fi
+            # unbound relaunch
+            if pgrep systemd-journal; then
+              systemctl reenable unbound
+              systemctl restart unbound
+            else
+              service unbound enable
+              service unbound restart
             fi
           fi
         fi
