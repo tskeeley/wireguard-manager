@@ -114,8 +114,6 @@ WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_OLD_BACKUP="${SYSTEM_BACKUP_PATH}/OLD_WIREGUARD_FILES"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
-PIHOLE_ROOT="/etc/pihole"
-PIHOLE_MANAGER="${PIHOLE_ROOT}/wireguard-manager"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="${RESOLV_CONFIG}.old"
 UNBOUND_ROOT="/etc/unbound"
@@ -124,6 +122,9 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/unbound-manager/main/configs/host"
+UNBOUND_CONFIG_HOST="/etc/unbound/unbound.conf.d/host.conf"
+UNBOUND_CONFIG_HOST_TMP="/tmp/host"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -793,10 +794,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         INSTALL_UNBOUND="y"
         if [ "${INSTALL_UNBOUND}" = "y" ]; then
-          read -rp "Do you want to use ComplexOrganizations block list? (y/n): " -n 1 -r
-          if [[ ${REPLY} =~ ^[Yy]$ ]]; then
-            echo "do something"
-          fi
+          read -p "Do you want to use ComplexOrganizations block list? (y/n)? " INSTALL_BLOCK_LIST
         fi
         ;;
       2)
@@ -1092,6 +1090,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
+          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+            echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+          fi
           # restart unbound
           if pgrep systemd-journal; then
             systemctl reenable unbound
@@ -1122,7 +1123,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       PEER_PORT=$(shuf -i1024-65535 -n1)
       mkdir -p ${WIREGUARD_CLIENT_PATH}
       touch ${WIREGUARD_CONFIG} && chmod 600 ${WIREGUARD_CONFIG}
-      if { [ -f "${PIHOLE_MANAGER}" ] || [ -f "${UNBOUND_MANAGER}" ]; }; then
+      if [ -f "${UNBOUND_MANAGER}" ]; then
         IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -A INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -A INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
         IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -D INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -D INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
       else
@@ -1458,27 +1459,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               rm -f ${UNBOUND_CONFIG}
             fi
           fi
-          # Uninstall Pihole
-          if [ -f "${PIHOLE_MANAGER}" ]; then
-            if [ -x "$(command -v pihole)" ]; then
-              if pgrep systemd-journal; then
-                systemctl disable pihole
-                systemctl stop pihole
-              else
-                service pihole disable
-                service pihole stop
-              fi
-              pihole uninstall
-              if [ -d "${PIHOLE_ROOT}" ]; then
-                rm -rf ${PIHOLE_ROOT}
-              fi
-              if [ -f "${PIHOLE_MANAGER}" ]; then
-                rm -f ${PIHOLE_MANAGER}
-              fi
-            else
-              pihole reconfigure
-            fi
-          fi
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
@@ -1505,10 +1485,18 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             chmod +x "${CURRENT_FILE_PATH}" || exit
           fi
         fi
+        # Update the unbound configs
         if [ -f "${UNBOUND_MANAGER}" ]; then
           if [ -x "$(command -v unbound)" ]; then
             if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
               curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
+            fi
+            if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+              rm -f ${UNBOUND_CONFIG_HOST}
+              curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+              sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
+              grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
+              rm -f ${UNBOUND_CONFIG_HOST_TMP}
             fi
           fi
         fi
