@@ -794,7 +794,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         INSTALL_UNBOUND="y"
         if [ "${INSTALL_UNBOUND}" = "y" ]; then
-          read -rp "Do you want to use ComplexOrganizations block list? (y/n)?" INSTALL_BLOCK_LIST
+          read -rp "Do you want to use ComplexOrganizations block list? (y/n): " INSTALL_BLOCK_LIST
         fi
         ;;
       2)
