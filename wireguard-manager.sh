@@ -1504,14 +1504,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
               rm -f ${UNBOUND_CONFIG_HOST_TMP}
             fi
-            # unbound relaunch
-            if pgrep systemd-journal; then
-              systemctl reenable unbound
-              systemctl restart unbound
-            else
-              service unbound enable
-              service unbound restart
-            fi
           fi
         fi
         ;;
