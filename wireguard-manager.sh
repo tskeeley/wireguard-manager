@@ -497,7 +497,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What do you want your keepalive interval to be?"
       echo "  1) 25 (Default)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1-65535]"
+      echo "  3) Random [1024-65535]"
       until [[ "${NAT_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Nat Choice [1-3]: " -e -i 1 NAT_CHOICE_SETTINGS
       done
@@ -511,7 +511,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         done
         ;;
       3)
-        NAT_CHOICE=$(shuf -i1-65535 -n1)
+        NAT_CHOICE=$(shuf -i1024-65535 -n1)
         ;;
       esac
     fi
