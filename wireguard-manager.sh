@@ -467,7 +467,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What port do you want WireGuard server to listen to?"
       echo "  1) 51820 (Recommended)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1024-65535]"
+      echo "  3) Random [1-65535]"
       until [[ "${SERVER_PORT_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Port Choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
       done
@@ -476,12 +476,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_PORT="51820"
         ;;
       2)
-        until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1024 ] && [ "${SERVER_PORT}" -le 65535 ]; do
-          read -rp "Custom port [1024-65535]: " -e -i 51820 SERVER_PORT
+        until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1 ] && [ "${SERVER_PORT}" -le 65535 ]; do
+          read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT
         done
         ;;
       3)
-        SERVER_PORT=$(shuf -i1024-65535 -n1)
+        SERVER_PORT=$(shuf -i1-65535 -n1)
         echo "Random Port: ${SERVER_PORT}"
         ;;
       esac
