@@ -475,7 +475,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         SERVER_PORT="51820"
         if [ "$(lsof -i UDP:${SERVER_PORT})" ]; then
-          echo "Error: The port is already used, please use a different port."
+          echo "Error: Please use a different port because "${SERVER_PORT}" is already in use."
         fi
         ;;
       2)
@@ -483,13 +483,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT
         done
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
-          echo "Error: The port is already used, please use a different port."
+          echo "Error: The port "${SERVER_PORT}" is already used by a different application, please use a different port."
         fi
         ;;
       3)
         SERVER_PORT=$(shuf -i1-65535 -n1)
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
-          echo "Error: The port is already used, please use a different port."
+          echo "Error: The port "${SERVER_PORT}" already in use, so please use a different one."
         else
           echo "Random Port: ${SERVER_PORT}"
         fi
