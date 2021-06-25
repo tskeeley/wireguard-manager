@@ -70,7 +70,7 @@ virt-check
 function docker-check() {
   if [ -f /.dockerenv ]; then
     DOCKER_KERNEL_VERSION_LIMIT=5.6
-    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+    DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
     if (($(echo "${DOCKER_KERNEL_CURRENT_VERSION} >= ${DOCKER_KERNEL_VERSION_LIMIT}" | bc -l))); then
       echo "Correct: Kernel ${DOCKER_KERNEL_CURRENT_VERSION} supported." >>/dev/null
     else
@@ -877,7 +877,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-kernel-headers() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
       LINUX_HEADER_KERNEL_VERSION_LIMIT=5.6
-      LINUX_HEADER_KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+      LINUX_HEADER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
       if (($(echo "${LINUX_HEADER_KERNEL_CURRENT_VERSION} <= ${LINUX_HEADER_KERNEL_VERSION_LIMIT}" | bc -l))); then
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
           apt-get update
