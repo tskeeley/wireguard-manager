@@ -86,7 +86,7 @@ docker-check
 # Lets check the kernel version
 function kernel-check() {
   KERNEL_VERSION_LIMIT=3.1
-  KERNEL_CURRENT_VERSION=$(uname -r | cut -c1-3)
+  KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
   if (($(echo "${KERNEL_CURRENT_VERSION} >= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
     echo "Correct: Kernel ${KERNEL_CURRENT_VERSION} supported." >>/dev/null
   else
