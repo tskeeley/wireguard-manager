@@ -467,7 +467,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What port do you want WireGuard server to listen to?"
       echo "  1) 51820 (Recommended)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1-65535]"
+      echo "  3) Random [1024-65535]"
       until [[ "${SERVER_PORT_SETTINGS}" =~ ^[1-3]$ ]]; do
         read -rp "Port Choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
       done
@@ -482,14 +482,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1 ] && [ "${SERVER_PORT}" -le 65535 ]; do
           read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT
         done
-        if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
-          echo "Error: The port ""${SERVER_PORT}"" is already used by a different application, please use a different port."
+        if [ "$(lsof -i UDP:${SERVER_PORT})" ]; then
+          echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
         fi
         ;;
       3)
-        SERVER_PORT=$(shuf -i1-65535 -n1)
-        if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
-          echo "Error: The port ""${SERVER_PORT}"" already in use, so please use a different one."
+        SERVER_PORT=$(shuf -i1024-65535 -n1)
+        if [ "$(lsof -i UDP:${SERVER_PORT})" ]; then
+          SERVER_PORT=$(shuf -i1024-65535 -n1)
         else
           echo "Random Port: ${SERVER_PORT}"
         fi
