@@ -60,8 +60,17 @@ bash /usr/local/bin/wireguard-manager.sh
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
 #### Docker Installation
+Let's download the docker file and construct it from there.
 ```
-docker build -t wireguard https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
+docker build -t wireguard-manager https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
+```
+Let's get the docker container up and running.
+```
+docker run -it --rm --name wireguard-manager-running wireguard-manager
+```
+Finally, let's establish a connection to the docker container.
+```
+docker exec -it wireguard-manager-running /bin/bash
 ```
 
 ---
