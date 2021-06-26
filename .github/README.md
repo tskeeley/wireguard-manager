@@ -42,7 +42,7 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 - Docker `Kernel 5.6` or newer
 
 ---
-### 📲 Installation
+### 🐧 Installation
 #### Instance Installation
 Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
@@ -59,7 +59,7 @@ bash /usr/local/bin/wireguard-manager.sh
 
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
-#### Docker Installation
+#### 🐳 Docker Installation
 Let's download the docker file and construct it from there.
 ```
 docker build -t wireguard-manager https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
