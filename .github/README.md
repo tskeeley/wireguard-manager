@@ -64,13 +64,9 @@ Let's download the docker file and construct it from there.
 ```
 docker build -t wireguard-manager https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
 ```
-Let's get the docker container up and running.
+Let's start by constructing the docker container and then connecting to it.
 ```
-docker run -it --rm --name wireguard-manager-running wireguard-manager
-```
-Finally, let's establish a connection to the docker container.
-```
-docker exec -it wireguard-manager-running /bin/bash
+docker run -it --name wireguard-manager-running wireguard-manager
 ```
 
 ---
@@ -217,6 +213,9 @@ Are there any good alternative to self-hosting vpn?
 
 Why is all the code in one place?
 - Consider a remote control, you can have thirty different remotes each doing a different job, or you may have a single remote that does everything.
+
+What is the best way to connect to a running docker container?
+- `docker exec -it wireguard-manager-running /bin/bash`
 
 Official Links
 - Homepage: https://www.wireguard.com
