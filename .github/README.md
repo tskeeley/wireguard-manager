@@ -217,6 +217,9 @@ Why is all the code in one place?
 What is the best way to connect to a running docker container?
 - `docker exec -it wireguard-manager-running /bin/bash`
 
+Why is `kernel 5.6` or above only required for Docker?
+- Wireguard requires kernel 5.6 or above to install due to linux headers, and we can't install kernel headers on the host OS using the script.
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
