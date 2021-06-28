@@ -1379,7 +1379,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
                 rm -f /etc/apt/preferences.d/limit-unstable
               fi
-            elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
+            elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
               apt-get remove --purge wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "ubuntu" ]; then
               apt-get remove --purge wireguard qrencode haveged -y
@@ -1436,7 +1436,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             fi
             if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
               yum remove unbound unbound-host -y
-            elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ]; }; then
+            elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
               apt-get remove --purge unbound unbound-host -y
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
               pacman -Rs --noconfirm unbound unbound-host
