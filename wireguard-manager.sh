@@ -388,9 +388,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       case ${SERVER_HOST_V4_SETTINGS} in
       1)
         SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        if [ -z "${SERVER_HOST_V4}" ]; then
+          echo "Error: Curl unable to locate your server's public IP address."
+          exit
+        fi
         ;;
       2)
         SERVER_HOST_V4="$(ip route get 8.8.8.8 | grep src | sed 's/.*src \(.* \)/\1/g' | cut -f1 -d ' ')"
+        if [ -z "${SERVER_HOST_V4}" ]; then
+          echo "Error: Curl unable to locate your server's public IP address."
+          exit
+        fi
         ;;
       3)
         read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
@@ -418,9 +426,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       case ${SERVER_HOST_V6_SETTINGS} in
       1)
         SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        if [ -z "${SERVER_HOST_V6}" ]; then
+          echo "Error: Curl unable to locate your server's public IP address."
+          exit
+        fi
         ;;
       2)
         SERVER_HOST_V6="$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)"
+        if [ -z "${SERVER_HOST_V6}" ]; then
+          echo "Error: Curl unable to locate your server's public IP address."
+          exit
+        fi
         ;;
       3)
         read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
@@ -447,11 +463,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       case ${SERVER_PUB_NIC_SETTINGS} in
       1)
         SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+        if [ -z "${SERVER_PUB_NIC}" ]; then
+          echo "Error: Your server's public network interface could not be found."
+          exit
+        fi
         ;;
       2)
         read -rp "Custom NAT: " -e -i "$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)" SERVER_PUB_NIC
         if [ -z "${SERVER_PUB_NIC}" ]; then
           SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+          exit
         fi
         ;;
       esac
@@ -476,6 +497,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_PORT="51820"
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: Please use a different port because ${SERVER_PORT} is already in use."
+          exit
         fi
         ;;
       2)
@@ -484,6 +506,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         done
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
+          exit
         fi
         ;;
       3)
