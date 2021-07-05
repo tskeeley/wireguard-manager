@@ -115,21 +115,21 @@ usage: ./wireguard-manager.sh <command>
 
 ---
 ### 💡 Options
-* `PRIVATE_SUBNET_V4` - private IPv4 subnet configuration `10.8.0.0/24` by default
-* `PRIVATE_SUBNET_V6` - private IPv6 subnet configuration `fd42:42:42::0/64` by default
-* `SERVER_HOST_V4` - public IPv4 address, detected by default using `curl`
-* `SERVER_HOST_V6` - public IPv6 address, detected by default using `curl`
-* `SERVER_PUB_NIC` - public nig address, detected by default
-* `SERVER_PORT` - public port for wireguard server, default is `51820`
-* `DISABLE_HOST` - Disable or enable ipv4 and ipv6, default disabled
-* `CLIENT_ALLOWED_IP` - private or public IP range allowed in the tunnel
-* `NAT_CHOICE` - Keep sending packets to keep the tunnel alive `25`
-* `INSTALL_UNBOUND` - Install unbound with a basic `y/n`
-* `UNINSTALL_UNBOUND` - Uninstall unbound with `y/n`
-* `REMOVE_WIREGUARD` - Uninstall WireGuard with `y/n`
-* `DNS_CHOICE` - Without Unbound you have to use a public dns like `8.8.8.8`
-* `CLIENT_NAME` - Name the first peer from wireguard
-* `MTU_CHOICE` - MTU the peer will use `1420`
+* `PRIVATE_SUBNET_V4` - By default, the private IPv4 subnet configuration is `10.8.0.0/24`.
+* `PRIVATE_SUBNET_V6` - `fd42:42:42::0/64` is the default private IPv6 subnet.
+* `SERVER_HOST_V4` - Curl detects a public IPv4 address by default.
+* `SERVER_HOST_V6` - Curl by default finds a public IPv6 address.
+* `SERVER_PUB_NIC` - Using the ip command, to find the local public network interface.
+* `SERVER_PORT` - `51820` is the default public port for the wireguard interface.
+* `DISABLE_HOST` - Determine whether or not IPv4 or IPv6 should be disabled.
+* `CLIENT_ALLOWED_IP` - Using an IP range, choose what should be sent to the VPN.
+* `NAT_CHOICE` - Determine whether or not to use the vpn tunnel's keep alive feature.
+* `INSTALL_UNBOUND` - Whether or not to install unbound is up to you.
+* `UNINSTALL_UNBOUND` - If you need to remove Unbound for whatever reason, you can do so.
+* `REMOVE_WIREGUARD` - It is entirely up to you whether or not to remove wireguard altogether.
+* `DNS_CHOICE` - You'll have to utilize another DNS if you don't have Unbound.
+* `CLIENT_NAME` - The wireguard peer's name.
+* `MTU_CHOICE` - The wireguard peers will utilize this MTU.
 
 ---
 ### 👉👈 Compatibility with Linux Distro
