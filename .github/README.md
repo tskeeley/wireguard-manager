@@ -277,6 +277,21 @@ Give a ⭐️ and 🍴 if this project helped you!
 Open Source Community
 
 ---
+### 🤝 Sponsors
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="middle">
+        <a href="https://m.do.co/c/fb46acb2b3b1" target="_blank">
+          <img width="200px" src="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/digitalocean.png">
+        </a>
+      </td>
+      </td>
+    </tr><tr></tr>
+  </tbody>
+</table>
+
+---
 ### 📝 License
 Copyright © 2020 [Prajwal](https://github.com/prajwal-koirala)
 
