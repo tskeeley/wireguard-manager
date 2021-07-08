@@ -220,6 +220,12 @@ What is the best way to connect to a running docker container?
 Why is `kernel 5.6` or above only required for Docker?
 - Wireguard requires kernel 5.6 or above to install due to linux headers, and we can't install kernel headers on the host OS using the script.
 
+Which port do I need to forward for wireguard, and which protocol should I use?
+- On the udp protocol, either the port of your choice or the default port of `51820` must be forwarded.
+
+For unbound, which ports do I need to forward?
+- Because all DNS traffic is routed through the vpn, you don't need to forward those ports `53`.
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
