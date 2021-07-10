@@ -235,7 +235,7 @@ Official Links
 
 ---
 ### 📐 Architecture
-![image](https://user-images.githubusercontent.com/16564273/103967799-bb71a780-5130-11eb-8462-69e728e1fd95.png)
+![image](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/Wireguard-Manager.png)
 
 ---
 ### 🤝 Developing
