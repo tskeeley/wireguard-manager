@@ -239,12 +239,13 @@ Official Links
 
 ---
 ### 🤝 Developing
-Using a browser based development environment:
+Developing the code without having to clone the repository
 
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/complexorganizations/wireguard-manager)
 
-
 ### 🐛 Debugging
+After cloning the repo, Then start debugging the code.
+
 ```
 git clone https://github.com/complexorganizations/wireguard-manager /usr/local/bin/
 bash -x /usr/local/bin/wireguard-manager.sh >> /usr/local/bin/wireguard-manager.log
