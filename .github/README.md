@@ -241,7 +241,8 @@ Official Links
 ### 🤝 Developing
 Using a browser based development environment:
 
-[![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/complexorganizations/wireguard-manager)
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/complexorganizations/wireguard-manager)
+
 
 ### 🐛 Debugging
 ```
