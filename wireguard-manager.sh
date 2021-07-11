@@ -122,6 +122,9 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/configs/hosts"
+UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/host.conf"
+UNBOUND_CONFIG_HOST_TMP="/tmp/host"
 
 # Verify that it is an old installation or another installer
 function previous-wireguard-installation() {
@@ -823,6 +826,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       case ${DNS_PROVIDER_SETTINGS} in
       1)
         INSTALL_UNBOUND="y"
+        if [ "${INSTALL_UNBOUND}" = "y" ]; then
+          read -rp "Are you interested in using a content-blocker? (y/n): " INSTALL_BLOCK_LIST
+        fi
         ;;
       2)
         CUSTOM_DNS="y"
@@ -1125,6 +1131,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
+          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+            echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+            curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+            sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
+            grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
+            rm -f ${UNBOUND_CONFIG_HOST_TMP}
+          fi
           # restart unbound
           if pgrep systemd-journal; then
             systemctl reenable unbound
@@ -1524,6 +1537,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
               curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
             fi
+          fi
+          # The block list should be updated.
+          if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+            rm -f ${UNBOUND_CONFIG_HOST}
+            curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+            sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
+            grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
+            rm -f ${UNBOUND_CONFIG_HOST_TMP}
           fi
         fi
         ;;
