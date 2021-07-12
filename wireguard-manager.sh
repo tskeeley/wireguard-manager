@@ -1546,6 +1546,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
             rm -f ${UNBOUND_CONFIG_HOST_TMP}
           fi
+          if pgrep systemd-journal; then
+            systemctl restart unbound
+          else
+            service unbound restart
+          fi
         fi
         ;;
       10) # Backup WireGuard Config
