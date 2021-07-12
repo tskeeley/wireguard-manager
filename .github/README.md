@@ -226,12 +226,19 @@ Which port do I need to forward for wireguard, and which protocol should I use?
 For unbound, which ports do I need to forward?
 - Because all DNS traffic is routed through the vpn, you don't need to forward those ports `53`.
 
+What is blocked if I enable the content blocker?
+- Advertisement, Tracking, malware, and phishing are all prohibited.
+
 Official Links
 - Homepage: https://www.wireguard.com
 - Install: https://www.wireguard.com/install/
 - QuickStart: https://www.wireguard.com/quickstart/
 - Compiling: https://www.wireguard.com/compilation/
 - Whitepaper: https://www.wireguard.com/papers/wireguard.pdf
+
+---
+### 🙅 No Content-Blocking vs. Content-Blocking
+https://user-images.githubusercontent.com/16564273/125283630-9845d180-e2e6-11eb-8b7d-f30a8f2eae8a.mp4
 
 ---
 ### 📐 Architecture
