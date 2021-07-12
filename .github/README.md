@@ -234,6 +234,10 @@ Official Links
 - Whitepaper: https://www.wireguard.com/papers/wireguard.pdf
 
 ---
+### No content blocker VS. Content-Blocker
+https://user-images.githubusercontent.com/16564273/125283630-9845d180-e2e6-11eb-8b7d-f30a8f2eae8a.mp4
+
+---
 ### 📐 Architecture
 ![image](https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/Wireguard-Manager.png)
 
