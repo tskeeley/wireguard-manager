@@ -1135,7 +1135,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
-            grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
+            grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" A 0.0.0.0\""}' >> ${UNBOUND_CONFIG_HOST}
             rm -f ${UNBOUND_CONFIG_HOST_TMP}
           fi
           # restart unbound
@@ -1543,7 +1543,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             rm -f ${UNBOUND_CONFIG_HOST}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
-            grep "^0\.0\.0\.0" "${UNBOUND_CONFIG_HOST_TMP}" | awk '{print "local-data: \""$2" IN A 0.0.0.0\""}' >"${UNBOUND_CONFIG_HOST}"
+            grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" A 0.0.0.0\""}' >> ${UNBOUND_CONFIG_HOST}
             rm -f ${UNBOUND_CONFIG_HOST_TMP}
           fi
           if pgrep systemd-journal; then
