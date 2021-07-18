@@ -1109,7 +1109,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     harden-dnssec-stripped: yes
     harden-referral-path: yes
     unwanted-reply-threshold: 10000000
-    val-log-level: 1
     cache-min-ttl: 1800
     cache-max-ttl: 14400
     prefetch: yes
