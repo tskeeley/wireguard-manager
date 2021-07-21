@@ -301,6 +301,7 @@ function headless-install() {
 # No GUI
 headless-install
 
+# Set up the wireguard, if config it isn't already there.
 if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Custom IPv4 subnet
@@ -1591,6 +1592,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       12)
+        # Twilio's server for real-time notifications.
         if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
           TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
           TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
