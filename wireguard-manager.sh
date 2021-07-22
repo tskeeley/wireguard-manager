@@ -1416,7 +1416,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
               rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
             fi
-            if [ "${DISTRO}" == "centos" ]; then
+            if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "almalinux" ]; }; then
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
               apt-get remove --purge wireguard qrencode -y
