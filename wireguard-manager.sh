@@ -1284,9 +1284,9 @@ else
       4) # Restart WireGuard
         if [ -x "$(command -v wg)" ]; then
           if pgrep systemd-journal; then
-            systemctl start wg-quick@${WIREGUARD_PUB_NIC}
+            systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
           else
-            service wg-quick@${WIREGUARD_PUB_NIC} start
+            service wg-quick@${WIREGUARD_PUB_NIC} restart
           fi
         fi
         ;;
@@ -1539,19 +1539,20 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
               curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
             fi
-          fi
-          # The block list should be updated.
-          if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-            rm -f ${UNBOUND_CONFIG_HOST}
-            curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-            sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
-            grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
-            rm -f ${UNBOUND_CONFIG_HOST_TMP}
-          fi
-          if pgrep systemd-journal; then
-            systemctl restart unbound
-          else
-            service unbound restart
+            # The block list should be updated.
+            if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+              rm -f ${UNBOUND_CONFIG_HOST}
+              curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+              sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
+              grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+              rm -f ${UNBOUND_CONFIG_HOST_TMP}
+            fi
+            # Once everything is completed, restart the service.
+            if pgrep systemd-journal; then
+              systemctl restart unbound
+            else
+              service unbound restart
+            fi
           fi
         fi
         ;;
