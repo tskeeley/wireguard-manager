@@ -232,7 +232,7 @@ What is blocked if I enable the content blocker?
 - Advertisement, Tracking, malware, and phishing are all prohibited.
 
 What kind of information is collected and how is it gathered?
-- We do not collect or retain any logs; everything takes place on the user's VPS, and logs are never sent outside of it.
+- We do not collect or retain any logs; everything takes place on the system, and logs are never sent outside of it.
 
 Official Links
 - Homepage: https://www.wireguard.com
