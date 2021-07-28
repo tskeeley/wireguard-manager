@@ -1521,7 +1521,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete crontab
         if [ -x "$(command -v cron)" ]; then
-          crontab -r
+          # If any cronjobs are identified, they should be removed.
+          crontab -l | grep -v "$(realpath "$0")" | crontab -
         fi
         ;;
       9) # Update the script
