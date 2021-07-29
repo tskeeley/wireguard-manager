@@ -394,14 +394,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${SERVER_HOST_V4}" ]; then
           echo "Error: Curl unable to locate your server's public IP address."
-          exit
         fi
         ;;
       2)
         SERVER_HOST_V4="$(ip route get 8.8.8.8 | grep src | sed 's/.*src \(.* \)/\1/g' | cut -f1 -d ' ')"
         if [ -z "${SERVER_HOST_V4}" ]; then
           echo "Error: IP unable to locate your server's public IP address."
-          exit
         fi
         ;;
       3)
@@ -432,14 +430,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${SERVER_HOST_V6}" ]; then
           echo "Error: Curl unable to locate your server's public IP address."
-          exit
         fi
         ;;
       2)
         SERVER_HOST_V6="$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)"
         if [ -z "${SERVER_HOST_V6}" ]; then
           echo "Error: IP unable to locate your server's public IP address."
-          exit
         fi
         ;;
       3)
