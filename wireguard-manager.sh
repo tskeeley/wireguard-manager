@@ -1133,8 +1133,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-            sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
-            grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+            awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
             rm -f ${UNBOUND_CONFIG_HOST_TMP}
           fi
           # restart unbound
@@ -1540,8 +1539,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
               rm -f ${UNBOUND_CONFIG_HOST}
               curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-              sed -i -e "s_.*_0.0.0.0 &_" ${UNBOUND_CONFIG_HOST_TMP}
-              grep "0.0.0.0" ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$2"\" redirect\nlocal-data: \""$2" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+              awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
               rm -f ${UNBOUND_CONFIG_HOST_TMP}
             fi
             # Once everything is completed, restart the service.
