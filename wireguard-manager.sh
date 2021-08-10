@@ -1525,7 +1525,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           CURRENT_FILE_PATH="$(realpath "$0")"
           if [ -f "${CURRENT_FILE_PATH}" ]; then
             curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
-            chmod +x "${CURRENT_FILE_PATH}" || exit
+            chmod +x "${CURRENT_FILE_PATH}"
           fi
         fi
         # Update the unbound configs
