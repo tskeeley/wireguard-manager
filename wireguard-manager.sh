@@ -943,10 +943,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -ge "21.04" ]; then
+        if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -ge "21" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-        elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -le "20.10" ]; then
+        elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -le "20" ]; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
@@ -957,14 +957,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
           apt-get update
-          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/sources.list
+          if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
+            echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
+          fi
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif [ "${DISTRO}" == "raspbian" ]; then
           apt-get update
           apt-get install dirmngr -y
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
-          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/sources.list
+          if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
+            echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
+          fi
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
@@ -1404,6 +1408,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
               apt-get remove --purge wireguard qrencode -y
+              if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
+                rm -f /etc/apt/sources.list.d/backports.list
+              fi
             elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
               apt-get remove --purge wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "ubuntu" ]; then
@@ -1418,6 +1425,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "raspbian" ]; then
               apt-key del 04EE7237B7D453EC
               apt-get remove --purge wireguard qrencode haveged dirmngr -y
+              if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
+                rm -f /etc/apt/sources.list.d/backports.list
+              fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
               pacman -Rs --noconfirm wireguard-tools qrencode haveged
             elif [ "${DISTRO}" == "fedora" ]; then
