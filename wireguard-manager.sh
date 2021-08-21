@@ -952,10 +952,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           add-apt-repository ppa:wireguard/wireguard -y
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-          if [ "${DISTRO}" == "ubuntu" ] && "${DISTRO_VERSION}" -le "16.04" ]; then
-            echo "Your distrois too old, please install WireGuard manually."
-            exit
-          fi
         elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
