@@ -943,54 +943,48 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] -ge [ "${DISTRO_VERSION}" == "21.04" ]; then
+        if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -ge "21.04" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-        elif [ "${DISTRO}" == "ubuntu" ] -le [ "${DISTRO_VERSION}" == "20.04" ]; then
+        elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -le "20.04" ]; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          if [ "${DISTRO}" == "ubuntu" ] && "${DISTRO_VERSION}" -le "16.04" ]; then
+            echo "Your distrois too old, please install WireGuard manually."
+            exit
+          fi
         elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
           apt-get update
-          if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
-            echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-          fi
-          if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
-            printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
-          fi
+          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/sources.list
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif [ "${DISTRO}" == "raspbian" ]; then
           apt-get update
           apt-get install dirmngr -y
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC
-          if [ ! -f "/etc/apt/sources.list.d/unstable.list" ]; then
-            echo "deb http://deb.debian.org/debian/ unstable main" >>/etc/apt/sources.list.d/unstable.list
-          fi
-          if [ ! -f "/etc/apt/preferences.d/limit-unstable" ]; then
-            printf "Package: *\nPin: release a=unstable\nPin-Priority: 90\n" >>/etc/apt/preferences.d/limit-unstable
-          fi
+          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/sources.list
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
           pacman -Syu --noconfirm --needed haveged qrencode openresolv wireguard-tools
-        elif [ "${DISTRO}" = "fedora" ] -ge [ "${DISTRO_VERSION}" == "32" ]; then
+        elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" -ge "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" = "fedora" ] -le [ "${DISTRO_VERSION}" == "31" ]; then
+        elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" -le "31" ]; then
           dnf update -y
           dnf copr enable jdoss/wireguard -y
           dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" == "centos" ] -ge [ "${DISTRO_VERSION}" == "8" ]; then
+        elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION}" -ge "8" ]; then
           yum update -y
           yum install elrepo-release epel-release -y
           yum install kmod-wireguard wireguard-tools qrencode haveged -y
-        elif [ "${DISTRO}" == "centos" ] -le [ "${DISTRO_VERSION}" == "7" ]; then
+        elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION}" -le "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
@@ -1414,12 +1408,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               yum remove wireguard qrencode haveged -y
             elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
               apt-get remove --purge wireguard qrencode -y
-              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
-                rm -f /etc/apt/sources.list.d/unstable.list
-              fi
-              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
-                rm -f /etc/apt/preferences.d/limit-unstable
-              fi
             elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
               apt-get remove --purge wireguard qrencode haveged -y
             elif [ "${DISTRO}" == "ubuntu" ]; then
@@ -1434,12 +1422,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             elif [ "${DISTRO}" == "raspbian" ]; then
               apt-key del 04EE7237B7D453EC
               apt-get remove --purge wireguard qrencode haveged dirmngr -y
-              if [ -f "/etc/apt/sources.list.d/unstable.list" ]; then
-                rm -f /etc/apt/sources.list.d/unstable.list
-              fi
-              if [ -f "/etc/apt/preferences.d/limit-unstable" ]; then
-                rm -f /etc/apt/preferences.d/limit-unstable
-              fi
             elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
               pacman -Rs --noconfirm wireguard-tools qrencode haveged
             elif [ "${DISTRO}" == "fedora" ]; then
