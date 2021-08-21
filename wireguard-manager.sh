@@ -943,10 +943,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -ge "21.04" ]; then
+        if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -ge "21" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-        elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -le "20.04" ]; then
+        elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION}" -le "20" ]; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
