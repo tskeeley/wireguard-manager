@@ -943,10 +943,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-        if [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "21.10" ] || [ "${DISTRO_VERSION}" == "21.04" ] || [ "${DISTRO_VERSION}" == "20.10" ] || [ "${DISTRO_VERSION}" == "20.04" ] || [ "${DISTRO_VERSION}" == "19.10" ]; }; then
+        if [ "${DISTRO}" == "ubuntu" ] -ge [ "${DISTRO_VERSION}" == "21.04" ]; then
           apt-get update
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
-        elif [ "${DISTRO}" == "ubuntu" ] && { [ "${DISTRO_VERSION}" == "16.04" ] || [ "${DISTRO_VERSION}" == "18.04" ]; }; then
+        elif [ "${DISTRO}" == "ubuntu" ] -le [ "${DISTRO_VERSION}" == "20.04" ]; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
@@ -979,18 +979,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
           pacman -Syu --noconfirm --needed haveged qrencode openresolv wireguard-tools
-        elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION}" == "32" ]; then
+        elif [ "${DISTRO}" = "fedora" ] -ge [ "${DISTRO_VERSION}" == "32" ]; then
           dnf update -y
           dnf install qrencode wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" = "fedora" ] && { [ "${DISTRO_VERSION}" == "30" ] || [ "${DISTRO_VERSION}" == "31" ]; }; then
+        elif [ "${DISTRO}" = "fedora" ] -le [ "${DISTRO_VERSION}" == "31" ]; then
           dnf update -y
           dnf copr enable jdoss/wireguard -y
           dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
-        elif [ "${DISTRO}" == "centos" ] && { [ "${DISTRO_VERSION}" == "8" ] || [ "${DISTRO_VERSION}" == "8.1" ] || [ "${DISTRO_VERSION}" == "8.2" ]; }; then
+        elif [ "${DISTRO}" == "centos" ] -ge [ "${DISTRO_VERSION}" == "8" ]; then
           yum update -y
           yum install elrepo-release epel-release -y
           yum install kmod-wireguard wireguard-tools qrencode haveged -y
-        elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION}" == "7" ]; then
+        elif [ "${DISTRO}" == "centos" ] -le [ "${DISTRO_VERSION}" == "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
