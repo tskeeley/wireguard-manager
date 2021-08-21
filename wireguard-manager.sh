@@ -826,8 +826,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ "${INSTALL_UNBOUND}" = "y" ]; then
           read -rp "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker? (y/n):" INSTALL_BLOCK_LIST
         fi
-        if [ -z "${INSTALL_UNBOUND}" ]; then
-          INSTALL_UNBOUND="y"
+        if [ -z "${INSTALL_BLOCK_LIST}" ]; then
+          INSTALL_BLOCK_LIST="y"
         fi
         ;;
       2)
