@@ -145,7 +145,7 @@ function interface-or-peer() {
     echo "  1) Interface"
     echo "  2) Peer"
     until [[ "${INTERFACE_OR_PEER}" =~ ^[1-2]$ ]]; do
-      read -rp "Interface Or Peer [1-2]: " -e -i 1 INTERFACE_OR_PEER
+      read -rp "Interface Or Peer [1-2]:" -e -i 1 INTERFACE_OR_PEER
     done
     case ${INTERFACE_OR_PEER} in
     1)
@@ -314,7 +314,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) 10.0.0.0/24"
       echo "  3) Custom (Advanced)"
       until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnet Choice [1-3]: " -e -i 1 IPV4_SUBNET_SETTINGS
+        read -rp "Subnet Choice [1-3]:" -e -i 1 IPV4_SUBNET_SETTINGS
       done
       case ${IPV4_SUBNET_SETTINGS} in
       1)
@@ -324,7 +324,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPV4_SUBNET="10.0.0.0/24"
         ;;
       3)
-        read -rp "Custom IPv4 Subnet: " -e IPV4_SUBNET
+        read -rp "Custom IPv4 Subnet:" -e IPV4_SUBNET
         if [ -z "${IPV4_SUBNET}" ]; then
           IPV4_SUBNET="10.8.0.0/24"
         fi
@@ -344,7 +344,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) fd86:ea04:1115::0/64"
       echo "  3) Custom (Advanced)"
       until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnet Choice [1-3]: " -e -i 1 IPV6_SUBNET_SETTINGS
+        read -rp "Subnet Choice [1-3]:" -e -i 1 IPV6_SUBNET_SETTINGS
       done
       case ${IPV6_SUBNET_SETTINGS} in
       1)
@@ -389,7 +389,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) IP (Advanced)"
       echo "  3) Custom (Advanced)"
       until [[ "${SERVER_HOST_V4_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IPv4 Choice [1-3]: " -e -i 1 SERVER_HOST_V4_SETTINGS
+        read -rp "IPv4 Choice [1-3]:" -e -i 1 SERVER_HOST_V4_SETTINGS
       done
       case ${SERVER_HOST_V4_SETTINGS} in
       1)
@@ -425,7 +425,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) IP (Advanced)"
       echo "  3) Custom (Advanced)"
       until [[ "${SERVER_HOST_V6_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IPv6 Choice [1-3]: " -e -i 1 SERVER_HOST_V6_SETTINGS
+        read -rp "IPv6 Choice [1-3]:" -e -i 1 SERVER_HOST_V6_SETTINGS
       done
       case ${SERVER_HOST_V6_SETTINGS} in
       1)
@@ -460,7 +460,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) IP (Recommended)"
       echo "  2) Custom (Advanced)"
       until [[ "${SERVER_PUB_NIC_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Nic Choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
+        read -rp "Nic Choice [1-2]:" -e -i 1 SERVER_PUB_NIC_SETTINGS
       done
       case ${SERVER_PUB_NIC_SETTINGS} in
       1)
@@ -490,7 +490,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Custom (Advanced)"
       echo "  3) Random [1024-65535]"
       until [[ "${SERVER_PORT_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Port Choice [1-3]: " -e -i 1 SERVER_PORT_SETTINGS
+        read -rp "Port Choice [1-3]:" -e -i 1 SERVER_PORT_SETTINGS
       done
       case ${SERVER_PORT_SETTINGS} in
       1)
@@ -606,7 +606,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        read -rp "Custom Domain: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname'[0])" SERVER_HOST
+        read -rp "Custom Domain:" -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.hostname'[0])" SERVER_HOST
         if [ -z "${SERVER_HOST}" ]; then
           SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
@@ -682,7 +682,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         CLIENT_ALLOWED_IP="0.0.0.0/5,8.0.0.0/7,11.0.0.0/8,12.0.0.0/6,16.0.0.0/4,32.0.0.0/3,64.0.0.0/2,128.0.0.0/3,160.0.0.0/5,168.0.0.0/6,172.0.0.0/12,172.32.0.0/11,172.64.0.0/10,172.128.0.0/9,173.0.0.0/8,174.0.0.0/7,176.0.0.0/4,192.0.0.0/9,192.128.0.0/11,192.160.0.0/13,192.169.0.0/16,192.170.0.0/15,192.172.0.0/14,192.176.0.0/12,192.192.0.0/10,193.0.0.0/8,194.0.0.0/7,196.0.0.0/6,200.0.0.0/5,208.0.0.0/4,::/0,${GATEWAY_ADDRESS_V4}/32"
         ;;
       3)
-        read -rp "Custom IPs: " -e CLIENT_ALLOWED_IP
+        read -rp "Custom IPs:" -e CLIENT_ALLOWED_IP
         if [ -z "${CLIENT_ALLOWED_IP}" ]; then
           CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
         fi
@@ -825,7 +825,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "  1) Yes (Recommended)"
         echo "  2) No"
         until [[ "${CONTENT_BLOCKER_SETTINGS}" =~ ^[1-2]$ ]]; do
-          read -rp "Content Blocker Choice [1-3]: " -e -i 1 CONTENT_BLOCKER_SETTINGS
+          read -rp "Content Blocker Choice [1-3]:" -e -i 1 CONTENT_BLOCKER_SETTINGS
         done
         case ${CONTENT_BLOCKER_SETTINGS} in
         1)
@@ -1249,7 +1249,7 @@ else
       echo "   11) Restore WireGuard"
       echo "   12) Check WireGuard Status"
       until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 12 ]; do
-        read -rp "Select an Option [1-12]: " -e -i 1 WIREGUARD_OPTIONS
+        read -rp "Select an Option [1-12]:" -e -i 1 WIREGUARD_OPTIONS
       done
       case ${WIREGUARD_OPTIONS} in
       1) # WG Show
@@ -1293,7 +1293,7 @@ else
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-              read -rp "New client peer: " -e NEW_CLIENT_NAME
+              read -rp "New client peer:" -e NEW_CLIENT_NAME
             fi
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
@@ -1353,8 +1353,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -x "$(command -v wg)" ]; then
             echo "Which WireGuard client do you want to remove?"
             grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
-            read -rp "Type in Client Name : " -e REMOVECLIENT
-            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -e -i "y" CHOOSE_CLIENT_TO_REMOVE
+            read -rp "Type in Client Name:" -e REMOVECLIENT
+            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n):" -e -i "y" CHOOSE_CLIENT_TO_REMOVE
             if { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "y" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "Y" ]; }; then
               CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
