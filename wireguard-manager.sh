@@ -403,7 +403,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        read -rp "Custom IPv4: " -e SERVER_HOST_V4
+        read -rp "Custom IPv4:" SERVER_HOST_V4
         if [ -z "${SERVER_HOST_V4}" ]; then
           SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
@@ -439,7 +439,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        read -rp "Custom IPv6: " -e SERVER_HOST_V6
+        read -rp "Custom IPv6:" SERVER_HOST_V6
         if [ -z "${SERVER_HOST_V6}" ]; then
           SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
@@ -469,7 +469,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       2)
-        read -rp "Custom NAT: " -e SERVER_PUB_NIC
+        read -rp "Custom NAT:" SERVER_PUB_NIC
         if [ -z "${SERVER_PUB_NIC}" ]; then
           SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
           exit
@@ -502,7 +502,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       2)
         until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1 ] && [ "${SERVER_PORT}" -le 65535 ]; do
-          read -rp "Custom port [1-65535]: " -e SERVER_PORT
+          read -rp "Custom port [1-65535]:" SERVER_PORT
         done
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
@@ -540,7 +540,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       2)
         until [[ "${NAT_CHOICE}" =~ ^[0-9]+$ ]] && [ "${NAT_CHOICE}" -ge 1 ] && [ "${NAT_CHOICE}" -le 65535 ]; do
-          read -rp "Custom NAT [1-65535]: " -e NAT_CHOICE
+          read -rp "Custom NAT [1-65535]:" NAT_CHOICE
         done
         ;;
       3)
@@ -572,7 +572,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       3)
         until [[ "${MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${MTU_CHOICE}" -ge 1 ] && [ "${MTU_CHOICE}" -le 65535 ]; do
-          read -rp "Custom MTU [1-65535]: " -e MTU_CHOICE
+          read -rp "Custom MTU [1-65535]:" MTU_CHOICE
         done
         ;;
       esac
