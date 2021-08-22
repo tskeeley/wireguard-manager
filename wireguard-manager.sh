@@ -530,7 +530,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Custom (Advanced)"
       echo "  3) Random [1024-65535]"
       until [[ "${NAT_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Nat Choice [1-3]: " -e -i 1 NAT_CHOICE_SETTINGS
+        read -rp "Nat Choice [1-3]:" -e -i 1 NAT_CHOICE_SETTINGS
       done
       case ${NAT_CHOICE_SETTINGS} in
       1)
@@ -559,7 +559,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) 1420"
       echo "  3) Custom (Advanced)"
       until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "MTU Choice [1-3]:" MTU_CHOICE_SETTINGS
+        read -rp "MTU Choice [1-3]:" -e -i 1 MTU_CHOICE_SETTINGS
       done
       case ${MTU_CHOICE_SETTINGS} in
       1)
@@ -588,7 +588,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) IPv6"
       echo "  3) Custom (Advanced)"
       until [[ "${SERVER_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IP Choice [1-3]: " -e -i 1 SERVER_HOST_SETTINGS
+        read -rp "IP Choice [1-3]:" -e -i 1 SERVER_HOST_SETTINGS
       done
       case ${SERVER_HOST_SETTINGS} in
       1)
@@ -626,7 +626,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Disable IPv4"
       echo "  3) Disable IPv6"
       until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Disable Host Choice [1-3]: " -e -i 1 DISABLE_HOST_SETTINGS
+        read -rp "Disable Host Choice [1-3]:" -e -i 1 DISABLE_HOST_SETTINGS
       done
       case ${DISABLE_HOST_SETTINGS} in
       1)
@@ -672,7 +672,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Exclude Private IPs"
       echo "  3) Custom (Advanced)"
       until [[ "${CLIENT_ALLOWED_IP_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Client Allowed IP Choice [1-3]: " -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
+        read -rp "Client Allowed IP Choice [1-3]:" -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
       done
       case ${CLIENT_ALLOWED_IP_SETTINGS} in
       1)
@@ -701,7 +701,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
       until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Automatic Updates [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+        read -rp "Automatic Updates [1-2]:" -e -i 1 AUTOMATIC_UPDATES_SETTINGS
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
@@ -734,7 +734,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
       until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_BACKUP_SETTINGS
+        read -rp "Automatic Backup [1-2]:" -e -i 1 AUTOMATIC_BACKUP_SETTINGS
       done
       case ${AUTOMATIC_BACKUP_SETTINGS} in
       1)
@@ -767,7 +767,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) No (Recommended)"
       echo "  2) Twilio (Advanced)"
       until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Notifications setup [1-2]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
+        read -rp "Notifications setup [1-2]:" -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
       done
       case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
       1)
@@ -816,7 +816,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Unbound (Recommended)"
       echo "  2) Custom (Advanced)"
       until [[ "${DNS_PROVIDER_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "DNS provider [1-2]: " -e -i 1 DNS_PROVIDER_SETTINGS
+        read -rp "DNS provider [1-2]:" -e -i 1 DNS_PROVIDER_SETTINGS
       done
       case ${DNS_PROVIDER_SETTINGS} in
       1)
@@ -861,7 +861,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "  8) FDN"
         echo "  9) Custom (Advanced)"
         until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 9 ]; do
-          read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
+          read -rp "DNS [1-9]:" -e -i 1 CLIENT_DNS_SETTINGS
         done
         case ${CLIENT_DNS_SETTINGS} in
         1)
