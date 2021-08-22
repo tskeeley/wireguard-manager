@@ -889,7 +889,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           CLIENT_DNS="80.67.169.40,80.67.169.12,2001:910:800::40,2001:910:800::12"
           ;;
         9)
-          read -rp "Custom DNS (IPv4 IPv6):" -e -i "8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844" CLIENT_DNS
+          read -rp "Custom DNS:" CLIENT_DNS
           if [ -z "${CLIENT_DNS}" ]; then
             CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
           fi
