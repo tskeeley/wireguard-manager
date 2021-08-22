@@ -1355,6 +1355,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
+              wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
             elif { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "n" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "N" ]; }; then
               exit
             fi
