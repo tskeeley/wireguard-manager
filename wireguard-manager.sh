@@ -467,14 +467,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
         if [ -z "${SERVER_PUB_NIC}" ]; then
           echo "Error: Your server's public network interface could not be found."
-          exit
         fi
         ;;
       2)
         read -rp "Custom NAT:" SERVER_PUB_NIC
         if [ -z "${SERVER_PUB_NIC}" ]; then
           SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
-          exit
         fi
         ;;
       esac
@@ -499,7 +497,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_PORT="51820"
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: Please use a different port because ${SERVER_PORT} is already in use."
-          exit
         fi
         ;;
       2)
@@ -508,7 +505,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         done
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
-          exit
         fi
         ;;
       3)
