@@ -354,7 +354,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPV6_SUBNET="fd86:ea04:1115::0/64"
         ;;
       3)
-        read -rp "Custom IPv6 Subnet: " -e IPV6_SUBNET
+        read -rp "Custom IPv6 Subnet:" IPV6_SUBNET
         if [ -z "${IPV6_SUBNET}" ]; then
           IPV6_SUBNET="fd42:42:42::0/64"
         fi
@@ -778,19 +778,19 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "Real-time Notifications Disabled"
         ;;
       2)
-        read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
+        read -rp "Twilio Account SID:" TWILIO_ACCOUNT_SID
         if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
           TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio Auth Token: " -e -i "" TWILIO_AUTH_TOKEN
+        read -rp "Twilio Auth Token:" TWILIO_AUTH_TOKEN
         if [ -z "${TWILIO_AUTH_TOKEN}" ]; then
           TWILIO_AUTH_TOKEN="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio From Number: " -e -i "" TWILIO_FROM_NUMBER
+        read -rp "Twilio From Number:" TWILIO_FROM_NUMBER
         if [ -z "${TWILIO_FROM_NUMBER}" ]; then
           TWILIO_FROM_NUMBER="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio To Number: " -e -i "" TWILIO_TO_NUMBER
+        read -rp "Twilio To Number:" TWILIO_TO_NUMBER
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
