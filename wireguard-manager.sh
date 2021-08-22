@@ -1127,7 +1127,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
-          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+          if { [ "${INSTALL_BLOCK_LIST}" = "y" ] || [ "${INSTALL_BLOCK_LIST}" = "Y" ]; }; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
@@ -1349,14 +1349,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             # shellcheck disable=SC2002
             cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
             read -rp "Type in Client Name : " -e REMOVECLIENT
-            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
-            if { [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; }; then
+            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n):" CHOOSE_CLIENT_TO_REMOVE
+            if { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "y" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "Y" ]; }; then
               CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
               echo "Client ${REMOVECLIENT} has been removed."
-            elif { [ "${REPLY}" = "n" ] || [ "${REPLY}" = "N" ]; }; then
+            elif { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "n" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "N" ]; }; then
               exit
             fi
             wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
@@ -1495,13 +1495,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Are you sure you want to remove WireGuard backup? (y/n): " -n 1 -r
-          if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+          read -rp "Are you sure you want to remove WireGuard backup? (y/n):" REMOVE_WIREGUARD_BACKUP
+          if { [ "${REMOVE_WIREGUARD_BACKUP}" = "y" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "Y" ]; }; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
             if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
               rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
             fi
-          elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
+          elif { [ "${REMOVE_WIREGUARD_BACKUP}" = "n" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "N" ]; }; then
             exit
           fi
         fi
