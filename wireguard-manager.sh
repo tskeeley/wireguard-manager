@@ -278,7 +278,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
+  if { [ "${HEADLESS_INSTALL}" == "y" ] || [ "${HEADLESS_INSTALL}" == "Y" ]; }; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -292,8 +292,10 @@ function headless-install() {
     DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS:-1}
     CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
     AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS:-1}
+    AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS:-1}
     NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
+    CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-client}
   fi
 }
@@ -322,7 +324,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPV4_SUBNET="10.0.0.0/24"
         ;;
       3)
-        read -rp "Custom Subnet: " -e -i "10.8.0.0/24" IPV4_SUBNET
+        read -rp "Custom IPv4 Subnet: " -e IPV4_SUBNET
         if [ -z "${IPV4_SUBNET}" ]; then
           IPV4_SUBNET="10.8.0.0/24"
         fi
@@ -352,7 +354,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPV6_SUBNET="fd86:ea04:1115::0/64"
         ;;
       3)
-        read -rp "Custom Subnet: " -e -i "fd42:42:42::0/64" IPV6_SUBNET
+        read -rp "Custom IPv6 Subnet:" IPV6_SUBNET
         if [ -z "${IPV6_SUBNET}" ]; then
           IPV6_SUBNET="fd42:42:42::0/64"
         fi
@@ -403,7 +405,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        read -rp "Custom IPv4: " -e -i "$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V4
+        read -rp "Custom IPv4:" SERVER_HOST_V4
         if [ -z "${SERVER_HOST_V4}" ]; then
           SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
@@ -439,7 +441,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        read -rp "Custom IPv6: " -e -i "$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')" SERVER_HOST_V6
+        read -rp "Custom IPv6:" SERVER_HOST_V6
         if [ -z "${SERVER_HOST_V6}" ]; then
           SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
@@ -458,21 +460,19 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) IP (Recommended)"
       echo "  2) Custom (Advanced)"
       until [[ "${SERVER_PUB_NIC_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "nic Choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
+        read -rp "Nic Choice [1-2]: " -e -i 1 SERVER_PUB_NIC_SETTINGS
       done
       case ${SERVER_PUB_NIC_SETTINGS} in
       1)
         SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
         if [ -z "${SERVER_PUB_NIC}" ]; then
           echo "Error: Your server's public network interface could not be found."
-          exit
         fi
         ;;
       2)
-        read -rp "Custom NAT: " -e -i "$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)" SERVER_PUB_NIC
+        read -rp "Custom NAT:" SERVER_PUB_NIC
         if [ -z "${SERVER_PUB_NIC}" ]; then
           SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
-          exit
         fi
         ;;
       esac
@@ -497,16 +497,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         SERVER_PORT="51820"
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: Please use a different port because ${SERVER_PORT} is already in use."
-          exit
         fi
         ;;
       2)
         until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1 ] && [ "${SERVER_PORT}" -le 65535 ]; do
-          read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT
+          read -rp "Custom port [1-65535]:" SERVER_PORT
         done
         if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
           echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
-          exit
         fi
         ;;
       3)
@@ -532,7 +530,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Custom (Advanced)"
       echo "  3) Random [1024-65535]"
       until [[ "${NAT_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Nat Choice [1-3]: " -e -i 1 NAT_CHOICE_SETTINGS
+        read -rp "Nat Choice [1-3]:" -e -i 1 NAT_CHOICE_SETTINGS
       done
       case ${NAT_CHOICE_SETTINGS} in
       1)
@@ -540,7 +538,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       2)
         until [[ "${NAT_CHOICE}" =~ ^[0-9]+$ ]] && [ "${NAT_CHOICE}" -ge 1 ] && [ "${NAT_CHOICE}" -le 65535 ]; do
-          read -rp "Custom NAT [1-65535]: " -e -i 25 NAT_CHOICE
+          read -rp "Custom NAT [1-65535]:" NAT_CHOICE
         done
         ;;
       3)
@@ -561,7 +559,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) 1420"
       echo "  3) Custom (Advanced)"
       until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "MTU Choice [1-3]: " -e -i 1 MTU_CHOICE_SETTINGS
+        read -rp "MTU Choice [1-3]:" -e -i 1 MTU_CHOICE_SETTINGS
       done
       case ${MTU_CHOICE_SETTINGS} in
       1)
@@ -572,7 +570,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       3)
         until [[ "${MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${MTU_CHOICE}" -ge 1 ] && [ "${MTU_CHOICE}" -le 65535 ]; do
-          read -rp "Custom MTU [1-65535]: " -e -i 1280 MTU_CHOICE
+          read -rp "Custom MTU [1-65535]:" MTU_CHOICE
         done
         ;;
       esac
@@ -590,7 +588,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) IPv6"
       echo "  3) Custom (Advanced)"
       until [[ "${SERVER_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IP Choice [1-3]: " -e -i 1 SERVER_HOST_SETTINGS
+        read -rp "IP Choice [1-3]:" -e -i 1 SERVER_HOST_SETTINGS
       done
       case ${SERVER_HOST_SETTINGS} in
       1)
@@ -628,7 +626,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Disable IPv4"
       echo "  3) Disable IPv6"
       until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Disable Host Choice [1-3]: " -e -i 1 DISABLE_HOST_SETTINGS
+        read -rp "Disable Host Choice [1-3]:" -e -i 1 DISABLE_HOST_SETTINGS
       done
       case ${DISABLE_HOST_SETTINGS} in
       1)
@@ -674,7 +672,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) Exclude Private IPs"
       echo "  3) Custom (Advanced)"
       until [[ "${CLIENT_ALLOWED_IP_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Client Allowed IP Choice [1-3]: " -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
+        read -rp "Client Allowed IP Choice [1-3]:" -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
       done
       case ${CLIENT_ALLOWED_IP_SETTINGS} in
       1)
@@ -684,7 +682,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         CLIENT_ALLOWED_IP="0.0.0.0/5,8.0.0.0/7,11.0.0.0/8,12.0.0.0/6,16.0.0.0/4,32.0.0.0/3,64.0.0.0/2,128.0.0.0/3,160.0.0.0/5,168.0.0.0/6,172.0.0.0/12,172.32.0.0/11,172.64.0.0/10,172.128.0.0/9,173.0.0.0/8,174.0.0.0/7,176.0.0.0/4,192.0.0.0/9,192.128.0.0/11,192.160.0.0/13,192.169.0.0/16,192.170.0.0/15,192.172.0.0/14,192.176.0.0/12,192.192.0.0/10,193.0.0.0/8,194.0.0.0/7,196.0.0.0/6,200.0.0.0/5,208.0.0.0/4,::/0,${GATEWAY_ADDRESS_V4}/32"
         ;;
       3)
-        read -rp "Custom IPs: " -e -i "0.0.0.0/0,::/0" CLIENT_ALLOWED_IP
+        read -rp "Custom IPs: " -e CLIENT_ALLOWED_IP
         if [ -z "${CLIENT_ALLOWED_IP}" ]; then
           CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
         fi
@@ -703,7 +701,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
       until [[ "${AUTOMATIC_UPDATES_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Automatic Updates [1-2]: " -e -i 1 AUTOMATIC_UPDATES_SETTINGS
+        read -rp "Automatic Updates [1-2]:" -e -i 1 AUTOMATIC_UPDATES_SETTINGS
       done
       case ${AUTOMATIC_UPDATES_SETTINGS} in
       1)
@@ -736,7 +734,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Yes (Recommended)"
       echo "  2) No (Advanced)"
       until [[ "${AUTOMATIC_BACKUP_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Automatic Backup [1-2]: " -e -i 1 AUTOMATIC_BACKUP_SETTINGS
+        read -rp "Automatic Backup [1-2]:" -e -i 1 AUTOMATIC_BACKUP_SETTINGS
       done
       case ${AUTOMATIC_BACKUP_SETTINGS} in
       1)
@@ -769,26 +767,26 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) No (Recommended)"
       echo "  2) Twilio (Advanced)"
       until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Notifications setup [1-2]: " -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
+        read -rp "Notifications setup [1-2]:" -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
       done
       case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
       1)
         echo "Real-time Notifications Disabled"
         ;;
       2)
-        read -rp "Twilio Account SID: " -e -i "" TWILIO_ACCOUNT_SID
+        read -rp "Twilio Account SID:" TWILIO_ACCOUNT_SID
         if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
           TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio Auth Token: " -e -i "" TWILIO_AUTH_TOKEN
+        read -rp "Twilio Auth Token:" TWILIO_AUTH_TOKEN
         if [ -z "${TWILIO_AUTH_TOKEN}" ]; then
           TWILIO_AUTH_TOKEN="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio From Number: " -e -i "" TWILIO_FROM_NUMBER
+        read -rp "Twilio From Number:" TWILIO_FROM_NUMBER
         if [ -z "${TWILIO_FROM_NUMBER}" ]; then
           TWILIO_FROM_NUMBER="$(openssl rand -hex 10)"
         fi
-        read -rp "Twilio To Number: " -e -i "" TWILIO_TO_NUMBER
+        read -rp "Twilio To Number:" TWILIO_TO_NUMBER
         if [ -z "${TWILIO_TO_NUMBER}" ]; then
           TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
         fi
@@ -818,17 +816,25 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  1) Unbound (Recommended)"
       echo "  2) Custom (Advanced)"
       until [[ "${DNS_PROVIDER_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "DNS provider [1-2]: " -e -i 1 DNS_PROVIDER_SETTINGS
+        read -rp "DNS provider [1-2]:" -e -i 1 DNS_PROVIDER_SETTINGS
       done
       case ${DNS_PROVIDER_SETTINGS} in
       1)
         INSTALL_UNBOUND="y"
-        if [ "${INSTALL_UNBOUND}" = "y" ]; then
-          read -rp "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker? (y/n):" INSTALL_BLOCK_LIST
-        fi
-        if [ -z "${INSTALL_BLOCK_LIST}" ]; then
-          INSTALL_BLOCK_LIST="y"
-        fi
+        echo "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker?"
+        echo "  1) Yes (Recommended)"
+        echo "  2) No"
+        until [[ "${CONTENT_BLOCKER_SETTINGS}" =~ ^[1-2]$ ]]; do
+          read -rp "Content Blocker Choice [1-3]: " -e -i 1 CONTENT_BLOCKER_SETTINGS
+        done
+        case ${CONTENT_BLOCKER_SETTINGS} in
+        1)
+          INSTALL_BLOCK_LIST="Y"
+          ;;
+        2)
+          INSTALL_BLOCK_LIST="N"
+          ;;
+        esac
         ;;
       2)
         CUSTOM_DNS="y"
@@ -855,7 +861,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "  8) FDN"
         echo "  9) Custom (Advanced)"
         until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 9 ]; do
-          read -rp "DNS [1-9]: " -e -i 1 CLIENT_DNS_SETTINGS
+          read -rp "DNS [1-9]:" -e -i 1 CLIENT_DNS_SETTINGS
         done
         case ${CLIENT_DNS_SETTINGS} in
         1)
@@ -901,7 +907,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ -z "${CLIENT_NAME}" ]; then
         echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-        read -rp "Client name: " -e CLIENT_NAME
+        read -rp "Client name:" -e -i "$(openssl rand -hex 25)" CLIENT_NAME
       fi
       if [ -z "${CLIENT_NAME}" ]; then
         CLIENT_NAME="$(openssl rand -hex 50)"
@@ -1041,7 +1047,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${INSTALL_UNBOUND}" = "y" ]; then
+      if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
         if [ ! -x "$(command -v unbound)" ]; then
           if [ "${DISTRO}" == "ubuntu" ]; then
             apt-get install unbound unbound-host e2fsprogs -y
@@ -1127,7 +1133,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
-          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+          if { [ "${INSTALL_BLOCK_LIST}" = "y" ] || [ "${INSTALL_BLOCK_LIST}" = "Y" ]; }; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
@@ -1346,20 +1352,18 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if [ -x "$(command -v wg)" ]; then
             echo "Which WireGuard client do you want to remove?"
-            # shellcheck disable=SC2002
-            cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
+            grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
             read -rp "Type in Client Name : " -e REMOVECLIENT
-            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
-            if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -e -i "y" CHOOSE_CLIENT_TO_REMOVE
+            if { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "y" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "Y" ]; }; then
               CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
-              echo "Client ${REMOVECLIENT} has been removed."
-            elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
+              wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+            elif { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "n" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "N" ]; }; then
               exit
             fi
-            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
           fi
         fi
         ;;
@@ -1495,13 +1499,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Are you sure you want to remove WireGuard backup? (y/n): " -n 1 -r
-          if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+          read -rp "Are you sure you want to remove WireGuard backup? (y/n):" REMOVE_WIREGUARD_BACKUP
+          if { [ "${REMOVE_WIREGUARD_BACKUP}" = "y" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "Y" ]; }; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
             if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
               rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
             fi
-          elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
+          elif { [ "${REMOVE_WIREGUARD_BACKUP}" = "n" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "N" ]; }; then
             exit
           fi
         fi
