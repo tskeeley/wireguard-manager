@@ -1041,7 +1041,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${INSTALL_UNBOUND}" = "y" ]; then
+      if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
         if [ ! -x "$(command -v unbound)" ]; then
           if [ "${DISTRO}" == "ubuntu" ]; then
             apt-get install unbound unbound-host e2fsprogs -y
@@ -1350,13 +1350,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             cat ${WIREGUARD_CONFIG} | grep start | awk '{ print $2 }'
             read -rp "Type in Client Name : " -e REMOVECLIENT
             read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n): " -n 1 -r
-            if [[ ${REPLY} =~ ^[Yy]$ ]]; then
+            if { [ "${REPLY}" = "y" ] || [ "${REPLY}" = "Y" ]; }; then
               CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
               echo "Client ${REMOVECLIENT} has been removed."
-            elif [[ ${REPLY} =~ ^[Nn]$ ]]; then
+            elif { [ "${REPLY}" = "n" ] || [ "${REPLY}" = "N" ]; }; then
               exit
             fi
             wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
