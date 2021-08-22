@@ -562,7 +562,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  2) 1420"
       echo "  3) Custom (Advanced)"
       until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "MTU Choice [1-3]: " -e MTU_CHOICE_SETTINGS
+        read -rp "MTU Choice [1-3]:" MTU_CHOICE_SETTINGS
       done
       case ${MTU_CHOICE_SETTINGS} in
       1)
