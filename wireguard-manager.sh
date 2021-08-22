@@ -295,7 +295,7 @@ function headless-install() {
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS:-1}
     NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
-    INSTALL_BLOCK_LIST=${INSTALL_BLOCK_LIST:-y}
+    CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-client}
   fi
 }
@@ -825,12 +825,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       case ${DNS_PROVIDER_SETTINGS} in
       1)
         INSTALL_UNBOUND="y"
-        if [ "${INSTALL_UNBOUND}" = "y" ]; then
-          read -rp "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker? (y/n):" -e -i "y" INSTALL_BLOCK_LIST
-        fi
-        if [ -z "${INSTALL_BLOCK_LIST}" ]; then
-          INSTALL_BLOCK_LIST="y"
-        fi
+      echo "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker?"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No"
+      until [[ "${CONTENT_BLOCKER_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Content Blocker Choice [1-3]: " -e -i 1 CONTENT_BLOCKER_SETTINGS
+      done
+      case ${CONTENT_BLOCKER_SETTINGS} in
+      1)
+        INSTALL_BLOCK_LIST="Y"
+        ;;
+      2)
+        INSTALL_BLOCK_LIST="N"
+        ;;
+      esac
         ;;
       2)
         CUSTOM_DNS="y"
@@ -903,7 +911,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if [ -z "${CLIENT_NAME}" ]; then
         echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-        read -rp "Client name: " -e -i "$(openssl rand -hex 25)" CLIENT_NAME
+        read -rp "Client name:" -e -i "$(openssl rand -hex 25)" CLIENT_NAME
       fi
       if [ -z "${CLIENT_NAME}" ]; then
         CLIENT_NAME="$(openssl rand -hex 50)"
