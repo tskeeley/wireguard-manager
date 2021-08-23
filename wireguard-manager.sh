@@ -825,7 +825,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "  1) Yes (Recommended)"
         echo "  2) No"
         until [[ "${CONTENT_BLOCKER_SETTINGS}" =~ ^[1-2]$ ]]; do
-          read -rp "Content Blocker Choice [1-3]:" -e -i 1 CONTENT_BLOCKER_SETTINGS
+          read -rp "Content Blocker Choice [1-2]:" -e -i 1 CONTENT_BLOCKER_SETTINGS
         done
         case ${CONTENT_BLOCKER_SETTINGS} in
         1)
