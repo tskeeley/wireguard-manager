@@ -966,7 +966,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get install wireguard qrencode haveged ifupdown resolvconf -y
         elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
           apt-get update
-          if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
+          if { [ "${DISTRO}" == "debian" ] && [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
             if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
               echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
               apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
