@@ -1609,7 +1609,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
           if [ -z "${SERVER_HOST_V4}" ]; then
             echo "Error: While attempting to locate your IP address, an error occurred."
-            exit
           fi
           sed -i "s/${SERVER_HOST}/${SERVER_HOST_V4}/g" ${WIREGUARD_CONFIG}
         fi
@@ -1623,7 +1622,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           done
           if [ "$(lsof -i UDP:"${SERVER_PORT_NEW}")" ]; then
             echo "Error: The port ${SERVER_PORT_NEW} is already used by a different application, please use a different port."
-            exit
           fi
           sed -i "s/${OLD_SERVER_PORT}/${SERVER_PORT_NEW}/g" ${WIREGUARD_CONFIG}
         fi
