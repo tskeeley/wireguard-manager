@@ -30,9 +30,9 @@ function installing-system-requirements() {
   if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ] || [ "${DISTRO}" == "neon" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ntpd)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v pgrep)" ]; }; then
       if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps -y
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl cron ntp lsof procps-ng -y
+        yum update -y && yum install iptables curl coreutils bc jq sed zip unzip grep gawk systemd openssl cron ntp lsof procps-ng -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed bc jq zip unzip cronie ntp lsof procps-ng
       elif [ "${DISTRO}" == "alpine" ]; then
@@ -1053,7 +1053,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
         if [ ! -x "$(command -v unbound)" ]; then
           if [ "${DISTRO}" == "ubuntu" ]; then
-            apt-get install unbound unbound-host e2fsprogs -y
+            apt-get install unbound unbound-host -y
             if pgrep systemd-journal; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
@@ -1062,7 +1062,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
               service systemd-resolved disable
             fi
           elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-            apt-get install unbound unbound-host e2fsprogs -y
+            apt-get install unbound unbound-host -y
           elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
             yum install unbound unbound-libs -y
           elif [ "${DISTRO}" == "fedora" ]; then
@@ -1123,11 +1123,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             rm -f ${RESOLV_CONFIG_OLD}
           fi
           if [ -f "${RESOLV_CONFIG}" ]; then
-            chattr -i ${RESOLV_CONFIG}
             mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
             echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
             echo "nameserver ::1" >>${RESOLV_CONFIG}
-            chattr +i ${RESOLV_CONFIG}
           else
             echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
             echo "nameserver ::1" >>${RESOLV_CONFIG}
@@ -1467,10 +1465,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               service unbound stop
             fi
             if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-              chattr -i ${RESOLV_CONFIG}
               rm -f ${RESOLV_CONFIG}
               mv ${RESOLV_CONFIG_OLD} ${RESOLV_CONFIG}
-              chattr +i ${RESOLV_CONFIG}
             fi
             if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
               yum remove unbound unbound-host -y
