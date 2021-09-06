@@ -1605,25 +1605,25 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       13)
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
-          SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
-          SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-          if [ -z "${SERVER_HOST_V4}" ]; then
+          OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
+          NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+          if [ -z "${NEW_SERVER_HOST}" ]; then
             echo "Error: While attempting to locate your IP address, an error occurred."
           fi
-          sed -i "s/${SERVER_HOST}/${SERVER_HOST_V4}/g" ${WIREGUARD_CONFIG}
+          sed -i "s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/g" ${WIREGUARD_CONFIG}
         fi
         ;;
       14)
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
           # Find the server port and than change it.
-          until [[ "${SERVER_PORT_NEW}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT_NEW}" -ge 1 ] && [ "${SERVER_PORT_NEW}" -le 65535 ]; do
-            read -rp "Custom port [1-65535]: " -e -i 51820 SERVER_PORT_NEW
+          until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
+            read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
           done
-          if [ "$(lsof -i UDP:"${SERVER_PORT_NEW}")" ]; then
-            echo "Error: The port ${SERVER_PORT_NEW} is already used by a different application, please use a different port."
+          if [ "$(lsof -i UDP:"${NEW_SERVER_PORT}")" ]; then
+            echo "Error: The port ${NEW_SERVER_PORT} is already used by a different application, please use a different port."
           fi
-          sed -i "s/${OLD_SERVER_PORT}/${SERVER_PORT_NEW}/g" ${WIREGUARD_CONFIG}
+          sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
         fi
         ;;
       esac
