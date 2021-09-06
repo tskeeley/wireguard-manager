@@ -69,7 +69,7 @@ virt-check
 # Check for docker stuff
 function docker-check() {
   if [ -f /.dockerenv ]; then
-    DOCKER_KERNEL_VERSION_LIMIT=5.6
+    DOCKER_KERNEL_VERSION_LIMIT=5.06
     DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
     if (($(echo "${DOCKER_KERNEL_CURRENT_VERSION} >= ${DOCKER_KERNEL_VERSION_LIMIT}" | bc -l))); then
       echo "Correct: Kernel ${DOCKER_KERNEL_CURRENT_VERSION} supported." >>/dev/null
@@ -85,7 +85,7 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-  KERNEL_VERSION_LIMIT=3.1
+  KERNEL_VERSION_LIMIT=3.01
   KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
   if (($(echo "${KERNEL_CURRENT_VERSION} >= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
     echo "Correct: Kernel ${KERNEL_CURRENT_VERSION} supported." >>/dev/null
@@ -921,7 +921,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-      LINUX_HEADER_KERNEL_VERSION_LIMIT=5.6
+      LINUX_HEADER_KERNEL_VERSION_LIMIT=5.06
       LINUX_HEADER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
       if (($(echo "${LINUX_HEADER_KERNEL_CURRENT_VERSION} <= ${LINUX_HEADER_KERNEL_VERSION_LIMIT}" | bc -l))); then
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
