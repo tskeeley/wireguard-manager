@@ -30,9 +30,9 @@ function installing-system-requirements() {
   if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ] || [ "${DISTRO}" == "neon" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ntpd)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v pgrep)" ]; }; then
       if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps -y
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed e2fsprogs zip unzip grep gawk systemd openssl cron ntp lsof procps-ng -y
+        yum update -y && yum install iptables curl coreutils bc jq sed zip unzip grep gawk systemd openssl cron ntp lsof procps-ng -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed bc jq zip unzip cronie ntp lsof procps-ng
       elif [ "${DISTRO}" == "alpine" ]; then
@@ -1052,27 +1052,27 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
         if [ ! -x "$(command -v unbound)" ]; then
-          if [ "${DISTRO}" == "ubuntu" ]; then
+          if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
             apt-get install unbound unbound-host e2fsprogs -y
-            if pgrep systemd-journal; then
-              systemctl stop systemd-resolved
-              systemctl disable systemd-resolved
-            else
-              service systemd-resolved stop
-              service systemd-resolved disable
+            if [ "${DISTRO}" == "ubuntu" ]; then
+              if pgrep systemd-journal; then
+                systemctl stop systemd-resolved
+                systemctl disable systemd-resolved
+              else
+                service systemd-resolved stop
+                service systemd-resolved disable
+              fi
             fi
-          elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-            apt-get install unbound unbound-host e2fsprogs -y
           elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-            yum install unbound unbound-libs -y
+            yum install unbound unbound-libs e2fsprogs -y
           elif [ "${DISTRO}" == "fedora" ]; then
-            dnf install unbound -y
+            dnf install unbound e2fsprogs -y
           elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-            pacman -Syu --noconfirm unbound
+            pacman -Syu --noconfirm unbound e2fsprogs
           elif [ "${DISTRO}" == "alpine" ]; then
-            apk add unbound
+            apk add unbound e2fsprogs
           elif [ "${DISTRO}" == "freebsd" ]; then
-            pkg install unbound
+            pkg install unbound e2fsprogs
           fi
           if [ -f "${UNBOUND_ANCHOR}" ]; then
             rm -f ${UNBOUND_ANCHOR}
