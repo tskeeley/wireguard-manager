@@ -1052,8 +1052,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
         if [ ! -x "$(command -v unbound)" ]; then
+          if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+            apt-get install unbound unbound-host e2fsprogs -y
           if [ "${DISTRO}" == "ubuntu" ]; then
-            apt-get install unbound unbound-host -y
             if pgrep systemd-journal; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
@@ -1061,18 +1062,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
               service systemd-resolved stop
               service systemd-resolved disable
             fi
-          elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-            apt-get install unbound unbound-host -y
+            fi
           elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-            yum install unbound unbound-libs -y
+            yum install unbound unbound-libs e2fsprogs -y
           elif [ "${DISTRO}" == "fedora" ]; then
-            dnf install unbound -y
+            dnf install unbound e2fsprogs -y
           elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-            pacman -Syu --noconfirm unbound
+            pacman -Syu --noconfirm unbound e2fsprogs
           elif [ "${DISTRO}" == "alpine" ]; then
-            apk add unbound
+            apk add unbound e2fsprogs
           elif [ "${DISTRO}" == "freebsd" ]; then
-            pkg install unbound
+            pkg install unbound e2fsprogs
           fi
           if [ -f "${UNBOUND_ANCHOR}" ]; then
             rm -f ${UNBOUND_ANCHOR}
@@ -1123,9 +1123,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             rm -f ${RESOLV_CONFIG_OLD}
           fi
           if [ -f "${RESOLV_CONFIG}" ]; then
+            chattr -i ${RESOLV_CONFIG}
             mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
             echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
             echo "nameserver ::1" >>${RESOLV_CONFIG}
+            chattr +i ${RESOLV_CONFIG}
           else
             echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
             echo "nameserver ::1" >>${RESOLV_CONFIG}
@@ -1465,8 +1467,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               service unbound stop
             fi
             if [ -f "${RESOLV_CONFIG_OLD}" ]; then
+              chattr -i ${RESOLV_CONFIG}
               rm -f ${RESOLV_CONFIG}
               mv ${RESOLV_CONFIG_OLD} ${RESOLV_CONFIG}
+              chattr +i ${RESOLV_CONFIG}
             fi
             if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
               yum remove unbound unbound-host -y
