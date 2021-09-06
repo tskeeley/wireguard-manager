@@ -69,7 +69,7 @@ virt-check
 # Check for docker stuff
 function docker-check() {
   if [ -f /.dockerenv ]; then
-    DOCKER_KERNEL_VERSION_LIMIT=5.6
+    DOCKER_KERNEL_VERSION_LIMIT=5.06
     DOCKER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
     if (($(echo "${DOCKER_KERNEL_CURRENT_VERSION} >= ${DOCKER_KERNEL_VERSION_LIMIT}" | bc -l))); then
       echo "Correct: Kernel ${DOCKER_KERNEL_CURRENT_VERSION} supported." >>/dev/null
@@ -85,7 +85,7 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-  KERNEL_VERSION_LIMIT=3.1
+  KERNEL_VERSION_LIMIT=3.01
   KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
   if (($(echo "${KERNEL_CURRENT_VERSION} >= ${KERNEL_VERSION_LIMIT}" | bc -l))); then
     echo "Correct: Kernel ${KERNEL_CURRENT_VERSION} supported." >>/dev/null
@@ -921,7 +921,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
-      LINUX_HEADER_KERNEL_VERSION_LIMIT=5.6
+      LINUX_HEADER_KERNEL_VERSION_LIMIT=5.06
       LINUX_HEADER_KERNEL_CURRENT_VERSION=$(uname -r | cut -d'.' -f1-2)
       if (($(echo "${LINUX_HEADER_KERNEL_CURRENT_VERSION} <= ${LINUX_HEADER_KERNEL_VERSION_LIMIT}" | bc -l))); then
         if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
@@ -1248,8 +1248,10 @@ else
       echo "   10) Backup WireGuard"
       echo "   11) Restore WireGuard"
       echo "   12) Check WireGuard Status"
-      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 12 ]; do
-        read -rp "Select an Option [1-12]:" -e -i 1 WIREGUARD_OPTIONS
+      echo "   13) Update Interface IP"
+      echo "   14) Update Interface Port"
+      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 14 ]; do
+        read -rp "Select an Option [1-14]:" -e -i 1 WIREGUARD_OPTIONS
       done
       case ${WIREGUARD_OPTIONS} in
       1) # WG Show
@@ -1599,6 +1601,29 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               fi
             fi
           fi
+        fi
+        ;;
+      13)
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
+          OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
+          NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+          if [ -z "${NEW_SERVER_HOST}" ]; then
+            echo "Error: While attempting to locate your IP address, an error occurred."
+          fi
+          sed -i "s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/g" ${WIREGUARD_CONFIG}
+        fi
+        ;;
+      14)
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
+          OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
+          # Find the server port and than change it.
+          until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
+            read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
+          done
+          if [ "$(lsof -i UDP:"${NEW_SERVER_PORT}")" ]; then
+            echo "Error: The port ${NEW_SERVER_PORT} is already used by a different application, please use a different port."
+          fi
+          sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
         fi
         ;;
       esac
