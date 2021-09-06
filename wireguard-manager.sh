@@ -1054,14 +1054,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ ! -x "$(command -v unbound)" ]; then
           if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
             apt-get install unbound unbound-host e2fsprogs -y
-          if [ "${DISTRO}" == "ubuntu" ]; then
-            if pgrep systemd-journal; then
-              systemctl stop systemd-resolved
-              systemctl disable systemd-resolved
-            else
-              service systemd-resolved stop
-              service systemd-resolved disable
-            fi
+            if [ "${DISTRO}" == "ubuntu" ]; then
+              if pgrep systemd-journal; then
+                systemctl stop systemd-resolved
+                systemctl disable systemd-resolved
+              else
+                service systemd-resolved stop
+                service systemd-resolved disable
+              fi
             fi
           elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
             yum install unbound unbound-libs e2fsprogs -y
