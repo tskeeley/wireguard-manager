@@ -334,7 +334,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         IPV4_SUBNET="10.0.0.0/24"
         ;;
       3)
-        read -rp "Custom IPv4 Subnet:" -e IPV4_SUBNET
+        read -rp "Custom IPv4 Subnet:" IPV4_SUBNET
         if [ -z "${IPV4_SUBNET}" ]; then
           IPV4_SUBNET="10.8.0.0/24"
         fi
@@ -692,7 +692,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         CLIENT_ALLOWED_IP="0.0.0.0/5,8.0.0.0/7,11.0.0.0/8,12.0.0.0/6,16.0.0.0/4,32.0.0.0/3,64.0.0.0/2,128.0.0.0/3,160.0.0.0/5,168.0.0.0/6,172.0.0.0/12,172.32.0.0/11,172.64.0.0/10,172.128.0.0/9,173.0.0.0/8,174.0.0.0/7,176.0.0.0/4,192.0.0.0/9,192.128.0.0/11,192.160.0.0/13,192.169.0.0/16,192.170.0.0/15,192.172.0.0/14,192.176.0.0/12,192.192.0.0/10,193.0.0.0/8,194.0.0.0/7,196.0.0.0/6,200.0.0.0/5,208.0.0.0/4,::/0,${GATEWAY_ADDRESS_V4}/32"
         ;;
       3)
-        read -rp "Custom IPs:" -e CLIENT_ALLOWED_IP
+        read -rp "Custom IPs:" CLIENT_ALLOWED_IP
         if [ -z "${CLIENT_ALLOWED_IP}" ]; then
           CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
         fi
@@ -997,7 +997,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
         fi
       else
-        echo "Correct: You do not need kernel headers." >/dev/null 2>&1
+        echo "Correct: You do not need kernel headers." >>/dev/null
       fi
     fi
   }
@@ -1157,12 +1157,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     access-control: ${PRIVATE_SUBNET_V4}               allow
     access-control: ${PRIVATE_SUBNET_V6}          allow
     access-control: 127.0.0.1                 allow
+    access-control: ::1                       allow
     private-address: ${PRIVATE_SUBNET_V4}
     private-address: ${PRIVATE_SUBNET_V6}
-    private-address: 10.0.0.0/8
-    private-address: 172.16.0.0/12
-    private-address: 192.168.0.0/16
-    private-address: fc00::/7
     do-tcp: no
     hide-identity: yes
     hide-version: yes
@@ -1353,7 +1350,7 @@ else
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-              read -rp "New client peer:" -e NEW_CLIENT_NAME
+              read -rp "New client peer:" -e -i "$(openssl rand -hex 25)" NEW_CLIENT_NAME
             fi
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
@@ -1422,8 +1419,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           if [ -x "$(command -v wg)" ]; then
             echo "Which WireGuard client do you want to remove?"
-            grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
-            read -rp "Type in Client Name:" -e REMOVECLIENT
+            grep start ${WIREGUARD_CONFIG} | awk '{print $2}'
+            read -rp "Type in Client Name:" REMOVECLIENT
             CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
             wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
             sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
@@ -1686,13 +1683,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       15)
         # All wireguard peers should be removed from your interface
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
-          COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }')
+          COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{print $2}')
           for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
             USER_LIST[$ADD_CONTENT]=$CLIENT_LIST_ARRAY
             ADD_CONTENT=$(("$ADD_CONTENT" + 1))
           done
           for CLIENT_NAME in "${USER_LIST[@]}"; do
-            CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk '{print $3}')
             wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
             sed -i "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/d" ${WIREGUARD_CONFIG}
             rm -f ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
