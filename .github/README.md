@@ -105,6 +105,7 @@ usage: ./wireguard-manager.sh <command>
 ### 🥰 Features
 - Install & Configure WireGuard Interface
 - Backup & Restore WireGuard
+- Expiration of peer configurations on autopilot
 - (IPv4|IPv6) Supported, Leak Protection
 - Variety of Public DNS to be pushed to the peers
 - Choice to use a self-hosted resolver with Unbound **Prevent DNS Leaks, DNSSEC Supported**
