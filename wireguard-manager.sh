@@ -997,7 +997,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
         fi
       else
-        echo "Correct: You do not need kernel headers." >/dev/null 2>&1
+        echo "Correct: You do not need kernel headers." >>/dev/null
       fi
     fi
   }
@@ -1157,12 +1157,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     access-control: ${PRIVATE_SUBNET_V4}               allow
     access-control: ${PRIVATE_SUBNET_V6}          allow
     access-control: 127.0.0.1                 allow
+    access-control: ::1                       allow
     private-address: ${PRIVATE_SUBNET_V4}
     private-address: ${PRIVATE_SUBNET_V6}
-    private-address: 10.0.0.0/8
-    private-address: 172.16.0.0/12
-    private-address: 192.168.0.0/16
-    private-address: fc00::/7
     do-tcp: no
     hide-identity: yes
     hide-version: yes
@@ -1353,7 +1350,7 @@ else
           if { [ -x "$(command -v wg)" ] || [ -x "$(command -v qrencode)" ]; }; then
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-              read -rp "New client peer:" -e NEW_CLIENT_NAME
+              read -rp "New client peer:" -e -i "$(openssl rand -hex 25)" NEW_CLIENT_NAME
             fi
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
