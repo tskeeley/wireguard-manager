@@ -86,18 +86,20 @@ docker run -it --name wireguard-manager-running wireguard-manager
 ### 🔑 Usage
 ```
 usage: ./wireguard-manager.sh <command>
-  --install     Install WireGuard Interface
-  --start       Start WireGuard Interface
-  --stop        Stop WireGuard Interface
-  --restart     Restart WireGuard Interface
-  --list        Show WireGuard Peers
+  --install     Install WireGuard
+  --start       Start WireGuard
+  --stop        Stop WireGuard
+  --restart     Restart WireGuard
+  --list        Show WireGuard
   --add         Add WireGuard Peer
   --remove      Remove WireGuard Peer
-  --reinstall   Reinstall WireGuard Interface
-  --uninstall   Uninstall WireGuard Interface
-  --update      Update WireGuard Script
-  --backup      Backup WireGuard Configs
-  --restore     Restore WireGuard Configs
+  --reinstall   Reinstall WireGuard
+  --uninstall   Uninstall WireGuard
+  --update      Update WireGuard Manager
+  --ddns        Update WireGuard IP Address
+  --backup      Backup WireGuard
+  --restore     Restore WireGuard
+  --purge       Purge WireGuard Peer(s)
   --help        Show Usage Guide
 ```
 
