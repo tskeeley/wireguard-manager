@@ -288,7 +288,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if { [ "${HEADLESS_INSTALL}" == "y" ] || [ "${HEADLESS_INSTALL}" == "Y" ]; }; then
+  if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -860,7 +860,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Use custom dns
   function custom-dns() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${CUSTOM_DNS}" == "y" ]; then
+      if [[ ${CUSTOM_DNS} =~ ^[Yy]$ ]]; then
         echo "Which DNS do you want to use with the WireGuard connection?"
         echo "  1) Google (Recommended)"
         echo "  2) AdGuard"
@@ -1108,7 +1108,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
+      if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
         if [ ! -x "$(command -v unbound)" ]; then
           if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
             apt-get install unbound unbound-host e2fsprogs -y
@@ -1191,7 +1191,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
-          if { [ "${INSTALL_BLOCK_LIST}" = "y" ] || [ "${INSTALL_BLOCK_LIST}" = "Y" ]; }; then
+          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
@@ -1562,12 +1562,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
           read -rp "Are you sure you want to remove WireGuard backup? (y/n):" REMOVE_WIREGUARD_BACKUP
-          if { [ "${REMOVE_WIREGUARD_BACKUP}" = "y" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "Y" ]; }; then
+          if [[ ${REMOVE_WIREGUARD_BACKUP} =~ ^[Yy]$ ]]; then
             rm -f ${WIREGUARD_CONFIG_BACKUP}
             if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
               rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
             fi
-          elif { [ "${REMOVE_WIREGUARD_BACKUP}" = "n" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "N" ]; }; then
+          elif [[ ${REMOVE_WIREGUARD_BACKUP} =~ ^[Nn]$ ]]; then
             exit
           fi
         fi
