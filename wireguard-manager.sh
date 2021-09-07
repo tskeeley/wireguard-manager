@@ -1409,7 +1409,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
             wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
             if [ "${REMOVECLIENT}" = "Remove-All" ]; then
-            # Remove all clients
+              echo "Remove all clients."
             fi
           fi
         fi
