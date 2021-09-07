@@ -922,8 +922,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function auto-remove-confg() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "Would you like to expire the peer after a certain period of time?"
-      echo "  1) Six Months (Recommended)"
-      echo "  2) One Month"
+      echo "  1) Every Year (Recommended)"
+      echo "  2) Six Months"
       echo "  3) No"
       until [[ "${AUTOMATIC_CONFIG_REMOVER}" =~ ^[1-3]$ ]]; do
         read -rp "Automatic config expire [1-3]:" -e -i 1 AUTOMATIC_CONFIG_REMOVER
@@ -932,7 +932,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         crontab -l | {
           cat
-          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 */6 * $(realpath "$0") --remove"
+          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 1 * $(realpath "$0") --remove"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -945,7 +945,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       2)
         crontab -l | {
           cat
-          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 * * $(realpath "$0") --remove"
+          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 */6 * $(realpath "$0") --remove"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -956,7 +956,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       3)
-        echo "Real-time Backup Disabled"
+        echo "The auto-config expiration feature has been deactivated."
         ;;
       esac
     fi
