@@ -1687,7 +1687,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }')
           for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
             USER_LIST[$ADD_CONTENT]=$CLIENT_LIST_ARRAY
-            ADD_CONTENT=$(expr $ADD_CONTENT + 1)
+            ADD_CONTENT=$(("$ADD_CONTENT" + 1))
           done
           for CLIENT_NAME in "${USER_LIST[@]}"; do
             CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
