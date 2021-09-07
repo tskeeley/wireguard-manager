@@ -932,7 +932,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         crontab -l | {
           cat
-          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 1 * $(realpath "$0") --remove"
+          echo "echo -e \"Remove-All\" | 0 0 1 1 * $(realpath "$0") --remove"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -945,7 +945,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       2)
         crontab -l | {
           cat
-          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 */6 * $(realpath "$0") --remove"
+          echo "echo -e \"Remove-All\" | 0 0 1 */6 * $(realpath "$0") --remove"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -1403,11 +1403,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Which WireGuard client do you want to remove?"
             grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
             read -rp "Type in Client Name:" -e REMOVECLIENT
-              CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
-              wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
-              sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
-              rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
-              wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+            CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
+            sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
+            rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+            if [ "${REMOVECLIENT}" = "Remove-All" ]; then
+            # Remove all clients
+            fi
           fi
         fi
         ;;
