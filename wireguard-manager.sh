@@ -197,8 +197,10 @@ function usage-guide() {
     echo "  --reinstall   Reinstall WireGuard"
     echo "  --uninstall   Uninstall WireGuard"
     echo "  --update      Update WireGuard Manager"
+    echo "  --ddns        Update WireGuard IP Address"
     echo "  --backup      Backup WireGuard"
     echo "  --restore     Restore WireGuard"
+    echo "  --purge       Purge WireGuard Peer(s)"
     echo "  --help        Show Usage Guide"
   fi
 }
@@ -260,6 +262,14 @@ function usage() {
         shift
         WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
         ;;
+      --ddns)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-13}
+        ;;
+      --purge)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-15}
+        ;;
       --help)
         shift
         usage-guide
@@ -267,7 +277,6 @@ function usage() {
       *)
         echo "Invalid argument: ${1}"
         usage-guide
-        exit
         ;;
       esac
     done
@@ -278,7 +287,7 @@ usage "$@"
 
 # Skips all questions and just get a client conf after install.
 function headless-install() {
-  if { [ "${HEADLESS_INSTALL}" == "y" ] || [ "${HEADLESS_INSTALL}" == "Y" ]; }; then
+  if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -296,7 +305,8 @@ function headless-install() {
     NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
     CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS:-1}
-    CLIENT_NAME=${CLIENT_NAME:-client}
+    CLIENT_NAME=${CLIENT_NAME:-$(openssl rand -hex 50)}
+    AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER:-1}
   fi
 }
 
@@ -849,7 +859,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Use custom dns
   function custom-dns() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [ "${CUSTOM_DNS}" == "y" ]; then
+      if [[ ${CUSTOM_DNS} =~ ^[Yy]$ ]]; then
         echo "Which DNS do you want to use with the WireGuard connection?"
         echo "  1) Google (Recommended)"
         echo "  2) AdGuard"
@@ -917,6 +927,53 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Client Name
   client-name
+
+  # Automatically remove wireguard peers after a period of time.
+  function auto-remove-confg() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to expire the peer after a certain period of time?"
+      echo "  1) Every Year (Recommended)"
+      echo "  2) Six Months"
+      echo "  3) No"
+      until [[ "${AUTOMATIC_CONFIG_REMOVER}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic config expire [1-3]:" -e -i 1 AUTOMATIC_CONFIG_REMOVER
+      done
+      case ${AUTOMATIC_CONFIG_REMOVER} in
+      1)
+        crontab -l | {
+          cat
+          echo "0 0 1 1 * $(realpath "$0") --purge"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      2)
+        crontab -l | {
+          cat
+          echo "0 0 1 */6 * $(realpath "$0") --purge"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      3)
+        echo "The auto-config expiration feature has been deactivated."
+        ;;
+      esac
+    fi
+  }
+
+  # Automatic Remove Config
+  auto-remove-confg
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
@@ -1050,7 +1107,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if { [ "${INSTALL_UNBOUND}" = "y" ] || [ "${INSTALL_UNBOUND}" = "Y" ]; }; then
+      if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
         if [ ! -x "$(command -v unbound)" ]; then
           if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
             apt-get install unbound unbound-host e2fsprogs -y
@@ -1133,7 +1190,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             echo "nameserver ::1" >>${RESOLV_CONFIG}
           fi
           echo "Unbound: true" >>${UNBOUND_MANAGER}
-          if { [ "${INSTALL_BLOCK_LIST}" = "y" ] || [ "${INSTALL_BLOCK_LIST}" = "Y" ]; }; then
+          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
             echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
             curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
             awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
@@ -1250,8 +1307,9 @@ else
       echo "   12) Check WireGuard Status"
       echo "   13) Update Interface IP"
       echo "   14) Update Interface Port"
-      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 14 ]; do
-        read -rp "Select an Option [1-14]:" -e -i 1 WIREGUARD_OPTIONS
+      echo "   15) Purge WireGuard Peers"
+      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 15 ]; do
+        read -rp "Select an Option [1-15]:" -e -i 1 WIREGUARD_OPTIONS
       done
       case ${WIREGUARD_OPTIONS} in
       1) # WG Show
@@ -1315,13 +1373,23 @@ else
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
-            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
+            if [ "${LASTIPV4}" = "" ]; then
+              LASTIPV4="2"
+            fi
             if [ "${LASTIPV4}" -ge "255" ]; then
               echo "Error: You have ${LASTIPV4} peers. The max is 255."
               exit
             fi
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            if [ "${LASTIPV6}" = "" ]; then
+              LASTIPV6="2"
+            fi
+            if [ "${LASTIPV6}" -ge "255" ]; then
+              echo "Error: You have ${LASTIPV6} peers. The max is 255."
+              exit
+            fi
+            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
+            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
@@ -1356,16 +1424,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Which WireGuard client do you want to remove?"
             grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
             read -rp "Type in Client Name:" -e REMOVECLIENT
-            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n):" -e -i "y" CHOOSE_CLIENT_TO_REMOVE
-            if { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "y" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "Y" ]; }; then
-              CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
-              wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
-              sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
-              rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
-              wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-            elif { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "n" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "N" ]; }; then
-              exit
-            fi
+            CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
+            sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
+            rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
           fi
         fi
         ;;
@@ -1501,14 +1564,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Are you sure you want to remove WireGuard backup? (y/n):" REMOVE_WIREGUARD_BACKUP
-          if { [ "${REMOVE_WIREGUARD_BACKUP}" = "y" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "Y" ]; }; then
-            rm -f ${WIREGUARD_CONFIG_BACKUP}
-            if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-              rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
-            fi
-          elif { [ "${REMOVE_WIREGUARD_BACKUP}" = "n" ] || [ "${REMOVE_WIREGUARD_BACKUP}" = "N" ]; }; then
-            exit
+          rm -f ${WIREGUARD_CONFIG_BACKUP}
+          if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
+            rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
           fi
         fi
         # Delete crontab
@@ -1561,8 +1619,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               BACKUP_PASSWORD="$(openssl rand -hex 25)"
               echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
               zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
-            else
-              exit
             fi
           fi
         fi
@@ -1624,6 +1680,22 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Error: The port ${NEW_SERVER_PORT} is already used by a different application, please use a different port."
           fi
           sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
+        fi
+        ;;
+      15)
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
+          COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }')
+          for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
+            USER_LIST[$ADD_CONTENT]=$CLIENT_LIST_ARRAY
+            ADD_CONTENT=$(("$ADD_CONTENT" + 1))
+          done
+          for CLIENT_NAME in "${USER_LIST[@]}"; do
+            CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
+            sed -i "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/d" ${WIREGUARD_CONFIG}
+            rm -f ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+          done
         fi
         ;;
       esac
