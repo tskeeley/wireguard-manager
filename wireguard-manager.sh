@@ -197,8 +197,10 @@ function usage-guide() {
     echo "  --reinstall   Reinstall WireGuard"
     echo "  --uninstall   Uninstall WireGuard"
     echo "  --update      Update WireGuard Manager"
+    echo "  --ddns        Update WireGuard IP Address"
     echo "  --backup      Backup WireGuard"
     echo "  --restore     Restore WireGuard"
+    echo "  --purge       Delete all wireguard users"
     echo "  --help        Show Usage Guide"
   fi
 }
@@ -259,6 +261,14 @@ function usage() {
       --notification)
         shift
         WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
+        ;;
+      --ddns)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-13}
+        ;;
+      --purge)
+        shift
+        WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-15}
         ;;
       --help)
         shift
@@ -933,7 +943,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       1)
         crontab -l | {
           cat
-          echo "echo -e \"Remove-All\" | 0 0 1 1 * $(realpath "$0") --remove"
+          echo "0 0 1 1 * $(realpath "$0") --purge"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -946,7 +956,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       2)
         crontab -l | {
           cat
-          echo "echo -e \"Remove-All\" | 0 0 1 */6 * $(realpath "$0") --remove"
+          echo "0 0 1 */6 * $(realpath "$0") --purge"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
@@ -1298,8 +1308,9 @@ else
       echo "   12) Check WireGuard Status"
       echo "   13) Update Interface IP"
       echo "   14) Update Interface Port"
-      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 14 ]; do
-        read -rp "Select an Option [1-14]:" -e -i 1 WIREGUARD_OPTIONS
+      echo "   15) Purge WireGuard Peers"
+      until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 15 ]; do
+        read -rp "Select an Option [1-15]:" -e -i 1 WIREGUARD_OPTIONS
       done
       case ${WIREGUARD_OPTIONS} in
       1) # WG Show
@@ -1409,9 +1420,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
             rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
             wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-            if [ "${REMOVECLIENT}" = "Remove-All" ]; then
-              echo "Remove all clients."
-            fi
           fi
         fi
         ;;
@@ -1670,6 +1678,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Error: The port ${NEW_SERVER_PORT} is already used by a different application, please use a different port."
           fi
           sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
+        fi
+        ;;
+      15)
+        if [ -f "${WIREGUARD_INTERFACE}" ]; then
+          # Purge all the peers in wireguard config.
+          sed -i '/^\[Peer\]/,/^\[Interface\]/d' ${WIREGUARD_CONFIG}
         fi
         ;;
       esac
