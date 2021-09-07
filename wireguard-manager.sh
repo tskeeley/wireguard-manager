@@ -917,11 +917,53 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Client Name
   client-name
-  
-  # Remove the config after a certain period of time.
+
+  # Automatically remove wireguard peers after a period of time.
   function auto-remove-confg() {
-  # Ask the user if they want to setup auto remove config after a certain period of time. 
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      echo "Would you like to expire the peer after a certain period of time?"
+      echo "  1) Six Months (Recommended)"
+      echo "  2) One Month"
+      echo "  3) No"
+      until [[ "${AUTOMATIC_CONFIG_REMOVER}" =~ ^[1-3]$ ]]; do
+        read -rp "Automatic config expire [1-3]:" -e -i 1 AUTOMATIC_CONFIG_REMOVER
+      done
+      case ${AUTOMATIC_CONFIG_REMOVER} in
+      1)
+        crontab -l | {
+          cat
+          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 */6 * $(realpath "$0") --remove"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      2)
+        crontab -l | {
+          cat
+          echo "echo -e \"${CLIENT_NAME}\" | 0 0 1 * * $(realpath "$0") --remove"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+        ;;
+      3)
+        echo "Real-time Backup Disabled"
+        ;;
+      esac
+    fi
   }
+
+  # Automatic Remove Config
+  auto-remove-confg
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
