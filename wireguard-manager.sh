@@ -1660,6 +1660,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       13)
+        # Change the IP address of your wireguard interface.
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
           NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
@@ -1670,9 +1671,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       14)
+        # Change the wireguard interface's port number.
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
-          # Find the server port and than change it.
           until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
             read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
           done
@@ -1683,6 +1684,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         ;;
       15)
+        # All wireguard peers should be removed from your interface
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
           COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }')
           for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
