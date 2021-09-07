@@ -200,7 +200,7 @@ function usage-guide() {
     echo "  --ddns        Update WireGuard IP Address"
     echo "  --backup      Backup WireGuard"
     echo "  --restore     Restore WireGuard"
-    echo "  --purge       Delete all wireguard users"
+    echo "  --purge       Purge WireGuard Peer(s)"
     echo "  --help        Show Usage Guide"
   fi
 }
