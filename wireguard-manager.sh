@@ -1374,7 +1374,13 @@ else
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+if [ "${LASTIPV4}" = "1" ]; then
+LASTIPV4="2"
+fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+if [ "${LASTIPV6}" = "1" ]; then
+LASTIPV6="2"
+fi
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
             if [ "${LASTIPV4}" -ge "255" ]; then
