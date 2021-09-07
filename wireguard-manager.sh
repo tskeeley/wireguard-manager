@@ -1403,16 +1403,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Which WireGuard client do you want to remove?"
             grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }'
             read -rp "Type in Client Name:" -e REMOVECLIENT
-            read -rp "Are you sure you want to remove ${REMOVECLIENT} ? (y/n):" -e -i "y" CHOOSE_CLIENT_TO_REMOVE
-            if { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "y" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "Y" ]; }; then
               CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
               wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
               sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
               rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
               wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-            elif { [ "${CHOOSE_CLIENT_TO_REMOVE}" = "n" ] || [ "${CHOOSE_CLIENT_TO_REMOVE}" = "N" ]; }; then
-              exit
-            fi
           fi
         fi
         ;;
