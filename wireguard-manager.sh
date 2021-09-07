@@ -277,7 +277,6 @@ function usage() {
       *)
         echo "Invalid argument: ${1}"
         usage-guide
-        exit
         ;;
       esac
     done
@@ -1377,16 +1376,20 @@ else
             if [ "${LASTIPV4}" = "" ]; then
               LASTIPV4="2"
             fi
-            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ "${LASTIPV6}" = "" ]; then
-              LASTIPV6="2"
-            fi
-            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
-            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
             if [ "${LASTIPV4}" -ge "255" ]; then
               echo "Error: You have ${LASTIPV4} peers. The max is 255."
               exit
             fi
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            if [ "${LASTIPV6}" = "" ]; then
+              LASTIPV6="2"
+            fi
+            if [ "${LASTIPV6}" -ge "255" ]; then
+              echo "Error: You have ${LASTIPV6} peers. The max is 255."
+              exit
+            fi
+            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
+            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
@@ -1561,14 +1564,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # Delete WireGuard backup
         if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          read -rp "Are you sure you want to remove WireGuard backup? (y/n):" REMOVE_WIREGUARD_BACKUP
-          if [[ ${REMOVE_WIREGUARD_BACKUP} =~ ^[Yy]$ ]]; then
-            rm -f ${WIREGUARD_CONFIG_BACKUP}
-            if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-              rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
-            fi
-          elif [[ ${REMOVE_WIREGUARD_BACKUP} =~ ^[Nn]$ ]]; then
-            exit
+          rm -f ${WIREGUARD_CONFIG_BACKUP}
+          if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
+            rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
           fi
         fi
         # Delete crontab
@@ -1621,8 +1619,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
               BACKUP_PASSWORD="$(openssl rand -hex 25)"
               echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
               zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
-            else
-              exit
             fi
           fi
         fi
