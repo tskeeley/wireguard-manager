@@ -917,6 +917,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Client Name
   client-name
+  
+  # Remove the config after a certain period of time.
+  function auto-remove-confg() {
+  # Ask the user if they want to setup auto remove config after a certain period of time. 
+  }
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
