@@ -1682,8 +1682,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         ;;
       15)
         if [ -f "${WIREGUARD_INTERFACE}" ]; then
-          # Purge all the peers in wireguard config.
-          sed -i '/^\[Peer\]/,/^\[Interface\]/d' ${WIREGUARD_CONFIG}
+          CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{ print $2 }')
+          for CLIENT_NAME in "${CLIENT_LIST[@]}"; do
+            CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
+            sed -i "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/d" ${WIREGUARD_CONFIG}
+            wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+          done
         fi
         ;;
       esac
