@@ -48,7 +48,7 @@ Lets first use `curl` and save the file in `/usr/local/bin/`
 ```
 curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
 ```
-Then let's make the script user executable (Optional)
+Then let's make the script user executable
 ```
 chmod +x /usr/local/bin/wireguard-manager.sh
 ```
