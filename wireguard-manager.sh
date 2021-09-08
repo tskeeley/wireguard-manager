@@ -277,6 +277,7 @@ function usage() {
       *)
         echo "Invalid argument: ${1}"
         usage-guide
+        exit
         ;;
       esac
     done
