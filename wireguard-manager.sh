@@ -28,17 +28,17 @@ dist-check
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ] || [ "${DISTRO}" == "neon" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ntpd)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v pgrep)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v shuf)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ntpd)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v haveged)" ] || [ ! -x "$(command -v resolvconf)" ] || [ ! -x "$(command -v ifupdown)" ]; }; then
       if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-        apt-get update && apt-get install iptables curl coreutils bc jq sed zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps -y
+        apt-get update && apt-get install iptables curl coreutils bc jq sed zip unzip grep gawk iproute2 systemd openssl cron ntp lsof procps qrencode haveged resolvconf ifupdown -y
       elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-        yum update -y && yum install iptables curl coreutils bc jq sed zip unzip grep gawk systemd openssl cron ntp lsof procps-ng -y
+        yum update -y && yum install iptables curl coreutils bc jq sed zip unzip grep gawk systemd openssl cron ntp lsof procps-ng qrencode haveged resolvconf ifupdown -y
       elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed bc jq zip unzip cronie ntp lsof procps-ng
+        pacman -Syu --noconfirm --needed bc jq zip unzip cronie ntp lsof procps-ng qrencode haveged openresolv ifupdown
       elif [ "${DISTRO}" == "alpine" ]; then
-        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron ntp lsof procps
+        apk update && apk add iptables curl bc jq sed zip unzip grep gawk iproute2 systemd coreutils openssl cron ntp lsof procps libqrencode haveged resolvconf ifupdown
       elif [ "${DISTRO}" == "freebsd" ]; then
-        pkg update && pkg install curl jq zip unzip gawk openssl cron ntp lsof procps-ng
+        pkg update && pkg install curl jq zip unzip gawk openssl cron ntp lsof procps-ng libqrencode haveged resolvconf ifupdown
       fi
     fi
   else
@@ -321,23 +321,19 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function set-ipv4-subnet() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "What IPv4 subnet do you want to use?"
-      echo "  1) 10.8.0.0/24 (Recommended)"
-      echo "  2) 10.0.0.0/24"
-      echo "  3) Custom (Advanced)"
-      until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnet Choice [1-3]:" -e -i 1 IPV4_SUBNET_SETTINGS
+      echo "  1) 10.0.0.0/8 (Recommended)"
+      echo "  2) Custom (Advanced)"
+      until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Subnet Choice [1-2]:" -e -i 1 IPV4_SUBNET_SETTINGS
       done
       case ${IPV4_SUBNET_SETTINGS} in
       1)
-        IPV4_SUBNET="10.8.0.0/24"
+        IPV4_SUBNET="10.0.0.0/8"
         ;;
       2)
-        IPV4_SUBNET="10.0.0.0/24"
-        ;;
-      3)
         read -rp "Custom IPv4 Subnet:" IPV4_SUBNET
         if [ -z "${IPV4_SUBNET}" ]; then
-          IPV4_SUBNET="10.8.0.0/24"
+          IPV4_SUBNET="10.0.0.0/8"
         fi
         ;;
       esac
@@ -351,23 +347,19 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function set-ipv6-subnet() {
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "What IPv6 subnet do you want to use?"
-      echo "  1) fd42:42:42::0/64 (Recommended)"
-      echo "  2) fd86:ea04:1115::0/64"
-      echo "  3) Custom (Advanced)"
-      until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Subnet Choice [1-3]:" -e -i 1 IPV6_SUBNET_SETTINGS
+      echo "  1) fd00:00:00::0/8 (Recommended)"
+      echo "  2) Custom (Advanced)"
+      until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Subnet Choice [1-2]:" -e -i 1 IPV6_SUBNET_SETTINGS
       done
       case ${IPV6_SUBNET_SETTINGS} in
       1)
-        IPV6_SUBNET="fd42:42:42::0/64"
+        IPV6_SUBNET="fd00:00:00::0/8"
         ;;
       2)
-        IPV6_SUBNET="fd86:ea04:1115::0/64"
-        ;;
-      3)
         read -rp "Custom IPv6 Subnet:" IPV6_SUBNET
         if [ -z "${IPV6_SUBNET}" ]; then
-          IPV6_SUBNET="fd42:42:42::0/64"
+          IPV6_SUBNET="fd00:00:00::0/8"
         fi
         ;;
       esac
@@ -383,13 +375,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     # Private Subnet Mask IPv4
     PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
     # IPv4 Getaway
-    GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}1"
+    GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}1"
     # Private Subnet Ipv6
     PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"${IPV6_SUBNET}"}
     # Private Subnet Mask IPv6
     PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
     # IPv6 Getaway
-    GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}1"
+    GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}1"
   fi
 
   # Get the IPv4
@@ -397,10 +389,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "How would you like to detect IPv4?"
       echo "  1) Curl (Recommended)"
-      echo "  2) IP (Advanced)"
-      echo "  3) Custom (Advanced)"
-      until [[ "${SERVER_HOST_V4_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IPv4 Choice [1-3]:" -e -i 1 SERVER_HOST_V4_SETTINGS
+      echo "  2) Custom (Advanced)"
+      until [[ "${SERVER_HOST_V4_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "IPv4 Choice [1-2]:" -e -i 1 SERVER_HOST_V4_SETTINGS
       done
       case ${SERVER_HOST_V4_SETTINGS} in
       1)
@@ -410,12 +401,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       2)
-        SERVER_HOST_V4="$(ip route get 8.8.8.8 | grep src | sed 's/.*src \(.* \)/\1/g' | cut -f1 -d ' ')"
-        if [ -z "${SERVER_HOST_V4}" ]; then
-          echo "Error: IP unable to locate your server's public IP address."
-        fi
-        ;;
-      3)
         read -rp "Custom IPv4:" SERVER_HOST_V4
         if [ -z "${SERVER_HOST_V4}" ]; then
           SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
@@ -433,10 +418,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "How would you like to detect IPv6?"
       echo "  1) Curl (Recommended)"
-      echo "  2) IP (Advanced)"
-      echo "  3) Custom (Advanced)"
-      until [[ "${SERVER_HOST_V6_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IPv6 Choice [1-3]:" -e -i 1 SERVER_HOST_V6_SETTINGS
+      echo "  2) Custom (Advanced)"
+      until [[ "${SERVER_HOST_V6_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "IPv6 Choice [1-2]:" -e -i 1 SERVER_HOST_V6_SETTINGS
       done
       case ${SERVER_HOST_V6_SETTINGS} in
       1)
@@ -446,12 +430,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         ;;
       2)
-        SERVER_HOST_V6="$(ip -6 addr | sed -ne 's|^.* inet6 \([^/]*\)/.* scope global.*$|\1|p' | head -1)"
-        if [ -z "${SERVER_HOST_V6}" ]; then
-          echo "Error: IP unable to locate your server's public IP address."
-        fi
-        ;;
-      3)
         read -rp "Custom IPv6:" SERVER_HOST_V6
         if [ -z "${SERVER_HOST_V6}" ]; then
           SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
@@ -499,9 +477,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What port do you want WireGuard server to listen to?"
       echo "  1) 51820 (Recommended)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1024-65535]"
-      until [[ "${SERVER_PORT_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Port Choice [1-3]:" -e -i 1 SERVER_PORT_SETTINGS
+      until [[ "${SERVER_PORT_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Port Choice [1-2]:" -e -i 1 SERVER_PORT_SETTINGS
       done
       case ${SERVER_PORT_SETTINGS} in
       1)
@@ -518,14 +495,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
         fi
         ;;
-      3)
-        SERVER_PORT=$(shuf -i1024-65535 -n1)
-        if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
-          SERVER_PORT=$(shuf -i1024-65535 -n1)
-        else
-          echo "Random Port: ${SERVER_PORT}"
-        fi
-        ;;
       esac
     fi
   }
@@ -539,9 +508,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What do you want your keepalive interval to be?"
       echo "  1) 25 (Default)"
       echo "  2) Custom (Advanced)"
-      echo "  3) Random [1024-65535]"
-      until [[ "${NAT_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Nat Choice [1-3]:" -e -i 1 NAT_CHOICE_SETTINGS
+      until [[ "${NAT_CHOICE_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Nat Choice [1-2]:" -e -i 1 NAT_CHOICE_SETTINGS
       done
       case ${NAT_CHOICE_SETTINGS} in
       1)
@@ -551,9 +519,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         until [[ "${NAT_CHOICE}" =~ ^[0-9]+$ ]] && [ "${NAT_CHOICE}" -ge 1 ] && [ "${NAT_CHOICE}" -le 65535 ]; do
           read -rp "Custom NAT [1-65535]:" NAT_CHOICE
         done
-        ;;
-      3)
-        NAT_CHOICE=$(shuf -i1024-65535 -n1)
         ;;
       esac
     fi
@@ -567,19 +532,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "What MTU do you want to use?"
       echo "  1) 1280 (Recommended)"
-      echo "  2) 1420"
       echo "  3) Custom (Advanced)"
-      until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "MTU Choice [1-3]:" -e -i 1 MTU_CHOICE_SETTINGS
+      until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "MTU Choice [1-2]:" -e -i 1 MTU_CHOICE_SETTINGS
       done
       case ${MTU_CHOICE_SETTINGS} in
       1)
         MTU_CHOICE="1280"
         ;;
       2)
-        MTU_CHOICE="1420"
-        ;;
-      3)
         until [[ "${MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${MTU_CHOICE}" -ge 1 ] && [ "${MTU_CHOICE}" -le 65535 ]; do
           read -rp "Custom MTU [1-65535]:" MTU_CHOICE
         done
@@ -597,9 +558,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "What IPv do you want to use to connect to the WireGuard server?"
       echo "  1) IPv4 (Recommended)"
       echo "  2) IPv6"
-      echo "  3) Custom (Advanced)"
-      until [[ "${SERVER_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "IP Choice [1-3]:" -e -i 1 SERVER_HOST_SETTINGS
+      until [[ "${SERVER_HOST_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "IP Choice [1-2]:" -e -i 1 SERVER_HOST_SETTINGS
       done
       case ${SERVER_HOST_SETTINGS} in
       1)
@@ -614,12 +574,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           SERVER_HOST="[${SERVER_HOST_V6}]"
         else
           SERVER_HOST="${SERVER_HOST_V4}"
-        fi
-        ;;
-      3)
-        read -rp "Custom IP:" SERVER_HOST
-        if [ -z "${SERVER_HOST}" ]; then
-          SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
         fi
         ;;
       esac
@@ -680,19 +634,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ -f "${WIREGUARD_INTERFACE}" ]; then
       echo "What traffic do you want the client to forward through WireGuard?"
       echo "  1) Everything (Recommended)"
-      echo "  2) Exclude Private IPs"
-      echo "  3) Custom (Advanced)"
-      until [[ "${CLIENT_ALLOWED_IP_SETTINGS}" =~ ^[1-3]$ ]]; do
-        read -rp "Client Allowed IP Choice [1-3]:" -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
+      echo "  2) Custom (Advanced)"
+      until [[ "${CLIENT_ALLOWED_IP_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Client Allowed IP Choice [1-2]:" -e -i 1 CLIENT_ALLOWED_IP_SETTINGS
       done
       case ${CLIENT_ALLOWED_IP_SETTINGS} in
       1)
         CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
         ;;
       2)
-        CLIENT_ALLOWED_IP="0.0.0.0/5,8.0.0.0/7,11.0.0.0/8,12.0.0.0/6,16.0.0.0/4,32.0.0.0/3,64.0.0.0/2,128.0.0.0/3,160.0.0.0/5,168.0.0.0/6,172.0.0.0/12,172.32.0.0/11,172.64.0.0/10,172.128.0.0/9,173.0.0.0/8,174.0.0.0/7,176.0.0.0/4,192.0.0.0/9,192.128.0.0/11,192.160.0.0/13,192.169.0.0/16,192.170.0.0/15,192.172.0.0/14,192.176.0.0/12,192.192.0.0/10,193.0.0.0/8,194.0.0.0/7,196.0.0.0/6,200.0.0.0/5,208.0.0.0/4,::/0,${GATEWAY_ADDRESS_V4}/32"
-        ;;
-      3)
         read -rp "Custom IPs:" CLIENT_ALLOWED_IP
         if [ -z "${CLIENT_ALLOWED_IP}" ]; then
           CLIENT_ALLOWED_IP="0.0.0.0/0,::/0"
@@ -1008,83 +958,85 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if { [ ! -x "$(command -v wg)" ] || [ ! -x "$(command -v qrencode)" ]; }; then
+    if { [ ! -x "$(command -v wg)" ]; }; then
       if { [ -f "${WIREGUARD_INTERFACE}" ] || [ -f "${WIREGUARD_PEER}" ]; }; then
         if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -ge "21" ]; then
           apt-get update
-          apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          apt-get install wireguard -y
         elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -le "20" ]; then
           apt-get update
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
           apt-get update
-          apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          apt-get install wireguard -y
         elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
           apt-get update
-          apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          apt-get install wireguard -y
         elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
           apt-get update
           if { [ "${DISTRO}" == "debian" ] && [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
             if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
               echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
               apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+              apt-get update
             fi
           fi
-          apt-get update
-          apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          apt-get install wireguard -y
         elif [ "${DISTRO}" == "raspbian" ]; then
           apt-get update
           apt-get install dirmngr -y
           if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
             echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+            apt-get update
           fi
-          apt-get update
-          apt-get install wireguard qrencode haveged ifupdown resolvconf -y
+          apt-get install wireguard -y
         elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm --needed haveged qrencode openresolv wireguard-tools
+          pacman -Syu --noconfirm --needed wireguard-tools
         elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -ge "32" ]; then
           dnf update -y
-          dnf install qrencode wireguard-tools haveged resolvconf -y
+          dnf install wireguard-tools -y
         elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -le "31" ]; then
           dnf update -y
           dnf copr enable jdoss/wireguard -y
-          dnf install qrencode wireguard-dkms wireguard-tools haveged resolvconf -y
+          dnf install wireguard-dkms wireguard-tools -y
         elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -ge "8" ]; then
           yum update -y
           yum install elrepo-release epel-release -y
-          yum install kmod-wireguard wireguard-tools qrencode haveged -y
+          yum install kmod-wireguard wireguard-tools -y
         elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -le "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+            yum update -y
           fi
-          yum update -y
-          yum install wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          yum install wireguard-dkms wireguard-tools -y
         elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "8" ]; then
           yum update -y
           yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
           yum update -y
           subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
           yum copr enable jdoss/wireguard
-          yum install epel-release wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          yum install epel-release -y
+          yum install wireguard-dkms wireguard-tools -y
         elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "7" ]; then
           yum update -y
           if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
             curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+            yum update -y
           fi
-          yum update -y
-          yum install epel-release wireguard-dkms wireguard-tools qrencode haveged resolvconf -y
+          yum install epel-release -y
+          yum install wireguard-dkms wireguard-tools -y
         elif [ "${DISTRO}" == "alpine" ]; then
           apk update
-          apk add wireguard-tools libqrencode haveged
+          apk add wireguard-tools
         elif [ "${DISTRO}" == "freebsd" ]; then
           pkg update
-          pkg install wireguard libqrencode
+          pkg install wireguard
         elif { [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
           yum update -y
           yum install elrepo-release epel-release -y
-          yum install kmod-wireguard wireguard-tools qrencode haveged -y
+          yum install kmod-wireguard wireguard-tools -y
         fi
       fi
     fi
@@ -1155,8 +1107,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     max-udp-size: 3072
     access-control: 0.0.0.0/0                 refuse
     access-control: ::0                       refuse
-    access-control: ${PRIVATE_SUBNET_V4}               allow
-    access-control: ${PRIVATE_SUBNET_V6}          allow
+    access-control: ${PRIVATE_SUBNET_V4}                allow
+    access-control: ${PRIVATE_SUBNET_V6}           allow
     access-control: 127.0.0.1                 allow
     access-control: ::1                       allow
     private-address: ${PRIVATE_SUBNET_V4}
@@ -1218,8 +1170,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       SERVER_PUBKEY=$(echo "${SERVER_PRIVKEY}" | wg pubkey)
       CLIENT_PRIVKEY=$(wg genkey)
       CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
-      CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}3"
-      CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}3"
+      CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}3"
+      CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}3"
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
       mkdir -p ${WIREGUARD_CLIENT_PATH}
@@ -1276,7 +1228,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       fi
       ntpq -p
       # Generate QR Code
-      qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+      qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       echo "Client Config --> ${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
     fi
   }
@@ -1371,7 +1323,7 @@ else
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ "${LASTIPV4}" = "" ]; then
+            if [ -z "${LASTIPV4}" ]; then
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge "255" ]; then
@@ -1379,15 +1331,15 @@ else
               exit
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ "${LASTIPV6}" = "" ]; then
+            if [ -z "${LASTIPV6}" ]; then
               LASTIPV6="2"
             fi
             if [ "${LASTIPV6}" -ge "255" ]; then
               echo "Error: You have ${LASTIPV6} peers. The max is 255."
               exit
             fi
-            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-4}$((LASTIPV4 + 1))"
-            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-4}$((LASTIPV6 + 1))"
+            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
+            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
@@ -1411,7 +1363,7 @@ PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
             wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-            qrencode -t ansiutf8 -l L <${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+            qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
             echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
           fi
         fi
@@ -1422,7 +1374,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
             echo "Which WireGuard client do you want to remove?"
             grep start ${WIREGUARD_CONFIG} | awk '{print $2}'
             read -rp "Type in Client Name:" REMOVECLIENT
-            CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk ' { print $3 } ')
+            CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk '{print $3}')
             wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
             sed -i "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
             rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
@@ -1628,8 +1580,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           fi
           if [ -x "$(command -v wg)" ]; then
             unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
-          else
-            exit
           fi
           # Restart WireGuard
           if pgrep systemd-journal; then
