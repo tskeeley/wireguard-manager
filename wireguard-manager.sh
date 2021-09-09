@@ -1327,16 +1327,14 @@ else
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge "255" ]; then
-              echo "Error: You have ${LASTIPV4} peers. The max is 255."
-              exit
+              echo "Go to the next IP range"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if [ -z "${LASTIPV6}" ]; then
               LASTIPV6="2"
             fi
             if [ "${LASTIPV6}" -ge "255" ]; then
-              echo "Error: You have ${LASTIPV6} peers. The max is 255."
-              exit
+              echo "Go to the next IP range"
             fi
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
