@@ -1327,14 +1327,14 @@ else
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge "255" ]; then
-              echo "Go to the next IP range"
+              NEXT_IPV4_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 3)
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if [ -z "${LASTIPV6}" ]; then
               LASTIPV6="2"
             fi
             if [ "${LASTIPV6}" -ge "255" ]; then
-              echo "Go to the next IP range"
+              NEXT_IPV6_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 3)
             fi
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
