@@ -1325,6 +1325,7 @@ else
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if { [ -z "${LASTIPV4}" ] || [ "${LASTIPV4}" -ge "255" ]; }; then
               LASTIPV4="2"
+            fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if { [ -z "${LASTIPV6}" ] || [ "${LASTIPV6}" -ge "255" ]; }; then
               LASTIPV6="2"
