@@ -1323,24 +1323,15 @@ else
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ -z "${LASTIPV4}" ]; then
+            if { [ -z "${LASTIPV4}" ] || [ "${LASTIPV4}" -ge "255" ]; }; then
               LASTIPV4="2"
-            fi
-            if [ "${LASTIPV4}" -ge "255" ]; then
-              CURRENT_IPV4_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 3)
-              NEXT_IPV4_RANGE=$(CURRENT_IPV4_RANGE + 1)
-            else
-              CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
-            fi
+              LASTIPV4="2"
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ -z "${LASTIPV6}" ]; then
+            if { [ -z "${LASTIPV6}" ] || [ "${LASTIPV6}" -ge "255" ]; }; then
               LASTIPV6="2"
             fi
-            if [ "${LASTIPV6}" -ge "255" ]; then
-              NEXT_IPV6_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 3)
-            else
-              CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
-            fi
+            CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
+            CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
