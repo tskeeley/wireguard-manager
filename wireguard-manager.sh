@@ -1313,10 +1313,15 @@ else
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge 255 ]; then
-              CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
-              NEXT_IP_RANGE=$((CURRENT_IPV4_RANGE + 1))
-              sed -i "1s/${CURRENT_IPV4_RANGE}/${NEXT_IP_RANGE}/3" ${WIREGUARD_CONFIG}
+              THIRD_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
+              NEXT_IP_RANGE=$((THIRD_IP_IN_RANGE + 1))
+              sed -i "1s/${THIRD_IP_IN_RANGE}/${NEXT_IP_RANGE}/3" ${WIREGUARD_CONFIG}
               LASTIPV4="2"
+              SECOND_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
+              if [ "${SECOND_IP_IN_RANGE}" -ge 255 ]; then
+                NEXT_IP_RANGE=$((SECOND_IP_IN_RANGE + 1))
+                sed -i "1s/${SECOND_IP_IN_RANGE}/${NEXT_IP_RANGE}/2" ${WIREGUARD_CONFIG}
+              fi
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if [ -z "${LASTIPV6}" ]; then
