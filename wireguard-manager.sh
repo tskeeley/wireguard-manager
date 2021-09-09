@@ -1327,7 +1327,7 @@ else
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge "255" ]; then
-              NEXT_IPV4_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 3)
+              NEXT_IPV4_RANGE=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if [ -z "${LASTIPV6}" ]; then
