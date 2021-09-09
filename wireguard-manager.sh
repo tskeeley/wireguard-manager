@@ -1328,7 +1328,7 @@ else
               LASTIPV6="2"
             fi
             if [ "${LASTIPV6}" -ge 255 ]; then
-              #
+              echo "Change it here"
             fi
             CLIENT_PRIVKEY=$(wg genkey)
             CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
