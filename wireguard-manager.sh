@@ -1315,7 +1315,8 @@ else
             if [ "${LASTIPV4}" -ge 255 ]; then
               CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
               NEXT_IP_RANGE=$((CURRENT_IPV4_RANGE + 1))
-              echo "Replace it here."
+              sed -i "s/${CURRENT_IPV4_RANGE}/${NEXT_IP_RANGE}/3" ${WIREGUARD_CONFIG}
+              LASTIPV4="2"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
             if [ -z "${LASTIPV6}" ]; then
