@@ -1308,6 +1308,22 @@ else
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
             fi
+            LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            if [ -z "${LASTIPV4}" ]; then
+              LASTIPV4="2"
+            fi
+            if [ "${LASTIPV4}" -ge 255 ]; then
+              CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
+              NEXT_IP_RANGE=$((CURRENT_IPV4_RANGE + 1))
+              echo "Replace it here."
+            fi
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            if [ -z "${LASTIPV6}" ]; then
+              LASTIPV6="2"
+            fi
+            if [ "${LASTIPV6}" -ge 255 ]; then
+              #
+            fi
             CLIENT_PRIVKEY=$(wg genkey)
             CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
             PRESHARED_KEY=$(wg genpsk)
@@ -1322,14 +1338,6 @@ else
             MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $7}')
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
-            LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if { [ -z "${LASTIPV4}" ] || [ "${LASTIPV4}" -ge "255" ]; }; then
-              LASTIPV4="2"
-            fi
-            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if { [ -z "${LASTIPV6}" ] || [ "${LASTIPV6}" -ge "255" ]; }; then
-              LASTIPV6="2"
-            fi
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
