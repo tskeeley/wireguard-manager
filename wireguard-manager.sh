@@ -1329,7 +1329,7 @@ else
                 NEXT_IP_RANGE=$((SECOND_IP_IN_RANGE + 1))
                 FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1)".${NEXT_IP_RANGE}.${IP_AFTER_FIRST}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
               fi
-              sed "1s|${CURRENT_IP_RANGE}|${FINAL_IP_RANGE}|" ${WIREGUARD_CONFIG}
+              sed -i "1s|${CURRENT_IP_RANGE}|${FINAL_IP_RANGE}|" ${WIREGUARD_CONFIG}
               LASTIPV4="2"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
@@ -1339,7 +1339,6 @@ else
             if [ "${LASTIPV6}" -ge 255 ]; then
               LASTIPV6="2"
             fi
-            exit
             CLIENT_PRIVKEY=$(wg genkey)
             CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
             PRESHARED_KEY=$(wg genpsk)
