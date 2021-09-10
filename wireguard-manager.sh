@@ -1317,7 +1317,9 @@ else
               THIRD_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
               NEXT_IP_RANGE=$((THIRD_IP_IN_RANGE + 1))
               CURRENT_IP_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
-              FINAL_IP_RANGE=$(echo ${CURRENT_IP_RANGE} | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.0/${CURRENT_IP_RANGE_CIDR}"
+              IP_BEFORE_BACKSLASH=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
+              FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
+              # Change this.
               sed -i "1s/${CURRENT_IP_RANGE}/${FINAL_IP_RANGE}/" ${WIREGUARD_CONFIG}
               LASTIPV4="2"
             fi
