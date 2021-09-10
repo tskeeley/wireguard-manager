@@ -1316,9 +1316,9 @@ else
               CURRENT_IP_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
               THIRD_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
               NEXT_IP_RANGE=$((THIRD_IP_IN_RANGE + 1))
-              FINAL_IP_RANGE=$(echo ${CURRENT_IP_RANGE} | sed "s/\(.*\)\(${THIRD_IP_IN_RANGE}\)\(.*\)/\1${NEXT_IP_RANGE}\3/")
-              echo $FINAL_IP_RANGE
-              #sed -i "1s/${THIRD_IP_IN_RANGE}/${NEXT_IP_RANGE}/3" ${WIREGUARD_CONFIG}
+              CURRENT_IP_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
+              FINAL_IP_RANGE=$(echo ${CURRENT_IP_RANGE} | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.0/${CURRENT_IP_RANGE_CIDR}"
+              sed -i "1s/${CURRENT_IP_RANGE}/${FINAL_IP_RANGE}/" ${WIREGUARD_CONFIG}
               LASTIPV4="2"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
