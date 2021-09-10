@@ -1303,6 +1303,44 @@ else
             if [ -z "${NEW_CLIENT_NAME}" ]; then
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
             fi
+            LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            if { [ -z "${LASTIPV4}" ] || [ -z "${LASTIPV6}" ]; }; then
+              LASTIPV4="2"
+              LASTIPV6="2"
+            fi
+            if { [ "${LASTIPV4}" -ge 255 ] || [ "${LASTIPV6}" -ge 255 ]; }; then
+              CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+              CURRENT_IPV6_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}')
+              IPV4_BEFORE_BACKSLASH=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
+              IPV6_BEFORE_BACKSLASH=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f 1 | cut -d ":" -f 5)
+              IPV4_AFTER_FIRST=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 2)
+              IPV6_AFTER_FIRST=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f 1 | cut -d ":" -f 2)
+              SECOND_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
+              SECOND_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f 1 | cut -d ":" -f 2)
+              THIRD_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
+              THIRD_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f 1 | cut -d ":" -f 3)
+              NEXT_IPV4_RANGE=$((THIRD_IPV4_IN_RANGE + 1))
+              NEXT_IPV6_RANGE=$((THIRD_IPV6_IN_RANGE + 1))
+              CURRENT_IPV4_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
+              CURRENT_IPV6_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f 2)
+              FINAL_IPV4_RANGE=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IPV4_RANGE}.${IPV4_BEFORE_BACKSLASH}/${CURRENT_IPV4_RANGE_CIDR}"
+              FINAL_IPV6_RANGE=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f 1 | cut -d ":" -f 1,2)":${NEXT_IPV6_RANGE}::${IPV6_BEFORE_BACKSLASH}/${CURRENT_IPV6_RANGE_CIDR}"
+              if { [ "${THIRD_IPV4_IN_RANGE}" -ge 255 ] || [ "${THIRD_IPV6_IN_RANGE}" -ge 255 ]; }; then
+                if { [ "${SECOND_IPV4_IN_RANGE}" -ge 255 ] && [ "${SECOND_IPV6_IN_RANGE}" -ge 255 ] && [ "${THIRD_IPV4_IN_RANGE}" -ge 255 ] && [ "${THIRD_IPV6_IN_RANGE}" -ge 255 ] && [ "${LASTIPV4}" -ge 255 ] && [ "${LASTIPV6}" -ge 255 ]; }; then
+                  echo "Error: You are unable to add any more peers."
+                  exit
+                fi
+                NEXT_IPV4_RANGE=$((SECOND_IPV4_IN_RANGE + 1))
+                NEXT_IPV6_RANGE=$((SECOND_IPV6_IN_RANGE + 1))
+                FINAL_IPV4_RANGE=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1)".${NEXT_IPV4_RANGE}.${IPV4_AFTER_FIRST}.${IPV4_BEFORE_BACKSLASH}/${CURRENT_IPV4_RANGE_CIDR}"
+                FINAL_IPV6_RANGE=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f 1 | cut -d ":" -f 1)":${NEXT_IPV6_RANGE}:${IPV6_AFTER_FIRST}::${IPV6_BEFORE_BACKSLASH}/${CURRENT_IPV6_RANGE_CIDR}"
+              fi
+              sed -i "1s|${CURRENT_IPV4_RANGE}|${FINAL_IPV4_RANGE}|" ${WIREGUARD_CONFIG}
+              sed -i "1s|${CURRENT_IPV6_RANGE}|${FINAL_IPV6_RANGE}|" ${WIREGUARD_CONFIG}
+              LASTIPV4="2"
+              LASTIPV6="2"
+            fi
             CLIENT_PRIVKEY=$(wg genkey)
             CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
             PRESHARED_KEY=$(wg genpsk)
@@ -1317,22 +1355,6 @@ else
             MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $7}')
             NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
             CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
-            LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ -z "${LASTIPV4}" ]; then
-              LASTIPV4="2"
-            fi
-            if [ "${LASTIPV4}" -ge "255" ]; then
-              echo "Error: You have ${LASTIPV4} peers. The max is 255."
-              exit
-            fi
-            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            if [ -z "${LASTIPV6}" ]; then
-              LASTIPV6="2"
-            fi
-            if [ "${LASTIPV6}" -ge "255" ]; then
-              echo "Error: You have ${LASTIPV6} peers. The max is 255."
-              exit
-            fi
             CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}$((LASTIPV4 + 1))"
             CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}$((LASTIPV6 + 1))"
             echo "# ${NEW_CLIENT_NAME} start
@@ -1610,7 +1632,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -z "${NEW_SERVER_HOST}" ]; then
             echo "Error: While attempting to locate your IP address, an error occurred."
           fi
-          sed -i "s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/g" ${WIREGUARD_CONFIG}
+          sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
         fi
         ;;
       14)
