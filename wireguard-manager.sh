@@ -1313,23 +1313,23 @@ else
               LASTIPV4="2"
             fi
             if [ "${LASTIPV4}" -ge 255 ]; then
-              CURRENT_IP_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
-              IP_BEFORE_BACKSLASH=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
-              IP_AFTER_FIRST=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 2)
-              SECOND_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
-              THIRD_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
-              NEXT_IP_RANGE=$((THIRD_IP_IN_RANGE + 1))
-              CURRENT_IP_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
-              FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
-              if [ "${THIRD_IP_IN_RANGE}" -ge 255 ]; then
-                if { [ "${SECOND_IP_IN_RANGE}" -ge 255 ] && [ "${THIRD_IP_IN_RANGE}" -ge 255 ] && [ "${LASTIPV4}" -ge 255 ]; }; then
+              CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+              IPV4_BEFORE_BACKSLASH=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
+              IPV6_AFTER_FIRST=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 2)
+              SECOND_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
+              THIRD_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
+              NEXT_IPV4_RANGE=$((THIRD_IPV6_IN_RANGE + 1))
+              CURRENT_IPV4_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
+              FINAL_IPV4_RANGE=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IPV4_RANGE}.${IPV4_BEFORE_BACKSLASH}/${CURRENT_IPV4_RANGE_CIDR}"
+              if [ "${THIRD_IPV6_IN_RANGE}" -ge 255 ]; then
+                if { [ "${SECOND_IPV6_IN_RANGE}" -ge 255 ] && [ "${THIRD_IPV6_IN_RANGE}" -ge 255 ] && [ "${LASTIPV4}" -ge 255 ]; }; then
                   echo "Error: You are unable to add any more peers."
                   exit
                 fi
-                NEXT_IP_RANGE=$((SECOND_IP_IN_RANGE + 1))
-                FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1)".${NEXT_IP_RANGE}.${IP_AFTER_FIRST}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
+                NEXT_IPV4_RANGE=$((SECOND_IPV6_IN_RANGE + 1))
+                FINAL_IPV4_RANGE=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1)".${NEXT_IPV4_RANGE}.${IPV6_AFTER_FIRST}.${IPV4_BEFORE_BACKSLASH}/${CURRENT_IPV4_RANGE_CIDR}"
               fi
-              sed -i "1s|${CURRENT_IP_RANGE}|${FINAL_IP_RANGE}|" ${WIREGUARD_CONFIG}
+              sed -i "1s|${CURRENT_IPV4_RANGE}|${FINAL_IPV4_RANGE}|" ${WIREGUARD_CONFIG}
               LASTIPV4="2"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
