@@ -1304,7 +1304,7 @@ else
               NEW_CLIENT_NAME="$(openssl rand -hex 50)"
             fi
             LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
+            LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d ":" -f 5 | cut -d "/" -f 1)
             if { [ -z "${LASTIPV4}" ] || [ -z "${LASTIPV6}" ]; }; then
               LASTIPV4="2"
               LASTIPV6="2"
