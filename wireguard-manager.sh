@@ -1322,7 +1322,7 @@ else
               FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
               if [ "${THIRD_IP_IN_RANGE}" -ge 255 ]; then
                 SECOND_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
-                if [ "${SECOND_IP_IN_RANGE}" -ge 255 ]; then
+                if { [ "${SECOND_IP_IN_RANGE}" -ge 255 ] && [ "${THIRD_IP_IN_RANGE}" -ge 255 ] && [ "${LASTIPV4}" -ge 255 ]; }; then
                   echo "You are unable to add any more peers."
                   exit
                 fi
