@@ -1314,13 +1314,23 @@ else
             fi
             if [ "${LASTIPV4}" -ge 255 ]; then
               CURRENT_IP_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+              IP_BEFORE_BACKSLASH=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
+              IP_AFTER_FIRST=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 2)
               THIRD_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 3)
               NEXT_IP_RANGE=$((THIRD_IP_IN_RANGE + 1))
               CURRENT_IP_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 2)
-              IP_BEFORE_BACKSLASH=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 4)
               FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1,2)".${NEXT_IP_RANGE}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
-              # Change this.
-              sed -i "1s/${CURRENT_IP_RANGE}/${FINAL_IP_RANGE}/" ${WIREGUARD_CONFIG}
+              #sed "1s/${CURRENT_IP_RANGE}/${FINAL_IP_RANGE}/" ${WIREGUARD_CONFIG}
+              if [ "${THIRD_IP_IN_RANGE}" -ge 255 ]; then
+                SECOND_IP_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f 1 | cut -d "." -f 2)
+                if [ "${SECOND_IP_IN_RANGE}" -ge 255 ]; then
+                  echo "You are unable to add any more peers."
+                  exit
+                fi
+                NEXT_IP_RANGE=$((SECOND_IP_IN_RANGE + 1))
+                FINAL_IP_RANGE=$(echo "${CURRENT_IP_RANGE}" | cut -d "/" -f 1 | cut -d "." -f 1)".${NEXT_IP_RANGE}.${IP_AFTER_FIRST}.${IP_BEFORE_BACKSLASH}/${CURRENT_IP_RANGE_CIDR}"
+                #sed "1s/${CURRENT_IP_RANGE}/${FINAL_IP_RANGE}/" ${WIREGUARD_CONFIG}
+              fi
               LASTIPV4="2"
             fi
             LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
@@ -1328,8 +1338,9 @@ else
               LASTIPV6="2"
             fi
             if [ "${LASTIPV6}" -ge 255 ]; then
-              echo "Change it here"
+              LASTIPV6="2"
             fi
+            exit
             CLIENT_PRIVKEY=$(wg genkey)
             CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
             PRESHARED_KEY=$(wg genpsk)
