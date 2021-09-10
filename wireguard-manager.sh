@@ -1616,7 +1616,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           if [ -z "${NEW_SERVER_HOST}" ]; then
             echo "Error: While attempting to locate your IP address, an error occurred."
           fi
-          sed -i "s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
+          sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
         fi
         ;;
       14)
