@@ -142,7 +142,7 @@ previous-wireguard-installation
 function validate-dns-server() {
   if [ -f "${RESOLV_CONFIG}" ]; then
     sed -i "/^#/d" ${RESOLV_CONFIG}
-    if grep -q "nameserver" ${RESOLV_CONFIG}; then
+    if ! grep -q "nameserver" ${RESOLV_CONFIG}; then
       echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
     fi
   else
