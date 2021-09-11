@@ -140,11 +140,13 @@ previous-wireguard-installation
 
 # Verify that the system has DNS server.
 function validate-dns-server() {
-  if [ ! $(grep -q "nameserver" "${RESOLV_CONFIG}") ]; then
+  if [ -f "${RESOLV_CONFIG}" ]; then
+    sed -i "/^#/d" ${RESOLV_CONFIG}
+    if grep -q "nameserver" ${RESOLV_CONFIG}; then
+      echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
+    fi
+  else
     echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
-    echo "nameserver 1.0.0.1" >>${RESOLV_CONFIG}
-    echo "nameserver 2606:4700:4700::1111" >>${RESOLV_CONFIG}
-    echo "nameserver 2606:4700:4700::1001" >>${RESOLV_CONFIG}
   fi
 }
 
