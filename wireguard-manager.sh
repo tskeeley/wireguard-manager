@@ -161,6 +161,7 @@ function interface-or-peer() {
       if [ ! -f "${WIREGUARD_INTERFACE}" ]; then
         echo "WireGuard Interface: true" >>${WIREGUARD_INTERFACE}
       fi
+      echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
       ;;
     2)
       if [ -d "${WIREGUARD_PATH}" ]; then
@@ -175,6 +176,7 @@ function interface-or-peer() {
       if [ ! -f "${WIREGUARD_PEER}" ]; then
         echo "WireGuard Peer: true" >>${WIREGUARD_PEER}
       fi
+      echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
       ;;
     esac
   fi
