@@ -138,6 +138,18 @@ function previous-wireguard-installation() {
 # Run the function to eliminate old installation or another installer
 previous-wireguard-installation
 
+# Verify that the system has DNS server.
+function validate-dns-server() {
+  if [ ! $(grep -q "nameserver" "${RESOLV_CONFIG}") ]; then
+    echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
+    echo "nameserver 1.0.0.1" >>${RESOLV_CONFIG}
+    echo "nameserver 2606:4700:4700::1111" >>${RESOLV_CONFIG}
+    echo "nameserver 2606:4700:4700::1001" >>${RESOLV_CONFIG}
+  fi
+}
+
+validate-dns-server
+
 # Which would you like to install interface or peer?
 function interface-or-peer() {
   if [ ! -f "${WIREGUARD_MANAGER}" ]; then
@@ -161,7 +173,6 @@ function interface-or-peer() {
       if [ ! -f "${WIREGUARD_INTERFACE}" ]; then
         echo "WireGuard Interface: true" >>${WIREGUARD_INTERFACE}
       fi
-      echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
       ;;
     2)
       if [ -d "${WIREGUARD_PATH}" ]; then
@@ -176,7 +187,6 @@ function interface-or-peer() {
       if [ ! -f "${WIREGUARD_PEER}" ]; then
         echo "WireGuard Peer: true" >>${WIREGUARD_PEER}
       fi
-      echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
       ;;
     esac
   fi
