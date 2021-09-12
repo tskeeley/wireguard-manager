@@ -821,7 +821,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-unbound() {
     if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
       if [ ! -x "$(command -v unbound)" ]; then
-        apt-get install unbound unbound-host e2fsprogs -y
+        apt-get install unbound unbound-host -y
         if [ -f "${UNBOUND_ANCHOR}" ]; then
           rm -f ${UNBOUND_ANCHOR}
         fi
