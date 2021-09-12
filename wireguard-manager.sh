@@ -31,10 +31,10 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if [ ! -x "$(command -v curl)" ]; then
+  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v pgrep)" ]; }; then
     if { [ ${DISTRO} == ${ALLOWED_DISTRO} ] && [ ${DISTRO_VERSION} == ${ALLOWED_DISTRO_VERSION} ]; }; then
       apt-get update
-      apt-get install curl -y
+      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep -y
     else
       echo "Error: ${DISTRO} is not supported."
       exit
@@ -1124,30 +1124,35 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
       ;;
     8) # Uninstall WireGuard and purging files
-      if [ -x "$(command -v wg)" ]; then
-        if pgrep systemd-journal; then
-          systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-          systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-          wg-quick down ${WIREGUARD_PUB_NIC}
-        else
-          service wg-quick@${WIREGUARD_PUB_NIC} disable
-          service wg-quick@${WIREGUARD_PUB_NIC} stop
-          wg-quick down ${WIREGUARD_PUB_NIC}
+      if pgrep systemd-journal; then
+        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        wg-quick down ${WIREGUARD_PUB_NIC}
+      else
+        service wg-quick@${WIREGUARD_PUB_NIC} disable
+        service wg-quick@${WIREGUARD_PUB_NIC} stop
+        wg-quick down ${WIREGUARD_PUB_NIC}
+      fi
+      # Removing Wireguard Files
+      if [ -d "${WIREGUARD_PATH}" ]; then
+        rm -rf ${WIREGUARD_PATH}
+      fi
+      if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
+        rm -rf ${WIREGUARD_CLIENT_PATH}
+      fi
+      if [ -f "${WIREGUARD_CONFIG}" ]; then
+        rm -f ${WIREGUARD_CONFIG}
+      fi
+      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
+        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
+      fi
+      apt-get remove --purge wireguard -y
+      # Delete WireGuard backup
+      if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+        rm -f ${WIREGUARD_CONFIG_BACKUP}
+        if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
+          rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
         fi
-        # Removing Wireguard Files
-        if [ -d "${WIREGUARD_PATH}" ]; then
-          rm -rf ${WIREGUARD_PATH}
-        fi
-        if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
-          rm -rf ${WIREGUARD_CLIENT_PATH}
-        fi
-        if [ -f "${WIREGUARD_CONFIG}" ]; then
-          rm -f ${WIREGUARD_CONFIG}
-        fi
-        if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-          rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-        fi
-        apt-get remove --purge wireguard qrencode -y
       fi
       # Uninstall Unbound
       if [ -x "$(command -v unbound)" ]; then
@@ -1180,25 +1185,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           rm -f ${UNBOUND_CONFIG}
         fi
       fi
-      # Delete WireGuard backup
-      if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-        rm -f ${WIREGUARD_CONFIG_BACKUP}
-        if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-          rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
-        fi
-      fi
-      # Delete crontab
-      if [ -x "$(command -v cron)" ]; then
-        # If any cronjobs are identified, they should be removed.
-        crontab -l | grep -v "$(realpath "$0")" | crontab -
-      fi
+      # If any cronjobs are identified, they should be removed.
+      crontab -l | grep -v "$(realpath "$0")" | crontab -
       ;;
     9) # Update the script
       CURRENT_FILE_PATH="$(realpath "$0")"
-      if [ -f "${CURRENT_FILE_PATH}" ]; then
-        curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
-        chmod +x "${CURRENT_FILE_PATH}"
-      fi
+      curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
+      chmod +x "${CURRENT_FILE_PATH}"
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
@@ -1231,7 +1224,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if [ -f "${WIREGUARD_MANAGER}" ]; then
           BACKUP_PASSWORD="$(openssl rand -hex 25)"
           echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
-          zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG} ${WIREGUARD_MANAGER} ${WIREGUARD_INTERFACE} ${WIREGUARD_PEER}
+          zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
         fi
       fi
       ;;
@@ -1239,9 +1232,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -d "${WIREGUARD_PATH}" ]; then
         rm -rf ${WIREGUARD_PATH}
       fi
-      if [ -x "$(command -v wg)" ]; then
-        unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
-      fi
+      unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
       if pgrep systemd-journal; then
         systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
@@ -1256,11 +1247,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
       TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
       TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
-      if [ -x "$(command -v wg)" ]; then
-        if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
-          if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
-            curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
-          fi
+      if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
+        if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
+          curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
         fi
       fi
       ;;
