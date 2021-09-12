@@ -18,10 +18,11 @@ function system-information() {
     # shellcheck disable=SC1091
     source /etc/os-release
     DISTRO=${ID}
-    DISTRO_VERSION=${VERSION_ID}
-    CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
     ALLOWED_DISTRO="debian"
-    ALLOWED_DISTRO_VERSION="7.0"
+    DISTRO_VERSION=${VERSION_ID}
+    ALLOWED_DISTRO_VERSION="11"
+    DISTRO_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
+    ALLOWED_DISTRO_KERNEL_VERSION="5.10"
   fi
 }
 
@@ -57,8 +58,8 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-  if [ ${CURRENT_KERNEL_VERSION} != ${ALLOWED_DISTRO_VERSION} ]; then
-    echo "Error: Kernel version is not ${ALLOWED_DISTRO_VERSION}"
+  if [ ${DISTRO_KERNEL_VERSION} != ${ALLOWED_DISTRO_KERNEL_VERSION} ]; then
+    echo "Error: Kernel version is not ${DISTRO_KERNEL_VERSION}"
     exit
   fi
 }
