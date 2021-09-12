@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:11
 LABEL maintainer="John Doe <johndoe@example.com>"
 EXPOSE 51820/udp
 EXPOSE 53/udp
