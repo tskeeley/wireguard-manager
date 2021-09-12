@@ -553,10 +553,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * $(realpath "$0") --update"
       } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
+      if ! pgrep systemd-journal; then
         service cron enable
         service cron start
       fi
@@ -584,10 +581,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * $(realpath "$0") --backup"
       } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
+      if ! pgrep systemd-journal; then
         service cron enable
         service cron start
       fi
@@ -634,10 +628,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "* * * * * $(realpath "$0") --notification"
       } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
+      if ! pgrep systemd-journal; then
         service cron enable
         service cron start
       fi
@@ -766,10 +757,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 1 1 * $(realpath "$0") --purge"
       } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
+      if ! pgrep systemd-journal; then
         service cron enable
         service cron start
       fi
@@ -779,10 +767,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 1 */6 * $(realpath "$0") --purge"
       } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
+      if ! pgrep systemd-journal; then
         service cron enable
         service cron start
       fi
@@ -885,10 +870,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           rm -f ${UNBOUND_CONFIG_HOST_TMP}
         fi
         # restart unbound
-        if pgrep systemd-journal; then
-          systemctl reenable unbound
-          systemctl restart unbound
-        else
+        if ! pgrep systemd-journal; then
           service unbound enable
           service unbound restart
         fi
@@ -951,10 +933,7 @@ PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     # Service Restart
-    if pgrep systemd-journal; then
-      systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-      systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-    else
+    if ! pgrep systemd-journal; then
       service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
@@ -995,27 +974,19 @@ else
       wg show
       ;;
     2) # Enable & Start WireGuard
-      if pgrep systemd-journal; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      if ! pgrep systemd-journal; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
       fi
       ;;
     3) # Disable & Stop WireGuard
-      if pgrep systemd-journal; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      if ! pgrep systemd-journal; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       ;;
     4) # Restart WireGuard
-      if pgrep systemd-journal; then
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      if ! pgrep systemd-journal; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1120,15 +1091,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
     7) # Reinstall WireGuard
       dpkg-reconfigure wireguard-dkms
       modprobe wireguard
-      systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-      systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      service reenable wg-quick@${WIREGUARD_PUB_NIC}
+      service restart wg-quick@${WIREGUARD_PUB_NIC}
       ;;
     8) # Uninstall WireGuard and purging files
-      if pgrep systemd-journal; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-        wg-quick down ${WIREGUARD_PUB_NIC}
-      else
+      if ! pgrep systemd-journal; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
         wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1156,10 +1123,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Uninstall Unbound
       if [ -x "$(command -v unbound)" ]; then
-        if pgrep systemd-journal; then
-          systemctl disable unbound
-          systemctl stop unbound
-        else
+        if ! pgrep systemd-journal; then
           service unbound disable
           service unbound stop
         fi
@@ -1206,9 +1170,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           rm -f ${UNBOUND_CONFIG_HOST_TMP}
         fi
         # Once everything is completed, restart the service.
-        if pgrep systemd-journal; then
-          systemctl restart unbound
-        else
+        if ! pgrep systemd-journal; then
           service unbound restart
         fi
       fi
@@ -1234,10 +1196,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
-      if pgrep systemd-journal; then
-        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      if ! pgrep systemd-journal; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
@@ -1247,7 +1206,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
       TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
       TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
-      if [ "$(systemctl is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
+      if [ "$(service is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
         if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
           curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
         fi
