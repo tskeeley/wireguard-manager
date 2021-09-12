@@ -32,7 +32,7 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v nftables)" ]; }; then
-    if { [ ${DISTRO} == ${ALLOWED_DISTRO} ] && [ ${DISTRO_VERSION} == ${ALLOWED_DISTRO_VERSION} ]; }; then
+    if { [ "${DISTRO}" == ${ALLOWED_DISTRO} ] && [ "${DISTRO_VERSION}" == ${ALLOWED_DISTRO_VERSION} ]; }; then
       apt-get update
       apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown nftables -y
     else
@@ -58,7 +58,7 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-  if [ ${DISTRO_KERNEL_VERSION} != ${ALLOWED_DISTRO_KERNEL_VERSION} ]; then
+  if [ "${DISTRO_KERNEL_VERSION}" != ${ALLOWED_DISTRO_KERNEL_VERSION} ]; then
     echo "Error: Kernel version is not ${DISTRO_KERNEL_VERSION}"
     exit
   fi
@@ -783,8 +783,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
-    CHECK_KERNEL_HEADERS=$(ls -l /usr/src/linux-headers-$(uname -r))
-    if [ ! ${CHECK_KERNEL_HEADERS} ]; then
+    CHECK_KERNEL_HEADERS=$(ls -l /usr/src/linux-headers-"$(uname -r)")
+    if [ ! "${CHECK_KERNEL_HEADERS}" ]; then
       echo "Kernel headers are not installed. Installing now."
     fi
   }
