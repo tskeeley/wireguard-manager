@@ -36,30 +36,12 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 🌲 Prerequisite
-- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky
-- Linux `Kernel 3.1` or newer
-- You will need superuser access or a user account with `sudo` privilege.
-- Docker `Kernel 5.6` or newer
+- Docker
+- Debian
+- Linux Kernel `5.10`
 
 ---
-### 🐧 Installation
-#### Instance Installation
-Lets first use `curl` and save the file in `/usr/local/bin/`
-```
-curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
-```
-Then let's make the script user executable
-```
-chmod +x /usr/local/bin/wireguard-manager.sh
-```
-It's finally time to execute the script
-```
-bash /usr/local/bin/wireguard-manager.sh
-```
-
-In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
-
-#### 🐳 Docker Installation
+### 🐳 Building Docker Container
 Let's download the docker file and construct it from there.
 ```
 docker build -t wireguard-manager https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
@@ -68,6 +50,12 @@ Let's start by constructing the docker container and then connecting to it.
 ```
 docker run -it --name wireguard-manager-running wireguard-manager
 ```
+It's finally time to execute the script
+```
+bash /usr/local/bin/wireguard-manager.sh
+```
+
+In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
 ---
 ### 💣 After Installation
@@ -138,28 +126,8 @@ usage: ./wireguard-manager.sh <command>
 ### 👉👈 Compatibility with Linux Distro
 | OS              | i386               | amd64              | armhf              | arm64              |
 | --------------  | ------------------ | ------------------ | ------------------ | ------------------ |
-| Ubuntu 14 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
-| Ubuntu 16 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Debian 7 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
-| Debian 8 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| CentOS 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
-| CentOS 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Fedora 29 ≤     |:x:                 |:x:                 |:x:                 |:x:                 |
-| Fedora 30 ≥     |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| RedHat 6 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
-| RedHat 7 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Kali 1.0 ≤      |:x:                 |:x:                 |:x:                 |:x:                 |
-| Kali 1.1 ≥      |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Arch            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Raspbian        |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| PopOS           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Manjaro         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Mint            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Alma            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Alpine          |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| FreeBSD         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Neon            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| Rocky           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Debian 11       |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
@@ -180,18 +148,12 @@ usage: ./wireguard-manager.sh <command>
 ### 🛡️ Compatibility with Virtualization
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
-| KVM             |:heavy_check_mark:  |
-| LXC             |:x:                 |
-| OpenVZ          |:x:                 |
 | Docker          |:heavy_check_mark:  |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
 | ---------------------  | ---------------------  |
-| Linux Kernel 3.0 ≤     |:x:                     |
-| Linux Kernel 3.1 ≥     |:heavy_check_mark:      |
-| Docker Kernel 5.5 ≤    |:x:                     |
-| Docker Kernel 5.6 ≥    |:heavy_check_mark:      |
+| Docker Kernel 5.10     |:heavy_check_mark:      |
 
 ---
 ### 🙋 Q&A
