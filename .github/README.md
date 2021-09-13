@@ -118,8 +118,8 @@ usage: ./wireguard-manager.sh <command>
 
 ---
 ### 💡 Options
-* `PRIVATE_SUBNET_V4` - By default, the private IPv4 subnet configuration is `10.8.0.0/24`.
-* `PRIVATE_SUBNET_V6` - `fd42:42:42::0/64` is the default private IPv6 subnet.
+* `PRIVATE_SUBNET_V4` - By default, the private IPv4 subnet configuration is `10.0.0.0/8`.
+* `PRIVATE_SUBNET_V6` - `fd00:00:00::0/8` is the default private IPv6 subnet.
 * `SERVER_HOST_V4` - Curl detects a public IPv4 address by default.
 * `SERVER_HOST_V6` - Curl by default finds a public IPv6 address.
 * `SERVER_PUB_NIC` - Using the ip command, to find the local public network interface.
