@@ -1693,4 +1693,3 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
   wireguard-next-questions-interface
 
 fi
-=
