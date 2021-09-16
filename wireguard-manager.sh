@@ -429,7 +429,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function mtu-set() {
     echo "What MTU do you want to use?"
     echo "  1) 1280 (Recommended)"
-    echo "  3) Custom (Advanced)"
+    echo "  2) Custom (Advanced)"
     until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-2]$ ]]; do
       read -rp "MTU Choice [1-2]:" -e -i 1 MTU_CHOICE_SETTINGS
     done
