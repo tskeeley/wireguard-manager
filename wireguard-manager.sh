@@ -1650,7 +1650,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
           NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
           if [ -z "${NEW_SERVER_HOST}" ]; then
-            echo "Error: While attempting to locate your IP address, an error occurred."
+            NEW_SERVER_HOST="$(curl -4 -s 'https://checkip.amazonaws.com')"
           fi
           sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
         fi
