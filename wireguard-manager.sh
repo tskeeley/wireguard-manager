@@ -17,12 +17,12 @@ function system-information() {
   if [ -f /etc/os-release ]; then
     # shellcheck disable=SC1091
     source /etc/os-release
-    DISTRO=${ID}
+    CURRENT_DISTRO=${ID}
     ALLOWED_DISTRO="debian"
-    DISTRO_VERSION=${VERSION_ID}
+    CURRENT_DISTRO_VERSION=${VERSION_ID}
     ALLOWED_DISTRO_VERSION="11"
-    DISTRO_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-    ALLOWED_DISTRO_KERNEL_VERSION="5.10"
+    CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
+    ALLOWED_KERNEL_VERSION="5.10"
   fi
 }
 
@@ -32,11 +32,11 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ]; }; then
-    if { [ "${DISTRO}" == ${ALLOWED_DISTRO} ] && [ "${DISTRO_VERSION}" == ${ALLOWED_DISTRO_VERSION} ]; }; then
+    if [ "${CURRENT_DISTRO}" == ${ALLOWED_DISTRO} ]; then
       apt-get update
       apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables iptables-persistent-y
     else
-      echo "Error: ${DISTRO} is not supported."
+      echo "Error: ${CURRENT_DISTRO} is not supported."
       exit
     fi
   fi
@@ -48,7 +48,7 @@ installing-system-requirements
 # Check for docker stuff
 function docker-check() {
   if [ ! -f "/.dockerenv" ]; then
-    echo "Error: Not running in docker."
+    echo "Error: Wireguard-manager is"
     exit
   fi
 }
@@ -58,8 +58,8 @@ docker-check
 
 # Lets check the kernel version
 function kernel-check() {
-  if [ "${DISTRO_KERNEL_VERSION}" != ${ALLOWED_DISTRO_KERNEL_VERSION} ]; then
-    echo "Error: Kernel version is not ${DISTRO_KERNEL_VERSION}"
+  if [ "${CURRENT_KERNEL_VERSION}" != ${ALLOWED_KERNEL_VERSION} ]; then
+    echo "Error: Kernel version is not ${ALLOWED_KERNEL_VERSION}"
     exit
   fi
 }
