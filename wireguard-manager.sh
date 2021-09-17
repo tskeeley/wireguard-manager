@@ -91,7 +91,9 @@ CHECK_ARCHITECTURE="$(dpkg --print-architecture)"
 if { [ "${CHECK_ARCHITECTURE}" == "arm" ] || [ "${CHECK_ARCHITECTURE}" == "arm64" ] || [ "${CHECK_ARCHITECTURE}" == "armhf" ]; }; then
   CHECK_ARCHITECTURE="arm"
 fi
-COREDNS_LATEST_RELEASE_URL="https://github.com/coredns/coredns/releases/download/v1.8.4/coredns_1.8.4_linux_${CHECK_ARCHITECTURE}.tgz"
+COREDNS_LATEST_RELEASE=$(curl -s 'https://api.github.com/repos/coredns/coredns/releases/latest' | jq -r '.tag_name')
+COREDNS_LATEST_VERSION=$(echo "${COREDNS_LATEST_RELEASE}" | cut -d'v' -f2)
+COREDNS_LATEST_RELEASE_URL="https://github.com/coredns/coredns/releases/download/${COREDNS_LATEST_RELEASE}/coredns_${COREDNS_LATEST_VERSION}_linux_${CHECK_ARCHITECTURE}.tgz"
 COREDNS_TMP_PATH="/tmp/coredns.tgz"
 CONTENT_BLOCKER_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
 
