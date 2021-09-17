@@ -489,9 +489,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${DISABLE_HOST_SETTINGS} in
     1)
-      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
       if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
         echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
         echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
@@ -499,18 +496,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       ;;
     2)
-      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
       if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
         echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
         sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
       ;;
     3)
-      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
       if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
         echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
         sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
@@ -843,9 +834,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     minimal
     reload
 }" >>${COREDNS_CONFIG}
-        if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-          rm -f ${RESOLV_CONFIG_OLD}
-        fi
         if [ -f "${RESOLV_CONFIG}" ]; then
           chattr -i ${RESOLV_CONFIG}
           mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
@@ -853,13 +841,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           echo "nameserver ::1" >>${RESOLV_CONFIG}
           chattr +i ${RESOLV_CONFIG}
         fi
-        if [ -f "${COREDNS_TMP_PATH}" ]; then
-          rm -f ${COREDNS_TMP_PATH}
-        fi
         if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
-          if [ -f "${COREDNS_HOSTFILE}" ]; then
-            rm -f ${COREDNS_HOSTFILE}
-          fi
           curl -o ${COREDNS_HOSTFILE} ${CONTENT_BLOCKER_URL}
           sed -i -e "s/^/0.0.0.0 /" ${COREDNS_HOSTFILE}
         fi
@@ -1165,12 +1147,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     10) # Backup WireGuard Config
       if [ -d "${WIREGUARD_PATH}" ]; then
-        if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-          rm -f ${WIREGUARD_CONFIG_BACKUP}
-        fi
-        if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-          rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
-        fi
         BACKUP_PASSWORD="$(openssl rand -hex 25)"
         echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
         zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
