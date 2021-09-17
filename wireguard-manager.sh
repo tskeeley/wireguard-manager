@@ -87,7 +87,7 @@ COREDNS_CONFIG="${COREDNS_ROOT}/Corefile"
 COREDNS_HOSTFILE="${COREDNS_ROOT}/hosts"
 COREDNS_SERVICE_FILE="/etc/systemd/system/coredns.service"
 CHECK_ARCHITECTURE="$(dpkg --print-architecture)"
-if { [ "${CHECK_ARCHITECTURE}" == "arm" ] || [ "${CHECK_ARCHITECTURE}" == "arm64" ] || [ "${CHECK_ARCHITECTURE}" == "armhf" ]; }; then
+if { [ "${CHECK_ARCHITECTURE}" == "arm" ] || [ "${CHECK_ARCHITECTURE}" == "armhf" ]; }; then
   CHECK_ARCHITECTURE="arm"
 fi
 COREDNS_LATEST_RELEASE=$(curl -s 'https://api.github.com/repos/coredns/coredns/releases/latest' | jq -r '.tag_name')
