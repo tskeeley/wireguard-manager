@@ -4,7 +4,7 @@
 # Require script to be run as root
 function super-user-check() {
   if [ "${EUID}" -ne 0 ]; then
-    echo "You need to run this script as super user."
+    echo "Error: You need to run this script as super user."
     exit
   fi
 }
@@ -36,7 +36,7 @@ function installing-system-requirements() {
       apt-get update
       apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables iptables-persistent -y
     else
-      echo "Error: ${CURRENT_DISTRO} is not supported."
+      echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
       exit
     fi
   fi
@@ -48,7 +48,7 @@ installing-system-requirements
 # Check for docker stuff
 function docker-check() {
   if [ ! -f "/.dockerenv" ]; then
-    echo "Error: Wireguard-manager is"
+    echo "Error: The shell script is not executing within the docker container."
     exit
   fi
 }
@@ -59,7 +59,7 @@ docker-check
 # Lets check the kernel version
 function kernel-check() {
   if [ "${CURRENT_KERNEL_VERSION}" != ${ALLOWED_KERNEL_VERSION} ]; then
-    echo "Error: Kernel version is not ${ALLOWED_KERNEL_VERSION}"
+    echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
   fi
 }
