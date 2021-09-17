@@ -290,29 +290,29 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Get the IPv4
   function test-connectivity-v4() {
-      echo "How would you like to detect IPv4?"
-      echo "  1) Curl (Recommended)"
-      echo "  2) Custom (Advanced)"
-      until [[ "${SERVER_HOST_V4_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "IPv4 Choice [1-2]:" -e -i 1 SERVER_HOST_V4_SETTINGS
-      done
-      case ${SERVER_HOST_V4_SETTINGS} in
-      1)
+    echo "How would you like to detect IPv4?"
+    echo "  1) Curl (Recommended)"
+    echo "  2) Custom (Advanced)"
+    until [[ "${SERVER_HOST_V4_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "IPv4 Choice [1-2]:" -e -i 1 SERVER_HOST_V4_SETTINGS
+    done
+    case ${SERVER_HOST_V4_SETTINGS} in
+    1)
+      SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      if [ -z "${SERVER_HOST_V4}" ]; then
+        SERVER_HOST_V4="$(curl -4 -s 'https://checkip.amazonaws.com')"
+      fi
+      ;;
+    2)
+      read -rp "Custom IPv4:" SERVER_HOST_V4
+      if [ -z "${SERVER_HOST_V4}" ]; then
         SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        if [ -z "${SERVER_HOST_V4}" ]; then
-          SERVER_HOST_V4="$(curl -4 -s 'https://checkip.amazonaws.com')"
-        fi
-        ;;
-      2)
-        read -rp "Custom IPv4:" SERVER_HOST_V4
-        if [ -z "${SERVER_HOST_V4}" ]; then
-          SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        fi
-        if [ -z "${SERVER_HOST_V4}" ]; then
-          SERVER_HOST_V4="$(curl -4 -s 'https://checkip.amazonaws.com')"
-        fi
-        ;;
-      esac
+      fi
+      if [ -z "${SERVER_HOST_V4}" ]; then
+        SERVER_HOST_V4="$(curl -4 -s 'https://checkip.amazonaws.com')"
+      fi
+      ;;
+    esac
   }
 
   # Get the IPv4
@@ -320,29 +320,29 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Determine IPv6
   function test-connectivity-v6() {
-      echo "How would you like to detect IPv6?"
-      echo "  1) Curl (Recommended)"
-      echo "  2) Custom (Advanced)"
-      until [[ "${SERVER_HOST_V6_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "IPv6 Choice [1-2]:" -e -i 1 SERVER_HOST_V6_SETTINGS
-      done
-      case ${SERVER_HOST_V6_SETTINGS} in
-      1)
+    echo "How would you like to detect IPv6?"
+    echo "  1) Curl (Recommended)"
+    echo "  2) Custom (Advanced)"
+    until [[ "${SERVER_HOST_V6_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "IPv6 Choice [1-2]:" -e -i 1 SERVER_HOST_V6_SETTINGS
+    done
+    case ${SERVER_HOST_V6_SETTINGS} in
+    1)
+      SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      if [ -z "${SERVER_HOST_V6}" ]; then
+        SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
+      fi
+      ;;
+    2)
+      read -rp "Custom IPv6:" SERVER_HOST_V6
+      if [ -z "${SERVER_HOST_V6}" ]; then
         SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        if [ -z "${SERVER_HOST_V6}" ]; then
-          SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
-        fi
-        ;;
-      2)
-        read -rp "Custom IPv6:" SERVER_HOST_V6
-        if [ -z "${SERVER_HOST_V6}" ]; then
-          SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        fi
-        if [ -z "${SERVER_HOST_V6}" ]; then
-          SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
-        fi
-        ;;
-      esac
+      fi
+      if [ -z "${SERVER_HOST_V6}" ]; then
+        SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
+      fi
+      ;;
+    esac
   }
 
   # Get the IPv6
@@ -1173,25 +1173,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
           rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
         fi
-              BACKUP_PASSWORD="$(openssl rand -hex 25)"
-              echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
-              zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
-        ;;
-      13)
-        # Change the IP address of your wireguard interface.
-        if [ -f "${WIREGUARD_INTERFACE}" ]; then
-          OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
-          NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-          if [ -z "${NEW_SERVER_HOST}" ]; then
-            NEW_SERVER_HOST="$(curl -4 -s 'https://checkip.amazonaws.com')"
-          fi
-          sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
-        fi
-        if [ -f "${WIREGUARD_MANAGER}" ]; then
-          BACKUP_PASSWORD="$(openssl rand -hex 25)"
-          echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
-          zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
-        fi
+        BACKUP_PASSWORD="$(openssl rand -hex 25)"
+        echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
+        zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
       fi
       ;;
     11) # Restore WireGuard Config
