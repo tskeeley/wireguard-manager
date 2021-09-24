@@ -953,7 +953,7 @@ else
     echo "   14) Update Interface Port"
     echo "   15) Purge WireGuard Peers"
     until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 15 ]; do
-      read -rp "Select an Option [1-15]:" -e -i 1 WIREGUARD_OPTIONS
+      read -rp "Select an Option [1-15]:" -e -i 0 WIREGUARD_OPTIONS
     done
     case ${WIREGUARD_OPTIONS} in
     1) # WG Show
