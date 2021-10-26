@@ -12,15 +12,24 @@ function super-user-check() {
 # Check for root
 super-user-check
 
+# Check for docker installation
+function docker-check() {
+  if [ -f "/.dockerenv" ]; then
+    echo "Error: The shell script is executing within the docker container."
+    exit
+  fi
+}
+
+# Check for docker installation
+docker-check
+
 # Get the current system information
 function system-information() {
   if [ -f /etc/os-release ]; then
     # shellcheck disable=SC1091
     source /etc/os-release
     CURRENT_DISTRO=${ID}
-    ALLOWED_DISTRO="debian"
     CURRENT_DISTRO_VERSION=${VERSION_ID}
-    ALLOWED_DISTRO_VERSION="11"
     CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
     ALLOWED_KERNEL_VERSION="5.10"
   fi
@@ -31,10 +40,21 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ]; }; then
-    if { [ "${CURRENT_DISTRO}" == ${ALLOWED_DISTRO} ] && [ "${CURRENT_DISTRO_VERSION}" == ${ALLOWED_DISTRO_VERSION} ]; }; then
+  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ]; }; then
+    if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
       apt-get update
-      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables iptables-persistent -y
+      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc -y
+    elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      yum update
+      yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc -y
+    elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
+    elif [ "${DISTRO}" == "alpine" ]; then
+      apk update
+      apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
+    elif [ "${DISTRO}" == "freebsd" ]; then
+      pkg update
+      pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
     else
       echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
       exit
@@ -45,27 +65,29 @@ function installing-system-requirements() {
 # Run the function and check for requirements
 installing-system-requirements
 
-# Check for docker stuff
-function docker-check() {
-  if [ ! -f "/.dockerenv" ]; then
-    echo "Error: The shell script is not executing within the docker container."
+# Checking For Virtualization
+function virt-check() {
+  # Deny OpenVZ Virtualization
+  if [ "$(systemd-detect-virt)" == "openvz" ]; then
+    echo "OpenVZ virtualization is not supported (yet)."
+    exit
+  # Deny LXC Virtualization
+  elif [ "$(systemd-detect-virt)" == "lxc" ]; then
+    echo "LXC virtualization is not supported (yet)."
     exit
   fi
 }
 
-# Docker Check
-docker-check
+# Virtualization Check
+virt-check
 
 # Lets check the kernel version
 function kernel-check() {
-  if [ "${CURRENT_KERNEL_VERSION}" != ${ALLOWED_KERNEL_VERSION} ]; then
+  if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
   fi
 }
-
-# Kernel Version
-kernel-check
 
 # Global variables
 WIREGUARD_WEBSITE_URL="https://www.wireguard.com"
@@ -546,7 +568,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * $(realpath "$0") --update"
       } | crontab -
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable cron
+        systemctl start cron
+      else
         service cron enable
         service cron start
       fi
@@ -574,7 +599,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * $(realpath "$0") --backup"
       } | crontab -
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable cron
+        systemctl start cron
+      else
         service cron enable
         service cron start
       fi
@@ -706,7 +734,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 1 1 * $(realpath "$0") --purge"
       } | crontab -
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable cron
+        systemctl start cron
+      else
         service cron enable
         service cron start
       fi
@@ -716,7 +747,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 1 */6 * $(realpath "$0") --purge"
       } | crontab -
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable cron
+        systemctl start cron
+      else
         service cron enable
         service cron start
       fi
@@ -732,9 +766,24 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
-    CHECK_KERNEL_HEADERS=$(ls -l /usr/src/linux-headers-"$(uname -r)")
-    if [ ! "${CHECK_KERNEL_HEADERS}" ]; then
-      echo "Kernel headers are not installed. Installing now."
+    if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
+      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        apt-get update
+        apt-get install linux-headers-"$(uname -r)" -y
+      elif [ "${DISTRO}" == "raspbian" ]; then
+        apt-get update
+        apt-get install raspberrypi-kernel-headers -y
+      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        pacman -Syu --noconfirm --needed linux-headers
+      elif [ "${DISTRO}" == "fedora" ]; then
+        dnf update -y
+        dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        yum update -y
+        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+      fi
+    else
+      echo "Correct: You do not need kernel headers." >>/dev/null
     fi
   }
 
@@ -744,8 +793,84 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ]; }; then
-      apt-get update
-      apt-get install wireguard -y
+      if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -ge "21" ]; then
+        apt-get update
+        apt-get install wireguard -y
+      elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -le "20" ]; then
+        apt-get update
+        apt-get install software-properties-common -y
+        add-apt-repository ppa:wireguard/wireguard -y
+        apt-get update
+        apt-get install wireguard -y
+      elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        apt-get update
+        apt-get install wireguard -y
+      elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
+        apt-get update
+        if { [ "${DISTRO}" == "debian" ] && [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
+          if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
+            echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
+            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+            apt-get update
+          fi
+        fi
+        apt-get install wireguard -y
+      elif [ "${DISTRO}" == "raspbian" ]; then
+        apt-get update
+        apt-get install dirmngr -y
+        if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
+          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+          apt-get update
+        fi
+        apt-get install wireguard -y
+      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        pacman -Syu --noconfirm --needed wireguard-tools
+      elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -ge "32" ]; then
+        dnf update -y
+        dnf install wireguard-tools -y
+      elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -le "31" ]; then
+        dnf update -y
+        dnf copr enable jdoss/wireguard -y
+        dnf install wireguard-dkms wireguard-tools -y
+      elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -ge "8" ]; then
+        yum update -y
+        yum install elrepo-release epel-release -y
+        yum install kmod-wireguard wireguard-tools -y
+      elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -le "7" ]; then
+        yum update -y
+        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+          yum update -y
+        fi
+        yum install wireguard-dkms wireguard-tools -y
+      elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "8" ]; then
+        yum update -y
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        yum update -y
+        subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
+        yum copr enable jdoss/wireguard
+        yum install epel-release -y
+        yum install wireguard-dkms wireguard-tools -y
+      elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "7" ]; then
+        yum update -y
+        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
+          yum update -y
+        fi
+        yum install epel-release -y
+        yum install wireguard-dkms wireguard-tools -y
+      elif [ "${DISTRO}" == "alpine" ]; then
+        apk update
+        apk add wireguard-tools
+      elif [ "${DISTRO}" == "freebsd" ]; then
+        pkg update
+        pkg install wireguard
+      elif { [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        yum update -y
+        yum install elrepo-release epel-release -y
+        yum install kmod-wireguard wireguard-tools -y
+      fi
     fi
   }
 
@@ -807,7 +932,11 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target" >>${COREDNS_SERVICE_FILE}
         fi
-        if ! pgrep systemd-journal; then
+        if pgrep systemd-journal; then
+          systemctl daemon-reload
+          systemctl enable coredns
+          systemctl start coredns
+        else
           service coredns enable
           service coredns restart
         fi
@@ -870,7 +999,10 @@ PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     # Service Restart
-    if ! pgrep systemd-journal; then
+    if pgrep systemd-journal; then
+      systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+      systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+    else
       service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
@@ -910,19 +1042,27 @@ else
       wg show
       ;;
     2) # Enable & Start WireGuard
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
+      else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
       fi
       ;;
     3) # Disable & Stop WireGuard
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+      else
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       ;;
     4) # Restart WireGuard
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      else
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1025,13 +1165,30 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       ;;
     7) # Reinstall WireGuard
-      dpkg-reconfigure wireguard-dkms
-      modprobe wireguard
-      service reenable wg-quick@${WIREGUARD_PUB_NIC}
-      service restart wg-quick@${WIREGUARD_PUB_NIC}
+      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        dpkg-reconfigure wireguard-dkms
+        modprobe wireguard
+        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        yum reinstall wireguard-tools -y
+        service wg-quick@${WIREGUARD_PUB_NIC} restart
+      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        pacman -S --noconfirm wireguard-tools
+        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      elif [ "${DISTRO}" == "alpine" ]; then
+        apk fix wireguard-tools
+      elif [ "${DISTRO}" == "freebsd" ]; then
+        pkg check wireguard
+      fi
       ;;
     8) # Uninstall WireGuard and purging files
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        wg-quick down ${WIREGUARD_PUB_NIC}
+      else
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
         wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1059,7 +1216,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Uninstall coredns
       if [ -x "$(command -v coredns)" ]; then
-        if ! pgrep systemd-journal; then
+        if pgrep systemd-journal; then
+          systemctl disable coredns
+          systemctl stop coredns
+        else
           service coredns disable
           service coredns stop
         fi
@@ -1090,7 +1250,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           curl -o ${COREDNS_HOSTFILE} ${CONTENT_BLOCKER_URL}
           sed -i -e "s/^/0.0.0.0 /" ${COREDNS_HOSTFILE}
         fi
-        if ! pgrep systemd-journal; then
+        if pgrep systemd-journal; then
+          systemctl restart coredns
+        else
           service coredns restart
         fi
       fi
@@ -1108,7 +1270,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
-      if ! pgrep systemd-journal; then
+      if pgrep systemd-journal; then
+        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      else
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
