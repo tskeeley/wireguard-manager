@@ -1,0 +1,15 @@
+name: Check the latest version
+on:
+  push:
+    paths:
+      - "**.sh"
+jobs:
+  build:
+    name: Test the script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the directory
+        uses: actions/checkout@v2
+      - name: Test the script
+        run: |
+          sudo INTERFACE_OR_PEER=1 wireguard-manager.sh --install
