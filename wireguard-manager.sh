@@ -31,7 +31,6 @@ function system-information() {
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
     CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-    ALLOWED_KERNEL_VERSION="3.1"
   fi
 }
 
@@ -85,6 +84,7 @@ virt-check
 
 # Lets check the kernel version
 function kernel-check() {
+  ALLOWED_KERNEL_VERSION="3.1"
   if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
@@ -749,6 +749,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
+    ALLOWED_KERNEL_VERSION="5.6"
     if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
