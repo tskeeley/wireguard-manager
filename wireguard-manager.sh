@@ -210,7 +210,7 @@ function usage() {
 
 usage "$@"
 
-# Skips all questions and just get a client conf after install.
+# All questions are skipped, and wireguard is installed and a configuration is generated.
 function headless-install() {
   if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
