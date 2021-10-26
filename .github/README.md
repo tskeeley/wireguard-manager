@@ -36,24 +36,9 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 🌲 Prerequisite
-- Docker
-- Debian
-- Linux Kernel `5.10`
-
----
-### 🐳 Building Docker Container
-Let's download the docker file and construct it from there.
-```
-docker build -t wireguard-manager https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/Dockerfile
-```
-Let's start by constructing the docker container and then connecting to it.
-```
-docker run -it --name wireguard-manager-running wireguard-manager
-```
-It's finally time to execute the script
-```
-bash /usr/local/bin/wireguard-manager.sh
-```
+- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky
+- Linux `Kernel 3.1` or newer
+- You will need superuser access or a user account with `sudo` privilege.
 
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
 
@@ -148,12 +133,16 @@ usage: ./wireguard-manager.sh <command>
 ### 🛡️ Compatibility with Virtualization
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
-| Docker          |:heavy_check_mark:  |
+| KVM             |:heavy_check_mark:  |
+| LXC             |:x:                 |
+| OpenVZ          |:x:                 |
+| Docker          |:x:                 |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
 | ---------------------  | ---------------------  |
-| Docker Kernel 5.10     |:heavy_check_mark:      |
+| Linux Kernel 3.0 ≤     |:x:                     |
+| Linux Kernel 3.1 ≥     |:heavy_check_mark:      |
 
 ---
 ### 🙋 Q&A
@@ -184,12 +173,6 @@ Are there any good alternative to self-hosting vpn?
 
 Why is all the code in one place?
 - Consider a remote control, you can have thirty different remotes each doing a different job, or you may have a single remote that does everything.
-
-What is the best way to connect to a running docker container?
-- `docker exec -it wireguard-manager-running /bin/bash`
-
-Why is `kernel 5.6` or above only required for Docker?
-- Wireguard requires kernel 5.6 or above to install due to linux headers, and we can't install kernel headers on the host OS using the script.
 
 Which port do I need to forward for wireguard, and which protocol should I use?
 - On the udp protocol, either the port of your choice or the default port of `51820` must be forwarded.
