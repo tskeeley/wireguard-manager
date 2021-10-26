@@ -865,9 +865,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-unbound() {
     if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
       if [ ! -x "$(command -v unbound)" ]; then
-        if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound unbound-host e2fsprogs resolvconf -y
-          if [ "${DISTRO}" == "ubuntu" ]; then
+          if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if pgrep systemd-journal; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
@@ -876,15 +876,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
               service systemd-resolved disable
             fi
           fi
-        elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum install unbound unbound-libs e2fsprogs resolvconf -y
-        elif [ "${DISTRO}" == "fedora" ]; then
+        elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf install unbound e2fsprogs resolvconf -y
-        elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -Syu --noconfirm unbound e2fsprogs resolvconf
-        elif [ "${DISTRO}" == "alpine" ]; then
+        elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk add unbound e2fsprogs resolvconf
-        elif [ "${DISTRO}" == "freebsd" ]; then
+        elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound e2fsprogs resolvconf
         fi
         if [ -f "${UNBOUND_ANCHOR}" ]; then
@@ -1286,17 +1286,17 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           mv ${RESOLV_CONFIG_OLD} ${RESOLV_CONFIG}
           chattr +i ${RESOLV_CONFIG}
         fi
-        if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ]; }; then
           yum remove unbound unbound-host -y
-        elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get remove --purge unbound unbound-host -y
-        elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           pacman -Rs --noconfirm unbound unbound-host
-        elif [ "${DISTRO}" == "fedora" ]; then
+        elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf remove unbound -y
-        elif [ "${DISTRO}" == "alpine" ]; then
+        elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk del unbound
-        elif [ "${DISTRO}" == "freebsd" ]; then
+        elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg delete unbound
         fi
         if [ -d "${UNBOUND_ROOT}" ]; then
