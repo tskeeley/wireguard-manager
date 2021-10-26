@@ -105,20 +105,15 @@ WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="${RESOLV_CONFIG}.old"
-COREDNS_ROOT="/etc/coredns"
-COREDNS_BUILD="${COREDNS_ROOT}/coredns"
-COREDNS_CONFIG="${COREDNS_ROOT}/Corefile"
-COREDNS_HOSTFILE="${COREDNS_ROOT}/hosts"
-COREDNS_SERVICE_FILE="/etc/systemd/system/coredns.service"
-CHECK_ARCHITECTURE="$(dpkg --print-architecture)"
-if { [ "${CHECK_ARCHITECTURE}" == "arm" ] || [ "${CHECK_ARCHITECTURE}" == "armhf" ]; }; then
-  CHECK_ARCHITECTURE="arm"
-fi
-COREDNS_LATEST_RELEASE=$(curl -s 'https://api.github.com/repos/coredns/coredns/releases/latest' | jq -r '.tag_name')
-COREDNS_LATEST_VERSION=$(echo "${COREDNS_LATEST_RELEASE}" | cut -d'v' -f2)
-COREDNS_LATEST_RELEASE_URL="https://github.com/coredns/coredns/releases/download/${COREDNS_LATEST_RELEASE}/coredns_${COREDNS_LATEST_VERSION}_linux_${CHECK_ARCHITECTURE}.tgz"
-COREDNS_TMP_PATH="/tmp/coredns.tgz"
-CONTENT_BLOCKER_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
+UNBOUND_ROOT="/etc/unbound"
+UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
+UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
+UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
+UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
+UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
+UNBOUND_CONFIG_HOST_TMP="/tmp/hosts"
 
 # Usage Guide
 function usage-guide() {
@@ -618,17 +613,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # real-time backup
   enable-automatic-backup
 
-  # Would you like to install coredns.
+  # Would you like to install unbound.
   function ask-install-dns() {
     echo "Which DNS provider would you like to use?"
-    echo "  1) Coredns (Recommended)"
+    echo "  1) Unbound (Recommended)"
     echo "  2) Custom (Advanced)"
     until [[ "${DNS_PROVIDER_SETTINGS}" =~ ^[1-2]$ ]]; do
       read -rp "DNS provider [1-2]:" -e -i 1 DNS_PROVIDER_SETTINGS
     done
     case ${DNS_PROVIDER_SETTINGS} in
     1)
-      INSTALL_COREDNS="y"
+      INSTALL_UNBOUND="y"
       echo "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker?"
       echo "  1) Yes (Recommended)"
       echo "  2) No"
@@ -865,76 +860,111 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   install-wireguard-server
 
-  # Function to install coredns
-  function install-coredns() {
-    if [[ ${INSTALL_COREDNS} =~ ^[Yy]$ ]]; then
-      if [ ! -x "$(command -v coredns)" ]; then
-        if [ ! -d "${COREDNS_ROOT}" ]; then
-          mkdir -p ${COREDNS_ROOT}
+  # Function to install Unbound
+  function install-unbound() {
+    if [ -f "${WIREGUARD_INTERFACE}" ]; then
+      if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
+        if [ ! -x "$(command -v unbound)" ]; then
+          if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+            apt-get install unbound unbound-host e2fsprogs resolvconf -y
+            if [ "${DISTRO}" == "ubuntu" ]; then
+              if pgrep systemd-journal; then
+                systemctl stop systemd-resolved
+                systemctl disable systemd-resolved
+              else
+                service systemd-resolved stop
+                service systemd-resolved disable
+              fi
+            fi
+          elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+            yum install unbound unbound-libs e2fsprogs resolvconf -y
+          elif [ "${DISTRO}" == "fedora" ]; then
+            dnf install unbound e2fsprogs resolvconf -y
+          elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+            pacman -Syu --noconfirm unbound e2fsprogs resolvconf
+          elif [ "${DISTRO}" == "alpine" ]; then
+            apk add unbound e2fsprogs resolvconf
+          elif [ "${DISTRO}" == "freebsd" ]; then
+            pkg install unbound e2fsprogs resolvconf 
+          fi
+          if [ -f "${UNBOUND_ANCHOR}" ]; then
+            rm -f ${UNBOUND_ANCHOR}
+          fi
+          if [ -f "${UNBOUND_CONFIG}" ]; then
+            rm -f ${UNBOUND_CONFIG}
+          fi
+          if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+            rm -f ${UNBOUND_ROOT_HINTS}
+          fi
+          if [ -d "${UNBOUND_ROOT}" ]; then
+            unbound-anchor -a ${UNBOUND_ANCHOR}
+            curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
+            NPROC=$(nproc)
+            echo "server:
+    num-threads: ${NPROC}
+    verbosity: 1
+    root-hints: ${UNBOUND_ROOT_HINTS}
+    auto-trust-anchor-file: ${UNBOUND_ANCHOR}
+    interface: 0.0.0.0
+    interface: ::0
+    max-udp-size: 3072
+    access-control: 0.0.0.0/0                 refuse
+    access-control: ::0                       refuse
+    access-control: ${PRIVATE_SUBNET_V4}                allow
+    access-control: ${PRIVATE_SUBNET_V6}           allow
+    access-control: 127.0.0.1                 allow
+    access-control: ::1                       allow
+    private-address: ${PRIVATE_SUBNET_V4}
+    private-address: ${PRIVATE_SUBNET_V6}
+    do-tcp: no
+    hide-identity: yes
+    hide-version: yes
+    harden-glue: yes
+    harden-dnssec-stripped: yes
+    harden-referral-path: yes
+    unwanted-reply-threshold: 10000000
+    cache-min-ttl: 1800
+    cache-max-ttl: 14400
+    prefetch: yes
+    qname-minimisation: yes
+    prefetch-key: yes" >>${UNBOUND_CONFIG}
+          fi
+          if [ -f "${RESOLV_CONFIG_OLD}" ]; then
+            rm -f ${RESOLV_CONFIG_OLD}
+          fi
+          if [ -f "${RESOLV_CONFIG}" ]; then
+            chattr -i ${RESOLV_CONFIG}
+            mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
+            echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+            echo "nameserver ::1" >>${RESOLV_CONFIG}
+            chattr +i ${RESOLV_CONFIG}
+          else
+            echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+            echo "nameserver ::1" >>${RESOLV_CONFIG}
+          fi
+          echo "Unbound: true" >>${UNBOUND_MANAGER}
+          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+            echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+            curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+            awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+            rm -f ${UNBOUND_CONFIG_HOST_TMP}
+          fi
+          # restart unbound
+          if pgrep systemd-journal; then
+            systemctl reenable unbound
+            systemctl restart unbound
+          else
+            service unbound enable
+            service unbound restart
+          fi
         fi
-        if [ ! -f "${COREDNS_BUILD}" ]; then
-          curl -L "${COREDNS_LATEST_RELEASE_URL}" -o "${COREDNS_TMP_PATH}"
-          tar xvzf "${COREDNS_TMP_PATH}" -C "${COREDNS_ROOT}"
-          rm -f "${COREDNS_TMP_PATH}"
-        fi
-        ln -s ${COREDNS_BUILD} /usr/bin/coredns
-        echo ". {
-    bind 127.0.0.1 ::1 ${GATEWAY_ADDRESS_V4} ${GATEWAY_ADDRESS_V6}
-    acl {
-        allow net 127.0.0.1 ::1 ${IPV4_SUBNET} ${IPV6_SUBNET}
-        block
-    }
-    hosts ${COREDNS_HOSTFILE} {
-        fallthrough
-    }
-    forward . tls://1.1.1.1 tls://1.0.0.1 tls://2606:4700:4700::1111 tls://2606:4700:4700::1001 {
-        tls_servername cloudflare-dns.com
-        health_check 5s
-    }
-    any
-    errors
-    loop
-    cache
-    minimal
-    reload
-}" >>${COREDNS_CONFIG}
-        if [ -f "${RESOLV_CONFIG}" ]; then
-          chattr -i ${RESOLV_CONFIG}
-          mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
-          echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
-          echo "nameserver ::1" >>${RESOLV_CONFIG}
-          chattr +i ${RESOLV_CONFIG}
-        fi
-        if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
-          curl -o ${COREDNS_HOSTFILE} ${CONTENT_BLOCKER_URL}
-          sed -i -e "s/^/0.0.0.0 /" ${COREDNS_HOSTFILE}
-        fi
-        if [ ! -f "${COREDNS_SERVICE_FILE}" ]; then
-          echo "[Unit]
-Description=CoreDNS DNS server
-After=network.target
-[Service]
-Type=simple
-ExecStart=${COREDNS_BUILD} -conf=${COREDNS_CONFIG}
-Restart=on-failure
-[Install]
-WantedBy=multi-user.target" >>${COREDNS_SERVICE_FILE}
-        fi
-        if pgrep systemd-journal; then
-          systemctl daemon-reload
-          systemctl enable coredns
-          systemctl start coredns
-        else
-          service coredns enable
-          service coredns restart
-        fi
+        CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
       fi
-      CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
   }
 
-  # Install coredns
-  install-coredns
+  # Running Install Unbound
+  install-unbound
 
   # WireGuard Set Config
   function wireguard-setconf() {
