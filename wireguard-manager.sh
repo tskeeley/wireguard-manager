@@ -85,8 +85,7 @@ virt-check
 # Lets check the kernel version
 function kernel-check() {
   ALLOWED_KERNEL_VERSION="3.1"
-  CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-  if (($(echo "${CURRENT_KERNEL_VERSION} -le ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
+  if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
   fi
@@ -101,6 +100,7 @@ WIREGUARD_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}.conf"
 WIREGUARD_ADD_PEER_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}-add-peer.conf"
 WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 SYSTEM_BACKUP_PATH="/var/backups"
+CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
 WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
@@ -751,8 +751,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     ALLOWED_KERNEL_VERSION="5.6"
-    CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-    if (($(echo "${CURRENT_KERNEL_VERSION} -le ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
+    if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
