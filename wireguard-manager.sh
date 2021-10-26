@@ -725,10 +725,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function auto-remove-confg() {
     echo "Would you like to expire the peer after a certain period of time?"
     echo "  1) Every Year (Recommended)"
-    echo "  2) Six Months"
-    echo "  3) No"
-    until [[ "${AUTOMATIC_CONFIG_REMOVER}" =~ ^[1-3]$ ]]; do
-      read -rp "Automatic config expire [1-3]:" -e -i 1 AUTOMATIC_CONFIG_REMOVER
+    echo "  2) No"
+    until [[ "${AUTOMATIC_CONFIG_REMOVER}" =~ ^[1-2]$ ]]; do
+      read -rp "Automatic config expire [1-2]:" -e -i 1 AUTOMATIC_CONFIG_REMOVER
     done
     case ${AUTOMATIC_CONFIG_REMOVER} in
     1)
@@ -745,19 +744,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       ;;
     2)
-      crontab -l | {
-        cat
-        echo "0 0 1 */6 * $(realpath "$0") --purge"
-      } | crontab -
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
-        service cron enable
-        service cron start
-      fi
-      ;;
-    3)
       echo "The auto-config expiration feature has been deactivated."
       ;;
     esac
