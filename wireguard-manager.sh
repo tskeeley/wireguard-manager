@@ -31,7 +31,7 @@ function system-information() {
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
     CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-    ALLOWED_KERNEL_VERSION="3.10"
+    ALLOWED_KERNEL_VERSION="3.1"
   fi
 }
 
