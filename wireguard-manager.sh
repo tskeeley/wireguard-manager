@@ -775,7 +775,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Install WireGuard Server
   function install-wireguard-server() {
-    if { [ ! -x "$(command -v wg)" ]; }; then
+    if [ ! -x "$(command -v wg)" ]; then
       if [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -ge "21" ]; then
         apt-get update
         apt-get install wireguard -y
