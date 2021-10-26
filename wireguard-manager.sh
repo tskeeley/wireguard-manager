@@ -40,25 +40,27 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v shuf)" ]; }; then
-    if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-      apt-get update
-      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
-    elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-      yum update
-      yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
-    elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
-    elif [ "${DISTRO}" == "alpine" ]; then
-      apk update
-      apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
-    elif [ "${DISTRO}" == "freebsd" ]; then
-      pkg update
-      pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
-    else
-      echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
-      exit
+  if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v shuf)" ]; }; then
+      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        apt-get update
+        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
+      elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        yum update
+        yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
+      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
+      elif [ "${DISTRO}" == "alpine" ]; then
+        apk update
+        apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
+      elif [ "${DISTRO}" == "freebsd" ]; then
+        pkg update
+        pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
+      fi
     fi
+  else
+    echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
+    exit
   fi
 }
 
