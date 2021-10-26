@@ -12,4 +12,4 @@ jobs:
         uses: actions/checkout@v2
       - name: Test the script
         run: |
-          sudo INTERFACE_OR_PEER=1 wireguard-manager.sh --install
+          sudo wireguard-manager.sh --install
