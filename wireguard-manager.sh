@@ -4,7 +4,7 @@
 # Require script to be run as root
 function super-user-check() {
   if [ "${EUID}" -ne 0 ]; then
-    echo "Error: You need to run this script as super user."
+    echo "Error: You need to run this script as administrator."
     exit
   fi
 }
