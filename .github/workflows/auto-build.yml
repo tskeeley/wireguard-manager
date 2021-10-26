@@ -1,14 +1,14 @@
-name: Check the latest version
+name: Build the latest version
 on:
   push:
     paths:
       - "**.sh"
 jobs:
   build:
-    name: Test the script
+    name: Build on ubuntu
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the directory
         uses: actions/checkout@v2
-      - name: Test the script
+      - name: Run the code to build wireguard.
         run: sudo ./wireguard-manager.sh --install
