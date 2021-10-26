@@ -168,17 +168,13 @@ function usage() {
       shift
       WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
       ;;
-    --notification)
+    --ddns)
       shift
       WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
       ;;
-    --ddns)
-      shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-13}
-      ;;
     --purge)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-15}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-14}
       ;;
     --help)
       shift
@@ -212,7 +208,6 @@ function headless-install() {
     CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
     AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS:-1}
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS:-1}
-    NOTIFICATIONS_PREFERENCE_SETTINGS=${NOTIFICATIONS_PREFERENCE_SETTINGS:-1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
     CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS:-1}
     CLIENT_NAME=${CLIENT_NAME:-$(openssl rand -hex 50)}
@@ -593,50 +588,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # real-time backup
   enable-automatic-backup
 
-  # Send real time notifications
-  function real-time-notifications() {
-    echo "Would you like to setup notifications?"
-    echo "  1) No (Recommended)"
-    echo "  2) Twilio (Advanced)"
-    until [[ "${NOTIFICATIONS_PREFERENCE_SETTINGS}" =~ ^[1-2]$ ]]; do
-      read -rp "Notifications setup [1-2]:" -e -i 1 NOTIFICATIONS_PREFERENCE_SETTINGS
-    done
-    case ${NOTIFICATIONS_PREFERENCE_SETTINGS} in
-    1)
-      echo "Real-time Notifications Disabled"
-      ;;
-    2)
-      read -rp "Twilio Account SID:" TWILIO_ACCOUNT_SID
-      if [ -z "${TWILIO_ACCOUNT_SID}" ]; then
-        TWILIO_ACCOUNT_SID="$(openssl rand -hex 10)"
-      fi
-      read -rp "Twilio Auth Token:" TWILIO_AUTH_TOKEN
-      if [ -z "${TWILIO_AUTH_TOKEN}" ]; then
-        TWILIO_AUTH_TOKEN="$(openssl rand -hex 10)"
-      fi
-      read -rp "Twilio From Number:" TWILIO_FROM_NUMBER
-      if [ -z "${TWILIO_FROM_NUMBER}" ]; then
-        TWILIO_FROM_NUMBER="$(openssl rand -hex 10)"
-      fi
-      read -rp "Twilio To Number:" TWILIO_TO_NUMBER
-      if [ -z "${TWILIO_TO_NUMBER}" ]; then
-        TWILIO_TO_NUMBER="$(openssl rand -hex 10)"
-      fi
-      crontab -l | {
-        cat
-        echo "* * * * * $(realpath "$0") --notification"
-      } | crontab -
-      if ! pgrep systemd-journal; then
-        service cron enable
-        service cron start
-      fi
-      ;;
-    esac
-  }
-
-  # real time notifications updates
-  real-time-notifications
-
   # Would you like to install coredns.
   function ask-install-dns() {
     echo "Which DNS provider would you like to use?"
@@ -948,10 +899,9 @@ else
     echo "   9) Update this script"
     echo "   10) Backup WireGuard"
     echo "   11) Restore WireGuard"
-    echo "   12) Check WireGuard Status"
-    echo "   13) Update Interface IP"
-    echo "   14) Update Interface Port"
-    echo "   15) Purge WireGuard Peers"
+    echo "   12) Update Interface IP"
+    echo "   13) Update Interface Port"
+    echo "   14) Purge WireGuard Peers"
     until [[ "${WIREGUARD_OPTIONS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_OPTIONS}" -ge 1 ] && [ "${WIREGUARD_OPTIONS}" -le 15 ]; do
       read -rp "Select an Option [1-15]:" -e -i 0 WIREGUARD_OPTIONS
     done
@@ -1163,18 +1113,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
-    12) # Twilio's server for real-time notifications.
-      TWILIO_ACCOUNT_SID=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $1}')
-      TWILIO_AUTH_TOKEN=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $2}')
-      TWILIO_FROM_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $3}')
-      TWILIO_TO_NUMBER=$(head -2 ${WIREGUARD_CONFIG} | tail +2 | awk '{print $4}')
-      if [ "$(service is-active wg-quick@"${WIREGUARD_PUB_NIC}")" == "inactive" ]; then
-        if { [ -n "${TWILIO_ACCOUNT_SID}" ] && [ -n "${TWILIO_AUTH_TOKEN}" ] && [ -n "${TWILIO_FROM_NUMBER}" ] && [ -n "${TWILIO_TO_NUMBER}" ]; }; then
-          curl -X POST https://api.twilio.com/2010-04-01/Accounts/"${TWILIO_ACCOUNT_SID}"/Messages.json --data-urlencode "Body=Hello, WireGuard has gone down ${SERVER_HOST}." --data-urlencode "From=${TWILIO_FROM_NUMBER}" --data-urlencode "To=${TWILIO_TO_NUMBER}" -u "${TWILIO_ACCOUNT_SID}":"${TWILIO_AUTH_TOKEN}"
-        fi
-      fi
-      ;;
-    13) # Change the IP address of your wireguard interface.
+    12) # Change the IP address of your wireguard interface.
       OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
       NEW_SERVER_HOST="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${NEW_SERVER_HOST}" ]; then
@@ -1182,7 +1121,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
       ;;
-    14) # Change the wireguard interface's port number.
+    13) # Change the wireguard interface's port number.
       OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
       until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
         read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
@@ -1192,7 +1131,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
       ;;
-    15) # All wireguard peers should be removed from your interface
+    14) # All wireguard peers should be removed from your interface
       COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{print $2}')
       for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
         USER_LIST[${ADD_CONTENT}]=${CLIENT_LIST_ARRAY}
