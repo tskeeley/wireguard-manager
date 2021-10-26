@@ -12,6 +12,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Test the script
         run: |
-          curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
-          chmod +x /usr/local/bin/wireguard-manager.sh
-          /usr/local/bin/wireguard-manager.sh --install
+          sudo curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
+          sudo chmod +x /usr/local/bin/wireguard-manager.sh
+          sudo /usr/local/bin/wireguard-manager.sh --install
