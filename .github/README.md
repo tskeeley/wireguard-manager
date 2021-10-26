@@ -134,7 +134,6 @@ usage: ./wireguard-manager.sh <command>
 | Neon            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Rocky           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
-
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
 | --------------  | ------------------ |
