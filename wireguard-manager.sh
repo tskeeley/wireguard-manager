@@ -862,45 +862,44 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Function to install Unbound
   function install-unbound() {
-    if [ -f "${WIREGUARD_INTERFACE}" ]; then
-      if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
-        if [ ! -x "$(command -v unbound)" ]; then
-          if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
-            apt-get install unbound unbound-host e2fsprogs resolvconf -y
-            if [ "${DISTRO}" == "ubuntu" ]; then
-              if pgrep systemd-journal; then
-                systemctl stop systemd-resolved
-                systemctl disable systemd-resolved
-              else
-                service systemd-resolved stop
-                service systemd-resolved disable
-              fi
+    if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
+      if [ ! -x "$(command -v unbound)" ]; then
+        if { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+          apt-get install unbound unbound-host e2fsprogs resolvconf -y
+          if [ "${DISTRO}" == "ubuntu" ]; then
+            if pgrep systemd-journal; then
+              systemctl stop systemd-resolved
+              systemctl disable systemd-resolved
+            else
+              service systemd-resolved stop
+              service systemd-resolved disable
             fi
-          elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
-            yum install unbound unbound-libs e2fsprogs resolvconf -y
-          elif [ "${DISTRO}" == "fedora" ]; then
-            dnf install unbound e2fsprogs resolvconf -y
-          elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-            pacman -Syu --noconfirm unbound e2fsprogs resolvconf
-          elif [ "${DISTRO}" == "alpine" ]; then
-            apk add unbound e2fsprogs resolvconf
-          elif [ "${DISTRO}" == "freebsd" ]; then
-            pkg install unbound e2fsprogs resolvconf
           fi
-          if [ -f "${UNBOUND_ANCHOR}" ]; then
-            rm -f ${UNBOUND_ANCHOR}
-          fi
-          if [ -f "${UNBOUND_CONFIG}" ]; then
-            rm -f ${UNBOUND_CONFIG}
-          fi
-          if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-            rm -f ${UNBOUND_ROOT_HINTS}
-          fi
-          if [ -d "${UNBOUND_ROOT}" ]; then
-            unbound-anchor -a ${UNBOUND_ANCHOR}
-            curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
-            NPROC=$(nproc)
-            echo "server:
+        elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+          yum install unbound unbound-libs e2fsprogs resolvconf -y
+        elif [ "${DISTRO}" == "fedora" ]; then
+          dnf install unbound e2fsprogs resolvconf -y
+        elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+          pacman -Syu --noconfirm unbound e2fsprogs resolvconf
+        elif [ "${DISTRO}" == "alpine" ]; then
+          apk add unbound e2fsprogs resolvconf
+        elif [ "${DISTRO}" == "freebsd" ]; then
+          pkg install unbound e2fsprogs resolvconf
+        fi
+        if [ -f "${UNBOUND_ANCHOR}" ]; then
+          rm -f ${UNBOUND_ANCHOR}
+        fi
+        if [ -f "${UNBOUND_CONFIG}" ]; then
+          rm -f ${UNBOUND_CONFIG}
+        fi
+        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          rm -f ${UNBOUND_ROOT_HINTS}
+        fi
+        if [ -d "${UNBOUND_ROOT}" ]; then
+          unbound-anchor -a ${UNBOUND_ANCHOR}
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
+          NPROC=$(nproc)
+          echo "server:
     num-threads: ${NPROC}
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
@@ -928,38 +927,37 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>${UNBOUND_CONFIG}
-          fi
-          if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-            rm -f ${RESOLV_CONFIG_OLD}
-          fi
-          if [ -f "${RESOLV_CONFIG}" ]; then
-            chattr -i ${RESOLV_CONFIG}
-            mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
-            echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
-            echo "nameserver ::1" >>${RESOLV_CONFIG}
-            chattr +i ${RESOLV_CONFIG}
-          else
-            echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
-            echo "nameserver ::1" >>${RESOLV_CONFIG}
-          fi
-          echo "Unbound: true" >>${UNBOUND_MANAGER}
-          if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
-            echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-            curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-            awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
-            rm -f ${UNBOUND_CONFIG_HOST_TMP}
-          fi
-          # restart unbound
-          if pgrep systemd-journal; then
-            systemctl reenable unbound
-            systemctl restart unbound
-          else
-            service unbound enable
-            service unbound restart
-          fi
         fi
-        CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
+        if [ -f "${RESOLV_CONFIG_OLD}" ]; then
+          rm -f ${RESOLV_CONFIG_OLD}
+        fi
+        if [ -f "${RESOLV_CONFIG}" ]; then
+          chattr -i ${RESOLV_CONFIG}
+          mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
+          echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+          echo "nameserver ::1" >>${RESOLV_CONFIG}
+          chattr +i ${RESOLV_CONFIG}
+        else
+          echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+          echo "nameserver ::1" >>${RESOLV_CONFIG}
+        fi
+        echo "Unbound: true" >>${UNBOUND_MANAGER}
+        if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+          echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+          curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+          awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+          rm -f ${UNBOUND_CONFIG_HOST_TMP}
+        fi
+        # restart unbound
+        if pgrep systemd-journal; then
+          systemctl reenable unbound
+          systemctl restart unbound
+        else
+          service unbound enable
+          service unbound restart
+        fi
       fi
+      CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
   }
 
