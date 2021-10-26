@@ -885,7 +885,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           elif [ "${DISTRO}" == "alpine" ]; then
             apk add unbound e2fsprogs resolvconf
           elif [ "${DISTRO}" == "freebsd" ]; then
-            pkg install unbound e2fsprogs resolvconf 
+            pkg install unbound e2fsprogs resolvconf
           fi
           if [ -f "${UNBOUND_ANCHOR}" ]; then
             rm -f ${UNBOUND_ANCHOR}
@@ -1273,13 +1273,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
       fi
       # Uninstall coredns
-      if [ -x "$(command -v coredns)" ]; then
+      if [ -x "$(command -v unbound)" ]; then
         if pgrep systemd-journal; then
-          systemctl disable coredns
-          systemctl stop coredns
+          systemctl disable unbound
+          systemctl stop unbound
         else
-          service coredns disable
-          service coredns stop
+          service unbound disable
+          service unbound stop
         fi
         if [ -f "${RESOLV_CONFIG_OLD}" ]; then
           chattr -i ${RESOLV_CONFIG}
@@ -1287,11 +1287,30 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           mv ${RESOLV_CONFIG_OLD} ${RESOLV_CONFIG}
           chattr +i ${RESOLV_CONFIG}
         fi
-        if [ -d "${COREDNS_ROOT}" ]; then
-          rm -rf ${COREDNS_ROOT}
+        if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ]; }; then
+          yum remove unbound unbound-host -y
+        elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+          apt-get remove --purge unbound unbound-host -y
+        elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+          pacman -Rs --noconfirm unbound unbound-host
+        elif [ "${DISTRO}" == "fedora" ]; then
+          dnf remove unbound -y
+        elif [ "${DISTRO}" == "alpine" ]; then
+          apk del unbound
+        elif [ "${DISTRO}" == "freebsd" ]; then
+          pkg delete unbound
         fi
-        if [ -f "${COREDNS_SERVICE_FILE}" ]; then
-          rm -f ${COREDNS_SERVICE_FILE}
+        if [ -d "${UNBOUND_ROOT}" ]; then
+          rm -rf ${UNBOUND_ROOT}
+        fi
+        if [ -f "${UNBOUND_ANCHOR}" ]; then
+          rm -f ${UNBOUND_ANCHOR}
+        fi
+        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          rm -f ${UNBOUND_ROOT_HINTS}
+        fi
+        if [ -f "${UNBOUND_CONFIG}" ]; then
+          rm -f ${UNBOUND_CONFIG}
         fi
       fi
       # If any cronjobs are identified, they should be removed.
@@ -1302,20 +1321,30 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
       chmod +x "${CURRENT_FILE_PATH}"
       # Update the unbound configs
-      if [ -x "$(command -v coredns)" ]; then
-        if [ -f "${COREDNS_ROOT}" ]; then
-          rm -f ${COREDNS_ROOT}
-          curl -o ${COREDNS_HOSTFILE} ${CONTENT_BLOCKER_URL}
-          sed -i -e "s/^/0.0.0.0 /" ${COREDNS_HOSTFILE}
+      if [ -x "$(command -v unbound)" ]; then
+        # Refresh the root hints
+        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
         fi
+        # The block list should be updated.
+        if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+          rm -f ${UNBOUND_CONFIG_HOST}
+          curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
+          awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
+          rm -f ${UNBOUND_CONFIG_HOST_TMP}
+        fi
+        # Once everything is completed, restart the service.
         if pgrep systemd-journal; then
-          systemctl restart coredns
+          systemctl restart unbound
         else
-          service coredns restart
+          service unbound restart
         fi
       fi
       ;;
     10) # Backup WireGuard Config
+      if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
+        rm -f ${WIREGUARD_CONFIG_BACKUP}
+      fi
       if [ -d "${WIREGUARD_PATH}" ]; then
         BACKUP_PASSWORD="$(openssl rand -hex 25)"
         echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
