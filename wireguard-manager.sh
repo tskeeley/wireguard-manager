@@ -85,7 +85,7 @@ virt-check
 # Lets check the kernel version
 function kernel-check() {
   ALLOWED_KERNEL_VERSION="3.1"
-  if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
+  if (($(echo "${CURRENT_KERNEL_VERSION} -le ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
   fi
@@ -750,7 +750,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     ALLOWED_KERNEL_VERSION="5.6"
-    if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
+    if (($(echo "${CURRENT_KERNEL_VERSION} -le ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
@@ -777,10 +777,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
-      if [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge "21" ]; then
+      if [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 21 ]; then
         apt-get update
         apt-get install wireguard -y
-      elif [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le "20" ]; then
+      elif [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 20 ]; then
         apt-get update
         apt-get install software-properties-common -y
         add-apt-repository ppa:wireguard/wireguard -y
@@ -791,7 +791,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
         apt-get update
-        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le "11" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 11 ]; }; then
           if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
             echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -810,25 +810,25 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed wireguard-tools
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge "32" ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 32 ]; then
         dnf update -y
         dnf install wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le "31" ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 31 ]; then
         dnf update -y
         dnf copr enable jdoss/wireguard -y
         dnf install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge "8" ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
         yum update -y
         yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le "7" ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 7 ]; then
         yum update -y
         if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
           curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
           yum update -y
         fi
         yum install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == "8" ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 8 ]; then
         yum update -y
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
         yum update -y
@@ -836,7 +836,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         yum copr enable jdoss/wireguard
         yum install epel-release -y
         yum install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == "7" ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 7 ]; then
         yum update -y
         if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
           curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
