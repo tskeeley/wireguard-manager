@@ -40,21 +40,21 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ]; }; then
+  if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v shuf)" ]; }; then
     if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
       apt-get update
-      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc -y
+      apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
     elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
       yum update
-      yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc -y
+      yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
     elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
-      pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
+      pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
     elif [ "${DISTRO}" == "alpine" ]; then
       apk update
-      apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
+      apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
     elif [ "${DISTRO}" == "freebsd" ]; then
       pkg update
-      pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc
+      pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
     else
       echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
       exit
@@ -1206,7 +1206,47 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
         rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
-      apt-get remove --purge wireguard -y
+      if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+        yum remove wireguard qrencode haveged -y
+      elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
+        apt-get remove --purge wireguard qrencode -y
+        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
+          rm -f /etc/apt/sources.list.d/backports.list
+        fi
+      elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+        apt-get remove --purge wireguard qrencode haveged -y
+      elif [ "${DISTRO}" == "ubuntu" ]; then
+        apt-get remove --purge wireguard qrencode haveged -y
+        if pgrep systemd-journal; then
+          systemctl reenable systemd-resolved
+          systemctl restart systemd-resolved
+        else
+          service systemd-resolved enable
+          service systemd-resolved restart
+        fi
+      elif [ "${DISTRO}" == "raspbian" ]; then
+        apt-key del 04EE7237B7D453EC
+        apt-get remove --purge wireguard qrencode haveged dirmngr -y
+        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
+          rm -f /etc/apt/sources.list.d/backports.list
+        fi
+      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+        pacman -Rs --noconfirm wireguard-tools qrencode haveged
+      elif [ "${DISTRO}" == "fedora" ]; then
+        dnf remove wireguard qrencode haveged -y
+        if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          rm -f /etc/yum.repos.d/wireguard.repo
+        fi
+      elif [ "${DISTRO}" == "rhel" ]; then
+        yum remove wireguard qrencode haveged -y
+        if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
+          rm -f /etc/yum.repos.d/wireguard.repo
+        fi
+      elif [ "${DISTRO}" == "alpine" ]; then
+        apk del wireguard-tools libqrencode haveged
+      elif [ "${DISTRO}" == "freebsd" ]; then
+        pkg delete wireguard libqrencode
+      fi
       # Delete WireGuard backup
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
         rm -f ${WIREGUARD_CONFIG_BACKUP}
