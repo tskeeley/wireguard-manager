@@ -83,7 +83,7 @@ usage: ./wireguard-manager.sh <command>
 - Expiration of peer configurations on autopilot
 - (IPv4|IPv6) Supported, Leak Protection
 - Variety of Public DNS to be pushed to the peers
-- Choice to use a self-hosted DNS with coredns **Prevent DNS Leaks, DNSSEC Supported**
+- Choice to use a self-hosted resolver with Unbound **Prevent DNS Leaks, DNSSEC Supported**
 - Iptables rules and forwarding managed in a seamless way
 - Remove & Uninstall WireGuard Interface
 - Preshared-key for an extra layer of security. **Required**
@@ -100,10 +100,10 @@ usage: ./wireguard-manager.sh <command>
 * `DISABLE_HOST` - Determine whether or not IPv4 or IPv6 should be disabled.
 * `CLIENT_ALLOWED_IP` - Using an IP range, choose what should be sent to the VPN.
 * `NAT_CHOICE` - Determine whether or not to use the vpn tunnel's keep alive feature.
-* `INSTALL_COREDNS` - Whether or not to install coredns is up to you.
-* `UNINSTALL_COREDNS` - If you need to remove coredns for whatever reason, you can do so.
+* `INSTALL_UNBOUND` - Whether or not to install unbound is up to you.
+* `UNINSTALL_UNBOUND` - If you need to remove Unbound for whatever reason, you can do so.
 * `REMOVE_WIREGUARD` - It is entirely up to you whether or not to remove wireguard altogether.
-* `DNS_CHOICE` - You'll have to utilize another DNS if you don't have coredns.
+* `DNS_CHOICE` - You'll have to utilize another DNS if you don't have Unbound.
 * `CLIENT_NAME` - The wireguard peer's name.
 * `MTU_CHOICE` - The wireguard peers will utilize this MTU.
 
@@ -197,7 +197,7 @@ Why is all the code in one place?
 Which port do I need to forward for wireguard, and which protocol should I use?
 - On the udp protocol, either the port of your choice or the default port of `51820` must be forwarded.
 
-For coredns, which ports do I need to forward?
+For unbound, which ports do I need to forward?
 - Because all DNS traffic is routed through the vpn, you don't need to forward those ports `53`.
 
 What is blocked if I enable the content blocker?
