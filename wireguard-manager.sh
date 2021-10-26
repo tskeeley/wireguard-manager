@@ -40,20 +40,20 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ] || [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ] || [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ] || [ "${DISTRO}" == "alpine" ] || [ "${DISTRO}" == "freebsd" ]; }; then
+  if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v ifupdown)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v shuf)" ]; }; then
-      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
-      elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update
         yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf -y
-      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
-      elif [ "${DISTRO}" == "alpine" ]; then
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
-      elif [ "${DISTRO}" == "freebsd" ]; then
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
         pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl ifupdown iptables bc shuf
       fi
@@ -769,18 +769,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
-      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
-      elif [ "${DISTRO}" == "raspbian" ]; then
+      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
-      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed linux-headers
-      elif [ "${DISTRO}" == "fedora" ]; then
+      elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
         dnf update -y
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
-      elif { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
@@ -795,21 +795,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     if { [ ! -x "$(command -v wg)" ]; }; then
-      if [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -ge "21" ]; then
+      if [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -ge "21" ]; then
         apt-get update
         apt-get install wireguard -y
-      elif [ "${DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -le "20" ]; then
+      elif [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${DISTRO_VERSION%.*}" -le "20" ]; then
         apt-get update
         apt-get install software-properties-common -y
         add-apt-repository ppa:wireguard/wireguard -y
         apt-get update
         apt-get install wireguard -y
-      elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install wireguard -y
-      elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
         apt-get update
-        if { [ "${DISTRO}" == "debian" ] && [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${DISTRO_VERSION%.*}" -le "11" ]; }; then
           if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
             echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -817,7 +817,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           fi
         fi
         apt-get install wireguard -y
-      elif [ "${DISTRO}" == "raspbian" ]; then
+      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-get update
         apt-get install dirmngr -y
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
@@ -826,27 +826,27 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get update
         fi
         apt-get install wireguard -y
-      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed wireguard-tools
-      elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -ge "32" ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -ge "32" ]; then
         dnf update -y
         dnf install wireguard-tools -y
-      elif [ "${DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -le "31" ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${DISTRO_VERSION%.*}" -le "31" ]; then
         dnf update -y
         dnf copr enable jdoss/wireguard -y
         dnf install wireguard-dkms wireguard-tools -y
-      elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -ge "8" ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -ge "8" ]; then
         yum update -y
         yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -le "7" ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${DISTRO_VERSION%.*}" -le "7" ]; then
         yum update -y
         if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
           curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
           yum update -y
         fi
         yum install wireguard-dkms wireguard-tools -y
-      elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "8" ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "8" ]; then
         yum update -y
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
         yum update -y
@@ -854,7 +854,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         yum copr enable jdoss/wireguard
         yum install epel-release -y
         yum install wireguard-dkms wireguard-tools -y
-      elif [ "${DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "7" ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${DISTRO_VERSION%.*}" == "7" ]; then
         yum update -y
         if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
           curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
@@ -862,13 +862,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         yum install epel-release -y
         yum install wireguard-dkms wireguard-tools -y
-      elif [ "${DISTRO}" == "alpine" ]; then
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add wireguard-tools
-      elif [ "${DISTRO}" == "freebsd" ]; then
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
         pkg install wireguard
-      elif { [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update -y
         yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
@@ -1167,21 +1167,21 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       ;;
     7) # Reinstall WireGuard
-      if { [ "${DISTRO}" == "ubuntu" ] || [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "raspbian" ] || [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "kali" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
         systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      elif { [ "${DISTRO}" == "fedora" ] || [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "rhel" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum reinstall wireguard-tools -y
         service wg-quick@${WIREGUARD_PUB_NIC} restart
-      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm wireguard-tools
         systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      elif [ "${DISTRO}" == "alpine" ]; then
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk fix wireguard-tools
-      elif [ "${DISTRO}" == "freebsd" ]; then
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg check wireguard
       fi
       ;;
@@ -1208,16 +1208,16 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
         rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
-      if { [ "${DISTRO}" == "centos" ] || [ "${DISTRO}" == "almalinux" ] || [ "${DISTRO}" == "rocky" ]; }; then
+      if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode haveged -y
-      elif { [ "${DISTRO}" == "debian" ] || [ "${DISTRO}" == "kali" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
         apt-get remove --purge wireguard qrencode -y
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
-      elif { [ "${DISTRO}" == "pop" ] || [ "${DISTRO}" == "linuxmint" ] || [ "${DISTRO}" == "neon" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get remove --purge wireguard qrencode haveged -y
-      elif [ "${DISTRO}" == "ubuntu" ]; then
+      elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode haveged -y
         if pgrep systemd-journal; then
           systemctl reenable systemd-resolved
@@ -1226,27 +1226,27 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           service systemd-resolved enable
           service systemd-resolved restart
         fi
-      elif [ "${DISTRO}" == "raspbian" ]; then
+      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-key del 04EE7237B7D453EC
         apt-get remove --purge wireguard qrencode haveged dirmngr -y
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
-      elif { [ "${DISTRO}" == "arch" ] || [ "${DISTRO}" == "archarm" ] || [ "${DISTRO}" == "manjaro" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools qrencode haveged
-      elif [ "${DISTRO}" == "fedora" ]; then
+      elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
         dnf remove wireguard qrencode haveged -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-      elif [ "${DISTRO}" == "rhel" ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
         yum remove wireguard qrencode haveged -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
-      elif [ "${DISTRO}" == "alpine" ]; then
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk del wireguard-tools libqrencode haveged
-      elif [ "${DISTRO}" == "freebsd" ]; then
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg delete wireguard libqrencode
       fi
       # Delete WireGuard backup
