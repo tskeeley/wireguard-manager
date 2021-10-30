@@ -46,15 +46,15 @@ function installing-system-requirements() {
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update
-        yum install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl iptables bc ifupdown -y
+        yum install curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl iptables bc ifupdown
+        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
-        apk add curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl iptables bc ifupdown
+        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
-        pkg install curl coreutils jq iproute2 lsof cronie grep procps qrencode sed zip unzip openssl iptables bc ifupdown
+        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown
       fi
     fi
   else
