@@ -1010,7 +1010,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     if [[ ${AUTOMATIC_WIREGUARD_EXPIRATION} =~ ^[Yy]$ ]]; then
       crontab -l | {
         cat
-        echo "0 0 $(date +%d) $(date +%m) * $(realpath "$0") --purge"
+        echo "0 0 $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
