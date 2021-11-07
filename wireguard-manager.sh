@@ -1173,6 +1173,28 @@ PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
+      # If automaic wireguard expiration is enabled than set the expiration date.
+      if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
+        crontab -l | {
+          cat
+          echo "0 0 $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
+        } | crontab -
+        if pgrep systemd-journal; then
+          systemctl enable cron
+          systemctl start cron
+        else
+          service cron enable
+          service cron start
+        fi
+      fi
+      # Service Restart
+      if pgrep systemd-journal; then
+        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      else
+        service wg-quick@${WIREGUARD_PUB_NIC} enable
+        service wg-quick@${WIREGUARD_PUB_NIC} restart
+      fi
       qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
       ;;
