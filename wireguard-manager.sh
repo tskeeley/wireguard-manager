@@ -118,7 +118,7 @@ UNBOUND_CONFIG_HOST_TMP="/tmp/hosts"
 
 # Usage Guide
 function usage-guide() {
-  echo "usage: ./$(basename "$0") <command>"
+  echo "usage: ./$(basename "${0}") <command>"
   echo "  --install     Install WireGuard"
   echo "  --start       Start WireGuard"
   echo "  --stop        Stop WireGuard"
@@ -564,7 +564,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     1)
       crontab -l | {
         cat
-        echo "0 0 * * * $(realpath "$0") --update"
+        echo "0 0 * * * $(realpath "${0}") --update"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -595,7 +595,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     1)
       crontab -l | {
         cat
-        echo "0 0 * * * $(realpath "$0") --backup"
+        echo "0 0 * * * $(realpath "${0}") --backup"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -1009,7 +1009,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
-        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
+        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "${0}") --remove"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -1173,10 +1173,10 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       # If automaic wireguard expiration is enabled than set the expiration date.
-      if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
+      if [ -n "$(crontab -l | grep "$(realpath "${0}") --remove")" ]; then
         crontab -l | {
           cat
-          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
+          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${NEW_CLIENT_NAME} | $(realpath "${0}") --remove"
         } | crontab -
       fi
       # Service Restart
@@ -1332,10 +1332,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
       fi
       # If any cronjobs are identified, they should be removed.
-      crontab -l | grep -v "$(realpath "$0")" | crontab -
+      crontab -l | grep -v "$(realpath "${0}")" | crontab -
       ;;
     9) # Update the script
-      CURRENT_FILE_PATH="$(realpath "$0")"
+      CURRENT_FILE_PATH="$(realpath "${0}")"
       curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
       chmod +x "${CURRENT_FILE_PATH}"
       # Update the unbound configs
