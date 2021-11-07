@@ -1009,7 +1009,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
-        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "${0}") --remove"
+        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | $(realpath "${0}") --remove"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -1173,10 +1173,10 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       # If automaic wireguard expiration is enabled than set the expiration date.
-      if [ -n "$(crontab -l | grep "$(realpath "${0}") --remove")" ]; then
+      if crontab -l | grep -q "$(realpath "${0}") --remove"; then
         crontab -l | {
           cat
-          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${NEW_CLIENT_NAME} | $(realpath "${0}") --remove"
+          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | $(realpath "${0}") --remove"
         } | crontab -
       fi
       # Service Restart
