@@ -727,10 +727,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${AUTOMATIC_CONFIG_REMOVER} in
     1)
-      crontab -l | {
-        cat
-        echo "0 0 1 1 * $(realpath "$0") --purge"
-      } | crontab -
+      AUTOMATIC_WIREGUARD_EXPIRATION="y"
       if pgrep systemd-journal; then
         systemctl enable cron
         systemctl start cron
@@ -1016,6 +1013,13 @@ Endpoint = ${SERVER_HOST}:${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+    # If automaic wireguard expiration is enabled than set the expiration date.
+    if [[ ${AUTOMATIC_WIREGUARD_EXPIRATION} =~ ^[Yy]$ ]]; then
+      crontab -l | {
+        cat
+        echo "0 0 $(date +%d) $(date +%m) * $(realpath "$0") --purge"
+      } | crontab -
+    fi
     # Service Restart
     if pgrep systemd-journal; then
       systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
