@@ -142,7 +142,7 @@ function usage() {
     case ${1} in
     --install)
       shift
-      HEADLESS_INSTALL=${HEADLESS_INSTALL:-y}
+      HEADLESS_INSTALL=${HEADLESS_INSTALL:-true}
       ;;
     --start)
       shift
@@ -213,7 +213,7 @@ usage "$@"
 
 # All questions are skipped, and wireguard is installed and a configuration is generated.
 function headless-install() {
-  if [[ ${HEADLESS_INSTALL} =~ ^[Yy]$ ]]; then
+  if [ "${HEADLESS_INSTALL}" == true ]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
     IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
     IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
@@ -624,7 +624,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${DNS_PROVIDER_SETTINGS} in
     1)
-      INSTALL_UNBOUND="y"
+      INSTALL_UNBOUND=true
       echo "Do you want to prevent advertisements, tracking, malware, and phishing using the content-blocker?"
       echo "  1) Yes (Recommended)"
       echo "  2) No"
@@ -633,15 +633,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${CONTENT_BLOCKER_SETTINGS} in
       1)
-        INSTALL_BLOCK_LIST="y"
+        INSTALL_BLOCK_LIST=true
         ;;
       2)
-        INSTALL_BLOCK_LIST="n"
+        INSTALL_BLOCK_LIST=false
         ;;
       esac
       ;;
     2)
-      CUSTOM_DNS="y"
+      CUSTOM_DNS=true
       ;;
     esac
   }
@@ -651,7 +651,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Use custom dns
   function custom-dns() {
-    if [[ ${CUSTOM_DNS} =~ ^[Yy]$ ]]; then
+    if [ "${CUSTOM_DNS}" == true ]; then
       echo "Which DNS do you want to use with the WireGuard connection?"
       echo "  1) Google (Recommended)"
       echo "  2) AdGuard"
@@ -727,7 +727,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${AUTOMATIC_CONFIG_REMOVER} in
     1)
-      AUTOMATIC_WIREGUARD_EXPIRATION="y"
+      AUTOMATIC_WIREGUARD_EXPIRATION=true
       ;;
     2)
       echo "The auto-config expiration feature has been deactivated."
@@ -854,7 +854,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Function to install Unbound
   function install-unbound() {
-    if [[ ${INSTALL_UNBOUND} =~ ^[Yy]$ ]]; then
+    if [ "${INSTALL_UNBOUND}" == true ]; then
       if [ ! -x "$(command -v unbound)" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound unbound-host e2fsprogs resolvconf -y
@@ -934,7 +934,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           echo "nameserver ::1" >>${RESOLV_CONFIG}
         fi
         echo "Unbound: true" >>${UNBOUND_MANAGER}
-        if [[ ${INSTALL_BLOCK_LIST} =~ ^[Yy]$ ]]; then
+        if [ "${INSTALL_BLOCK_LIST}" == true ]; then
           echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
           curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
           awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
@@ -967,7 +967,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
-    if [[ ${INSTALL_COREDNS} =~ ^[Yy]$ ]]; then
+    if [ "${INSTALL_COREDNS}" == true ]; then
       IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -A INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -A INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
       IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -D INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -D INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
     else
@@ -1007,7 +1007,7 @@ PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     # If automaic wireguard expiration is enabled than set the expiration date.
-    if [[ ${AUTOMATIC_WIREGUARD_EXPIRATION} =~ ^[Yy]$ ]]; then
+    if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
         echo "0 0 $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
