@@ -967,7 +967,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
-    if [ "${INSTALL_COREDNS}" == true ]; then
+    if [ "${INSTALL_UNBOUND}" == true ]; then
       IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -A INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -A INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
       IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -D INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -D INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
     else
@@ -1297,7 +1297,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
         fi
       fi
-      # Uninstall coredns
+      # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
         if pgrep systemd-journal; then
           systemctl disable unbound
