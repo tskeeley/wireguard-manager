@@ -1178,13 +1178,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           cat
           echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
         } | crontab -
-        if pgrep systemd-journal; then
-          systemctl enable cron
-          systemctl start cron
-        else
-          service cron enable
-          service cron start
-        fi
       fi
       # Service Restart
       if pgrep systemd-journal; then
