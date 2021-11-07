@@ -1010,7 +1010,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
-        echo "0 0 $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
+        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -1177,7 +1177,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
         crontab -l | {
           cat
-          echo "0 0 $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
+          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e ${CLIENT_NAME} | $(realpath "$0") --remove"
         } | crontab -
         if pgrep systemd-journal; then
           systemctl enable cron
