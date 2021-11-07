@@ -728,13 +728,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     case ${AUTOMATIC_CONFIG_REMOVER} in
     1)
       AUTOMATIC_WIREGUARD_EXPIRATION="y"
-      if pgrep systemd-journal; then
-        systemctl enable cron
-        systemctl start cron
-      else
-        service cron enable
-        service cron start
-      fi
       ;;
     2)
       echo "The auto-config expiration feature has been deactivated."
@@ -1019,6 +1012,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         cat
         echo "0 0 $(date +%d) $(date +%m) * $(realpath "$0") --purge"
       } | crontab -
+      if pgrep systemd-journal; then
+        systemctl enable cron
+        systemctl start cron
+      else
+        service cron enable
+        service cron start
+      fi
     fi
     # Service Restart
     if pgrep systemd-journal; then
