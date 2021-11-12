@@ -938,7 +938,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
           rm -f ${UNBOUND_CONFIG_HOST_TMP}
         fi
-        # restart unbound
+        # Restart unbound after enabling it.
         if pgrep systemd-journal; then
           systemctl reenable unbound
           systemctl restart unbound
