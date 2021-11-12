@@ -26,8 +26,6 @@ jobs:
         run: sudo ./wireguard-manager.sh --ddns
       - name: Test wireguard-manager backup.
         run: sudo ./wireguard-manager.sh --backup
-      - name: Test wireguard-manager restore.
-        run: sudo ./wireguard-manager.sh --restore
       - name: Test wireguard-manager purge.
         run: sudo ./wireguard-manager.sh --purge
       - name: View WireGuard configuration.
