@@ -653,11 +653,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function custom-dns() {
     if [ "${CUSTOM_DNS}" == true ]; then
       echo "Which DNS do you want to use with the WireGuard connection?"
-      echo "  1) Google (Recommended)"
+      echo "  1) Cloudflare (Recommended)"
       echo "  2) AdGuard"
       echo "  3) NextDNS"
       echo "  4) OpenDNS"
-      echo "  5) Cloudflare"
+      echo "  5) Google"
       echo "  6) Verisign"
       echo "  7) Quad9"
       echo "  8) FDN"
@@ -667,7 +667,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       done
       case ${CLIENT_DNS_SETTINGS} in
       1)
-        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+        CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
         ;;
       2)
         CLIENT_DNS="94.140.14.14,94.140.15.15,2a10:50c0::ad1:ff,2a10:50c0::ad2:ff"
@@ -679,7 +679,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         CLIENT_DNS="208.67.222.222,208.67.220.220,2620:119:35::35,2620:119:53::53"
         ;;
       5)
-        CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+        CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
         ;;
       6)
         CLIENT_DNS="64.6.64.6,64.6.65.6,2620:74:1b::1:1,2620:74:1c::2:2"
