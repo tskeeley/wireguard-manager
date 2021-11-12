@@ -41,8 +41,6 @@ system-information
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
-      # Note: Make a copy of the resolv.conf file that is currently in use.
-      cp /etc/resolv.conf /etc/resolv.conf.temp
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown resolvconf -y
@@ -57,6 +55,10 @@ function installing-system-requirements() {
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown resolvconf
+      fi
+      sed -i "/^#/d" /etc/resolv.conf
+      if ! grep -q "nameserver" /etc/resolv.conf; then
+        echo "nameserver 1.1.1.1" >>/etc/resolv.conf
       fi
     fi
   else
@@ -108,7 +110,6 @@ WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="${RESOLV_CONFIG}.old"
-RESOLV_CONFIG_TEMP="${RESOLV_CONFIG}.temp"
 UNBOUND_ROOT="/etc/unbound"
 UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
@@ -240,17 +241,6 @@ function headless-install() {
 
 # No GUI
 headless-install
-
-# Note: Check for an old /etc/resolve.conf.tmp file and replace it with the current one if one exists.
-function fix-resolv-conf() {
-  if [ -f ${RESOLV_CONFIG_TEMP} ]; then
-    rm -f ${RESOLV_CONFIG}
-    mv ${RESOLV_CONFIG_TEMP} ${RESOLV_CONFIG}
-    rm -f ${RESOLV_CONFIG_TEMP}
-  fi
-}
-
-fix-resolv-conf
 
 # Set up the wireguard, if config it isn't already there.
 if [ ! -f "${WIREGUARD_CONFIG}" ]; then
