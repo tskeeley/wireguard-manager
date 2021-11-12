@@ -878,17 +878,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound e2fsprogs
         fi
-        # Note: Remove the old root.key file if it exists
         if [ -f "${UNBOUND_ANCHOR}" ]; then
           rm -f ${UNBOUND_ANCHOR}
         fi
         unbound-anchor -a ${UNBOUND_ANCHOR}
-        # Note: Remove the old root.hints file if it exists
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
           rm -f ${UNBOUND_ROOT_HINTS}
         fi
         curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
-        # Note: Remove the old unbound.conf file if it exists
         if [ -f "${UNBOUND_CONFIG}" ]; then
           rm -f ${UNBOUND_CONFIG}
         fi
@@ -921,11 +918,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >>${UNBOUND_CONFIG}
-        # Note: Remove the old resolve.conf.old file if it exists
         if [ -f "${RESOLV_CONFIG_OLD}" ]; then
           rm -f ${RESOLV_CONFIG_OLD}
         fi
-        # Note: If a resolve config file exists, move it to resolve.conf.old
         if [ -f "${RESOLV_CONFIG}" ]; then
           chattr -i ${RESOLV_CONFIG}
           mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
