@@ -238,6 +238,16 @@ function headless-install() {
 # No GUI
 headless-install
 
+# Note: The dns servers are removed from the /etc/resolv.conf file after resolvconf is installed.
+function install-temp-dns() {
+  sed -i "/^#/d" ${RESOLV_CONFIG}
+  if [ ! $(grep -q "nameserver" "${RESOLV_CONFIG}") ]; then
+    echo "nameserver 1.1.1.1" >>${RESOLV_CONFIG}
+  fi
+}
+
+install-temp-dns
+
 # Set up the wireguard, if config it isn't already there.
 if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
