@@ -19,7 +19,7 @@ jobs:
       - name: Restart WireGuard service
         run: sudo ./wireguard-manager.sh --restart
       - name: Add a new WireGuard peer
-        run: sudo echo -e "\n" | ./wireguard-manager.sh --add
+        run: echo -e "\n" | sudo ./wireguard-manager.sh --add
       - name: Update wireguard-manager.
         run: sudo ./wireguard-manager.sh --update
       - name: Test wireguard-manager ddns.
