@@ -21,15 +21,15 @@ jobs:
       - name: Add a new WireGuard peer
         run: sudo echo -e "\n" | ./wireguard-manager.sh --add
       - name: Update wireguard-manager.
-        run: ./wireguard-manager.sh --update
+        run: sudo ./wireguard-manager.sh --update
       - name: Test wireguard-manager ddns.
-        run: ./wireguard-manager.sh --ddns
+        run: sudo ./wireguard-manager.sh --ddns
       - name: Test wireguard-manager backup.
-        run: ./wireguard-manager.sh --backup
+        run: sudo ./wireguard-manager.sh --backup
       - name: Test wireguard-manager restore.
-        run: ./wireguard-manager.sh --restore
+        run: sudo ./wireguard-manager.sh --restore
       - name: Test wireguard-manager purge.
-        run: ./wireguard-manager.sh --purge
+        run: sudo ./wireguard-manager.sh --purge
       - name: View WireGuard configuration.
         run: sudo cat /etc/wireguard/wg0.conf
       - name: View unbound status.
