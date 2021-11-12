@@ -10,5 +10,29 @@ jobs:
     steps:
       - name: Check out code into the directory
         uses: actions/checkout@v2
-      - name: Run the code to build wireguard.
+      - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
+      - name: Start wireguard service
+        run: sudo ./wireguard-manager.sh --start
+      - name: Stop WireGuard service
+        run: sudo ./wireguard-manager.sh --stop
+      - name: Restart WireGuard service
+        run: sudo ./wireguard-manager.sh --restart
+      - name: Add a new WireGuard peer
+        run: sudo echo -e "\n" | ./wireguard-manager.sh --add
+      - name: Update wireguard-manager.
+        run: ./wireguard-manager.sh --update
+      - name: Test wireguard-manager ddns.
+        run: ./wireguard-manager.sh --ddns
+      - name: Test wireguard-manager backup.
+        run: ./wireguard-manager.sh --backup
+      - name: Test wireguard-manager restore.
+        run: ./wireguard-manager.sh --restore
+      - name: Test wireguard-manager purge.
+        run: ./wireguard-manager.sh --purge
+      - name: View WireGuard configuration.
+        run: sudo cat /etc/wireguard/wg0.conf
+      - name: View unbound status.
+        run: sudo systemctl status unbound
+      - name: View Unbound configuration.
+        run: sudo cat /etc/unbound/unbound.conf
