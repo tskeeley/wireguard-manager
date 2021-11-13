@@ -34,3 +34,5 @@ jobs:
         run: sudo systemctl status unbound
       - name: View Unbound configuration.
         run: sudo cat /etc/unbound/unbound.conf
+      - name: View the resolv.conf
+        run: sudo cat /etc/resolv.conf
