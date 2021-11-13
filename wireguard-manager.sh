@@ -40,28 +40,21 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf -y
+        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update
-        yum install curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf -y
+        yum install curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf
+        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
-        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf
+        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
-        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf
-      fi
-      if ! grep -q "nameserver" /etc/resolv.conf; then
-        chattr -i /etc/resolv.conf
-        mv /etc/resolv.conf /etc/resolv.conf.bak
-        echo "nameserver 1.1.1.1" >>/etc/resolv.conf
-        echo "nameserver 2606:4700:4700::1111" >>/etc/resolv.conf
-        chattr +i /etc/resolv.conf
+        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
       fi
     fi
   else
@@ -650,6 +643,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       ;;
     2)
       CUSTOM_DNS=true
+      INSTALL_UNBOUND=false
       ;;
     esac
   }
@@ -865,25 +859,38 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ "${INSTALL_UNBOUND}" == true ]; then
       if [ ! -x "$(command -v unbound)" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install unbound unbound-host -y
+          apt-get install unbound unbound-host resolvconf -y
+          if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
+            if pgrep systemd-journal; then
+              systemctl stop systemd-resolved
+              systemctl disable systemd-resolved
+            else
+              service systemd-resolved stop
+              service systemd-resolved disable
+            fi
+          fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum install unbound unbound-libs -y
+          yum install unbound unbound-libs resolvconf -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          dnf install unbound -y
+          dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm unbound
+          pacman -Syu --noconfirm unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-          apk add unbound
+          apk add unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-          pkg install unbound
+          pkg install unbound resolvconf
         fi
         unbound-anchor -a ${UNBOUND_ANCHOR}
-        curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+        curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
         if [ ! -f "${UNBOUND_ROOT_HINTS}" ]; then
-          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP} -o ${UNBOUND_ROOT_HINTS}
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP} --create-dirs -o ${UNBOUND_ROOT_HINTS}
         fi
-        NPROC=$(nproc)
-        echo "server:
+        if [ -f "${UNBOUND_CONFIG}" ]; then
+          rm -f ${UNBOUND_CONFIG}
+        fi
+        if [ -d "${UNBOUND_ROOT}" ]; then
+          NPROC=$(nproc)
+          echo "server:
     num-threads: ${NPROC}
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
@@ -910,7 +917,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     cache-max-ttl: 14400
     prefetch: yes
     qname-minimisation: yes
-    prefetch-key: yes" >${UNBOUND_CONFIG}
+    prefetch-key: yes" >>${UNBOUND_CONFIG}
+        fi
         if [ -f "${RESOLV_CONFIG}" ]; then
           chattr -i ${RESOLV_CONFIG}
           mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
@@ -938,6 +946,26 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
       fi
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
+    fi
+    # Determine what actions to take if we dont install unbound
+    if [ "${INSTALL_UNBOUND}" == false ]; then
+      if [ ! -x "$(command -v resolvconf)" ]; then
+        if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+          apt-get update
+          apt-get install resolvconf -y
+        elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          yum update
+          yum install resolvconf -y
+        elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+          pacman -Syu --noconfirm --needed resolvconf
+        elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
+          apk update
+          apk add resolvconf
+        elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
+          pkg update
+          pkg install resolvconf
+        fi
+      fi
     fi
   }
 
