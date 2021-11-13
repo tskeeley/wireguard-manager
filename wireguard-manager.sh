@@ -114,7 +114,6 @@ UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
 UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
-UNBOUND_CONFIG_HOST_TMP="/tmp/hosts"
 
 # Usage Guide
 function usage-guide() {
@@ -914,9 +913,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "Unbound: true" >>${UNBOUND_MANAGER}
         if [ "${INSTALL_BLOCK_LIST}" == true ]; then
           echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-          curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-          awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
-          rm -f ${UNBOUND_CONFIG_HOST_TMP}
+          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
         fi
         # restart unbound
         if pgrep systemd-journal; then
@@ -1324,10 +1321,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-          rm -f ${UNBOUND_CONFIG_HOST}
-          curl "${UNBOUND_CONFIG_HOST_URL}" -o ${UNBOUND_CONFIG_HOST_TMP}
-          awk '$1' ${UNBOUND_CONFIG_HOST_TMP} | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >>${UNBOUND_CONFIG_HOST}
-          rm -f ${UNBOUND_CONFIG_HOST_TMP}
+          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
         if pgrep systemd-journal; then
@@ -1343,7 +1337,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       if [ -d "${WIREGUARD_PATH}" ]; then
         BACKUP_PASSWORD="$(openssl rand -hex 25)"
-        echo "${BACKUP_PASSWORD}" >>"${WIREGUARD_BACKUP_PASSWORD_PATH}"
+        echo "${BACKUP_PASSWORD}" >"${WIREGUARD_BACKUP_PASSWORD_PATH}"
         zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
       fi
       ;;
