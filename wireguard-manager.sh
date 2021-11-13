@@ -504,25 +504,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${DISABLE_HOST_SETTINGS} in
     1)
-      if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-        echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-        sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
+      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
+      echo "net.ipv6.conf.all.forwarding=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
       ;;
     2)
-      if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-        sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
+      echo "net.ipv6.conf.all.forwarding=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
       ;;
     3)
-      if [ ! -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        echo "net.ipv4.ip_forward=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-        sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
+      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
       ;;
     esac
+    sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
   }
 
   # Disable IPv4 or IPv6
