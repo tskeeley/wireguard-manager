@@ -56,14 +56,13 @@ function installing-system-requirements() {
         pkg update
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf
       fi
-      chattr -i /etc/resolv.conf
-      # Note: Removes all lines that begin with a #, as well as all empty lines.
-      sed -i "/^#/d" /etc/resolv.conf
-      sed -i "/^$/d" /etc/resolv.conf
       if ! grep -q "nameserver" /etc/resolv.conf; then
+        chattr -i /etc/resolv.conf
+        mv /etc/resolv.conf /etc/resolv.conf.bak
         echo "nameserver 1.1.1.1" >>/etc/resolv.conf
+        echo "nameserver 2606:4700:4700::1111" >>/etc/resolv.conf
+        chattr +i /etc/resolv.conf
       fi
-      chattr +i /etc/resolv.conf
     fi
   else
     echo "Error: ${CURRENT_DISTRO} ${CURRENT_DISTRO_VERSION} is not supported."
