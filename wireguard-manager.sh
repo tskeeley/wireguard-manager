@@ -867,15 +867,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if [ ! -x "$(command -v unbound)" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound unbound-host -y
-          if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-            if pgrep systemd-journal; then
-              systemctl stop systemd-resolved
-              systemctl disable systemd-resolved
-            else
-              service systemd-resolved stop
-              service systemd-resolved disable
-            fi
-          fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum install unbound unbound-libs -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
