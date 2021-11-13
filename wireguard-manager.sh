@@ -887,17 +887,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound
         fi
-        if [ -f "${UNBOUND_ANCHOR}" ]; then
-          rm -f ${UNBOUND_ANCHOR}
-        fi
         unbound-anchor -a ${UNBOUND_ANCHOR}
-        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          rm -f ${UNBOUND_ROOT_HINTS}
-        fi
         curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
-        if [ -f "${UNBOUND_CONFIG}" ]; then
-          rm -f ${UNBOUND_CONFIG}
-        fi
         NPROC=$(nproc)
         echo "server:
     num-threads: ${NPROC}
@@ -926,10 +917,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     cache-max-ttl: 14400
     prefetch: yes
     qname-minimisation: yes
-    prefetch-key: yes" >>${UNBOUND_CONFIG}
-        if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-          rm -f ${RESOLV_CONFIG_OLD}
-        fi
+    prefetch-key: yes" >${UNBOUND_CONFIG}
         if [ -f "${RESOLV_CONFIG}" ]; then
           chattr -i ${RESOLV_CONFIG}
           mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
@@ -1349,7 +1337,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
