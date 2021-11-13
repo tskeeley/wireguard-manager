@@ -119,6 +119,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
 UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
 UNBOUND_CONFIG_HOST_TMP="/tmp/hosts"
@@ -878,6 +879,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         unbound-anchor -a ${UNBOUND_ANCHOR}
         curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+        if [ ! -f "${UNBOUND_ROOT_HINTS}" ]; then
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP} -o ${UNBOUND_ROOT_HINTS}
+        fi
         NPROC=$(nproc)
         echo "server:
     num-threads: ${NPROC}
@@ -1326,7 +1330,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          rm -f ${UNBOUND_ROOT_HINTS}
           curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+        fi
+        if [ ! -f "${UNBOUND_ROOT_HINTS}" ]; then
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP} -o ${UNBOUND_ROOT_HINTS}
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
