@@ -1330,7 +1330,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          rm -f ${UNBOUND_ROOT_HINTS}
           curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+        fi
+        if [ ! -f "${UNBOUND_ROOT_HINTS}" ]; then
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL_BACKUP} -o ${UNBOUND_ROOT_HINTS}
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
