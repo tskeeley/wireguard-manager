@@ -57,7 +57,10 @@ function installing-system-requirements() {
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs resolvconf
       fi
       chattr -i /etc/resolv.conf
+      # Note: All lines that begin with a # are removed.
       sed -i "/^#/d" /etc/resolv.conf
+      # Note: Removes all of the empty lines.
+      sed -i "/^$/d" /etc/resolv.conf
       if ! grep -q "nameserver" /etc/resolv.conf; then
         echo "nameserver 1.1.1.1" >>/etc/resolv.conf
       fi
