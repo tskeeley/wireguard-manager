@@ -36,3 +36,8 @@ jobs:
         run: sudo cat /etc/unbound/unbound.conf
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
+      - name: Test the local network.
+        run: |
+          curl -I https://www.example.com
+          curl -I https://www.example.net
+          curl -I https://www.example.org
