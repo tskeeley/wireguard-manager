@@ -40,21 +40,22 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v bc)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
+        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update
-        yum install curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
+        yum install epel-release elrepo-release -y
+        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
+        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
-        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
+        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
-        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
+        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs gnupg systemd
       fi
     fi
   else
@@ -68,13 +69,9 @@ installing-system-requirements
 
 # Checking For Virtualization
 function virt-check() {
-  # Deny OpenVZ Virtualization
-  if [ "$(systemd-detect-virt)" == "openvz" ]; then
-    echo "OpenVZ virtualization is not supported (yet)."
-    exit
-  # Deny LXC Virtualization
-  elif [ "$(systemd-detect-virt)" == "lxc" ]; then
-    echo "LXC virtualization is not supported (yet)."
+  # Deny certain virtualization
+  if [ "$(systemd-detect-virt)" != "kvm" ]; then
+    echo "$(systemd-detect-virt) virtualization is not supported (yet)."
     exit
   fi
 }
@@ -783,7 +780,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install wireguard -y
       elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-get update
-        apt-get install dirmngr -y
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
           echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -801,31 +797,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         dnf install wireguard-dkms wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
         yum update -y
-        yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 7 ]; then
         yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-          yum update -y
-        fi
-        yum install wireguard-dkms wireguard-tools -y
+        yum install yum-plugin-elrepo -y
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 8 ]; then
         yum update -y
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
         yum update -y
-        subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
-        yum copr enable jdoss/wireguard
-        yum install epel-release -y
-        yum install wireguard-dkms wireguard-tools -y
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 7 ]; then
         yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-          yum update -y
-        fi
-        yum install epel-release -y
-        yum install wireguard-dkms wireguard-tools -y
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add wireguard-tools
@@ -834,7 +819,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pkg install wireguard
       elif { [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update -y
-        yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
       fi
     fi
@@ -846,9 +830,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      if [ ! -x "$(command -v unbound)" ]; then
+      if { [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install unbound unbound-host resolvconf -y
+          apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if pgrep systemd-journal; then
               systemctl stop systemd-resolved
@@ -859,7 +843,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             fi
           fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum install unbound unbound-libs resolvconf -y
+          yum install unbound resolvconf -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
@@ -869,10 +853,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound resolvconf
         fi
-        unbound-anchor -a ${UNBOUND_ANCHOR}
-        curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
-        NPROC=$(nproc)
-        echo "server:
+      fi
+      unbound-anchor -a ${UNBOUND_ANCHOR}
+      curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
+      NPROC=$(nproc)
+      echo "server:
     num-threads: ${NPROC}
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
@@ -900,29 +885,28 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >${UNBOUND_CONFIG}
-        if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-          rm -f ${RESOLV_CONFIG_OLD}
-        fi
-        if [ -f "${RESOLV_CONFIG}" ]; then
-          chattr -i ${RESOLV_CONFIG}
-          mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
-        fi
-        echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
-        echo "nameserver ::1" >>${RESOLV_CONFIG}
-        chattr +i ${RESOLV_CONFIG}
-        echo "Unbound: true" >>${UNBOUND_MANAGER}
-        if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-          echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
-        fi
-        # restart unbound
-        if pgrep systemd-journal; then
-          systemctl reenable unbound
-          systemctl restart unbound
-        else
-          service unbound enable
-          service unbound restart
-        fi
+      if [ -f "${RESOLV_CONFIG_OLD}" ]; then
+        rm -f ${RESOLV_CONFIG_OLD}
+      fi
+      if [ -f "${RESOLV_CONFIG}" ]; then
+        chattr -i ${RESOLV_CONFIG}
+        mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
+      fi
+      echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+      echo "nameserver ::1" >>${RESOLV_CONFIG}
+      chattr +i ${RESOLV_CONFIG}
+      echo "Unbound: true" >>${UNBOUND_MANAGER}
+      if [ "${INSTALL_BLOCK_LIST}" == true ]; then
+        echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
+      fi
+      # restart unbound
+      if pgrep systemd-journal; then
+        systemctl reenable unbound
+        systemctl restart unbound
+      else
+        service unbound enable
+        service unbound restart
       fi
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
@@ -1237,7 +1221,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
       elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-key del 04EE7237B7D453EC
-        apt-get remove --purge wireguard qrencode haveged dirmngr -y
+        apt-get remove --purge wireguard qrencode haveged -y
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
@@ -1281,11 +1265,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           chattr +i ${RESOLV_CONFIG}
         fi
         if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ]; }; then
-          yum remove unbound unbound-host -y
+          yum remove unbound -y
         elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get remove --purge unbound unbound-host -y
+          apt-get remove --purge unbound -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          pacman -Rs --noconfirm unbound unbound-host
+          pacman -Rs --noconfirm unbound
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf remove unbound -y
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
