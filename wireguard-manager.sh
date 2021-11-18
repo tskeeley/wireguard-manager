@@ -836,7 +836,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-unbound() {
     if [ "${INSTALL_UNBOUND}" == true ]; then
       if [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v unbound-anchor)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
-        if  { { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound unbound-anchor resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if pgrep systemd-journal; then
