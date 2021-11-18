@@ -857,10 +857,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound resolvconf
         fi
-        unbound-anchor -a ${UNBOUND_ANCHOR}
-        curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
-        NPROC=$(nproc)
-        echo "server:
+      fi
+      unbound-anchor -a ${UNBOUND_ANCHOR}
+      curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
+      NPROC=$(nproc)
+      echo "server:
     num-threads: ${NPROC}
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
@@ -888,29 +889,28 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     prefetch: yes
     qname-minimisation: yes
     prefetch-key: yes" >${UNBOUND_CONFIG}
-        if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-          rm -f ${RESOLV_CONFIG_OLD}
-        fi
-        if [ -f "${RESOLV_CONFIG}" ]; then
-          chattr -i ${RESOLV_CONFIG}
-          mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
-        fi
-        echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
-        echo "nameserver ::1" >>${RESOLV_CONFIG}
-        chattr +i ${RESOLV_CONFIG}
-        echo "Unbound: true" >>${UNBOUND_MANAGER}
-        if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-          echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
-        fi
-        # restart unbound
-        if pgrep systemd-journal; then
-          systemctl reenable unbound
-          systemctl restart unbound
-        else
-          service unbound enable
-          service unbound restart
-        fi
+      if [ -f "${RESOLV_CONFIG_OLD}" ]; then
+        rm -f ${RESOLV_CONFIG_OLD}
+      fi
+      if [ -f "${RESOLV_CONFIG}" ]; then
+        chattr -i ${RESOLV_CONFIG}
+        mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
+      fi
+      echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+      echo "nameserver ::1" >>${RESOLV_CONFIG}
+      chattr +i ${RESOLV_CONFIG}
+      echo "Unbound: true" >>${UNBOUND_MANAGER}
+      if [ "${INSTALL_BLOCK_LIST}" == true ]; then
+        echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
+      fi
+      # restart unbound
+      if pgrep systemd-journal; then
+        systemctl reenable unbound
+        systemctl restart unbound
+      else
+        service unbound enable
+        service unbound restart
       fi
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
