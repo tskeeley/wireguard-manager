@@ -46,7 +46,8 @@ function installing-system-requirements() {
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update
-        yum install curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
+        yum install epel-release elrepo-release -y
+        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables bc ifupdown e2fsprogs
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -801,31 +802,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         dnf install wireguard-dkms wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
         yum update -y
-        yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 7 ]; then
         yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-          yum update -y
-        fi
-        yum install wireguard-dkms wireguard-tools -y
+        yum install yum-plugin-elrepo -y
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 8 ]; then
         yum update -y
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
         yum update -y
-        subscription-manager repos --enable codeready-builder-for-rhel-8-"$(arch)"-rpms
-        yum copr enable jdoss/wireguard
-        yum install epel-release -y
-        yum install wireguard-dkms wireguard-tools -y
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 7 ]; then
         yum update -y
-        if [ ! -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          curl https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo --create-dirs -o /etc/yum.repos.d/wireguard.repo
-          yum update -y
-        fi
-        yum install epel-release -y
-        yum install wireguard-dkms wireguard-tools -y
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+        yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add wireguard-tools
@@ -834,7 +824,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pkg install wireguard
       elif { [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum update -y
-        yum install elrepo-release epel-release -y
         yum install kmod-wireguard wireguard-tools -y
       fi
     fi
