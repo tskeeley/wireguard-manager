@@ -70,10 +70,13 @@ installing-system-requirements
 # Checking For Virtualization
 function virt-check() {
   # Deny certain virtualization
-  if [ "$(systemd-detect-virt)" != "kvm" ]; then
+  case $(systemd-detect-virt) in
+  "kvm" | "none") ;;
+  *)
     echo "$(systemd-detect-virt) virtualization is not supported (yet)."
     exit
-  fi
+    ;;
+  esac
 }
 
 # Virtualization Check
