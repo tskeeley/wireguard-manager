@@ -784,7 +784,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install wireguard -y
       elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-get update
-        apt-get install dirmngr -y
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
           echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -835,9 +834,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      if { [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v unbound-anchor)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
+      if { [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install unbound unbound-anchor resolvconf -y
+          apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if pgrep systemd-journal; then
               systemctl stop systemd-resolved
@@ -848,15 +847,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             fi
           fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum install unbound unbound-anchor resolvconf -y
+          yum install unbound resolvconf -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          dnf install unbound unbound-anchor resolvconf -y
+          dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm unbound unbound-anchor resolvconf
+          pacman -Syu --noconfirm unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-          apk add unbound unbound-anchor resolvconf
+          apk add unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-          pkg install unbound unbound-anchor resolvconf
+          pkg install unbound resolvconf
         fi
         unbound-anchor -a ${UNBOUND_ANCHOR}
         curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
@@ -1226,7 +1225,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
       elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
         apt-key del 04EE7237B7D453EC
-        apt-get remove --purge wireguard qrencode haveged dirmngr -y
+        apt-get remove --purge wireguard qrencode haveged -y
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
