@@ -319,10 +319,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     2)
       read -rp "Custom IPv4:" SERVER_HOST_V4
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
@@ -343,16 +343,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     1)
       SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     2)
       read -rp "Custom IPv6:" SERVER_HOST_V6
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
