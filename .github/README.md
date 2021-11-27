@@ -200,9 +200,6 @@ Is there WireGuard documentation?
 How do I install a wireguard without the questions? (Headless Install)
 - ```./wireguard-manager.sh --install```
 
-Is there any alternative to wireguard?
-- [ShadowSocks](https://github.com/complexorganizations/shadowsocks-manager)
-
 Are there any good alternative to self-hosting vpn?
 - [CloudFlare Warp](https://1.1.1.1/)
 
