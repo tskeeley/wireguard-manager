@@ -71,7 +71,7 @@ installing-system-requirements
 function virt-check() {
   # Deny certain virtualization
   case $(systemd-detect-virt) in
-  "kvm" | "none") ;;
+  "kvm" | "none" | "qemu") ;;
   *)
     echo "$(systemd-detect-virt) virtualization is not supported (yet)."
     exit
