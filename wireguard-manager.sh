@@ -721,7 +721,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       AUTOMATIC_WIREGUARD_EXPIRATION=true
       ;;
     2)
-      echo "The auto-config expiration feature has been deactivated."
+      AUTOMATIC_WIREGUARD_EXPIRATION=false
       ;;
     esac
   }
