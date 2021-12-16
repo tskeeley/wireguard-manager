@@ -293,7 +293,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Private Subnet Mask IPv4
   PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
   # IPv4 Getaway
-  GATEWAY_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}1"
+  GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).1
   # Private Subnet Ipv6
   PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"${IPV6_SUBNET}"}
   # Private Subnet Mask IPv6
