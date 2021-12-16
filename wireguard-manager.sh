@@ -12,17 +12,6 @@ function super-user-check() {
 # Check for root
 super-user-check
 
-# Check for docker installation
-function docker-check() {
-  if [ -f "/.dockerenv" ]; then
-    echo "Error: The shell script is executing within the docker container."
-    exit
-  fi
-}
-
-# Check for docker installation
-docker-check
-
 # Get the current system information
 function system-information() {
   if [ -f /etc/os-release ]; then
