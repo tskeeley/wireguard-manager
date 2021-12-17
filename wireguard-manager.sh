@@ -845,6 +845,23 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
+      case $(shuf -i1-5 -n1) in
+      1)
+        UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
+        ;;
+      2)
+        UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/assets/named.cache"
+        ;;
+      3)
+        UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
+        ;;
+      4)
+        UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
+        ;;
+      5)
+        UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+        ;;
+      esac
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
       NPROC=$(nproc)
       echo "server:
@@ -888,6 +905,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Unbound: true" >>${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        case $(shuf -i1-4 -n1) in
+        1)
+          UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
+          ;;
+        2)
+          UNBOUND_CONFIG_HOST_URL="https://cdn.statically.io/gh/complexorganizations/content-blocker/main/assets/hosts"
+          ;;
+        3)
+          UNBOUND_CONFIG_HOST_URL="https://cdn.jsdelivr.net/gh/complexorganizations/content-blocker/assets/hosts"
+          ;;
+        4)
+          UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
+          ;;
+        esac
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
