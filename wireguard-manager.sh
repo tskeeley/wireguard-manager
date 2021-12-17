@@ -81,13 +81,13 @@ function kernel-check() {
 }
 
 # Global variables
+CURRENT_FILE_PATH=$(realpath "${0}")
 WIREGUARD_WEBSITE_URL="https://www.wireguard.com"
 WIREGUARD_PATH="/etc/wireguard"
 WIREGUARD_CLIENT_PATH="${WIREGUARD_PATH}/clients"
 WIREGUARD_PUB_NIC="wg0"
 WIREGUARD_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}.conf"
 WIREGUARD_ADD_PEER_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}-add-peer.conf"
-WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
 SYSTEM_BACKUP_PATH="/var/backups"
 CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
 WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
@@ -100,8 +100,6 @@ UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
-UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
 
 # Usage Guide
@@ -544,7 +542,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     1)
       crontab -l | {
         cat
-        echo "0 0 * * * $(realpath "${0}") --update"
+        echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -575,7 +573,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     1)
       crontab -l | {
         cat
-        echo "0 0 * * * $(realpath "${0}") --backup"
+        echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -960,7 +958,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
-        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | $(realpath "${0}") --remove"
+        echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
       if pgrep systemd-journal; then
         systemctl enable cron
@@ -1125,10 +1123,10 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       # If automaic wireguard expiration is enabled than set the expiration date.
-      if crontab -l | grep -q "$(realpath "${0}") --remove"; then
+      if crontab -l | grep -q "${CURRENT_FILE_PATH}" --remove; then
         crontab -l | {
           cat
-          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | $(realpath "${0}") --remove"
+          echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
         } | crontab -
       fi
       # Service Restart
@@ -1286,20 +1284,64 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
       fi
       # If any cronjobs are identified, they should be removed.
-      crontab -l | grep -v "$(realpath "${0}")" | crontab -
+      crontab -l | grep -v "${CURRENT_FILE_PATH}" | crontab -
       ;;
     9) # Update the script
-      CURRENT_FILE_PATH="$(realpath "${0}")"
-      curl -o "${CURRENT_FILE_PATH}" ${WIREGUARD_MANAGER_UPDATE}
+      case $(shuf -i1-4 -n1) in
+      1)
+        WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+        ;;
+      2)
+        WIREGUARD_MANAGER_UPDATE="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+        ;;
+      3)
+        WIREGUARD_MANAGER_UPDATE="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/wireguard-manager.sh"
+        ;;
+      4)
+        WIREGUARD_MANAGER_UPDATE="https://combinatronics.io/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+        ;;
+      esac
+      curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
       chmod +x "${CURRENT_FILE_PATH}"
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          curl -o ${UNBOUND_ROOT_HINTS} ${UNBOUND_ROOT_SERVER_CONFIG_URL}
+          case $(shuf -i1-5 -n1) in
+          1)
+            UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
+            ;;
+          2)
+            UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/assets/named.cache"
+            ;;
+          3)
+            UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
+            ;;
+          4)
+            UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
+            ;;
+          5)
+            UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+            ;;
+          esac
+          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+          case $(shuf -i1-4 -n1) in
+          1)
+            UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
+            ;;
+          2)
+            UNBOUND_CONFIG_HOST_URL="https://cdn.statically.io/gh/complexorganizations/content-blocker/main/assets/hosts"
+            ;;
+          3)
+            UNBOUND_CONFIG_HOST_URL="https://cdn.jsdelivr.net/gh/complexorganizations/content-blocker/assets/hosts"
+            ;;
+          4)
+            UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
+            ;;
+          esac
           curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
