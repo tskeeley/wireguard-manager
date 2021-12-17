@@ -845,7 +845,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
-      curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} --create-dirs -o ${UNBOUND_ROOT_HINTS}
+      curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
       NPROC=$(nproc)
       echo "server:
     num-threads: ${NPROC}
