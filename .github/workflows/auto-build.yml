@@ -1,0 +1,47 @@
+name: Build the latest version
+on:
+  push:
+    paths:
+      - "**.sh"
+jobs:
+  build:
+    name: Build on ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the directory
+        uses: actions/checkout@v2
+      - name: Change systemd-detect-virt to enable the github workflow
+        run: sudo sed -i 's/"kvm" | "none" | "qemu"/"kvm" | "none" | "qemu"| "docker"/g' wireguard-manager.sh
+      - name: Install wireguard via wireguard-manager
+        run: sudo ./wireguard-manager.sh --install
+      - name: Start wireguard service
+        run: sudo ./wireguard-manager.sh --start
+      - name: Stop WireGuard service
+        run: sudo ./wireguard-manager.sh --stop
+      - name: Restart WireGuard service
+        run: sudo ./wireguard-manager.sh --restart
+      - name: Add a new WireGuard peer
+        run: echo -e "\n" | sudo ./wireguard-manager.sh --add
+      - name: Test wireguard-manager ddns.
+        run: sudo ./wireguard-manager.sh --ddns
+      - name: Test wireguard-manager backup.
+        run: sudo ./wireguard-manager.sh --backup
+      - name: View WireGuard configuration.
+        run: sudo cat /etc/wireguard/wg0.conf
+      - name: Test wireguard-manager purge.
+        run: sudo ./wireguard-manager.sh --purge
+      - name: View unbound status.
+        run: sudo systemctl status unbound
+      - name: View Unbound configuration.
+        run: sudo cat /etc/unbound/unbound.conf
+      - name: View unbound anchor file.
+        run: sudo cat /var/lib/unbound/root.key
+      - name: View unbound root.hints.
+        run: sudo cat /etc/unbound/root.hints
+      - name: View the resolv.conf
+        run: sudo cat /etc/resolv.conf
+      - name: Test the local network.
+        run: |
+          curl -I https://www.example.com
+          curl -I https://www.example.net
+          curl -I https://www.example.org
