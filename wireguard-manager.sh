@@ -1168,7 +1168,7 @@ PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
       # If automaic wireguard expiration is enabled than set the expiration date.
-      if crontab -l | grep -q "${CURRENT_FILE_PATH}" --remove; then
+      if crontab -l | grep -q "${CURRENT_FILE_PATH} --remove"; then
         crontab -l | {
           cat
           echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
