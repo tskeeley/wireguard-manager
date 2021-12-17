@@ -101,6 +101,51 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
+case $(shuf -i1-5 -n1) in
+1)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
+  ;;
+2)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/assets/named.cache"
+  ;;
+3)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
+  ;;
+4)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
+  ;;
+5)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
+  ;;
+esac
+case $(shuf -i1-4 -n1) in
+1)
+  UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
+  ;;
+2)
+  UNBOUND_CONFIG_HOST_URL="https://cdn.statically.io/gh/complexorganizations/content-blocker/main/assets/hosts"
+  ;;
+3)
+  UNBOUND_CONFIG_HOST_URL="https://cdn.jsdelivr.net/gh/complexorganizations/content-blocker/assets/hosts"
+  ;;
+4)
+  UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
+  ;;
+esac
+case $(shuf -i1-4 -n1) in
+1)
+  WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+  ;;
+2)
+  WIREGUARD_MANAGER_UPDATE="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+  ;;
+3)
+  WIREGUARD_MANAGER_UPDATE="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/wireguard-manager.sh"
+  ;;
+4)
+  WIREGUARD_MANAGER_UPDATE="https://combinatronics.io/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+  ;;
+esac
 
 # Usage Guide
 function usage-guide() {
@@ -845,23 +890,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
-      case $(shuf -i1-5 -n1) in
-      1)
-        UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
-        ;;
-      2)
-        UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/assets/named.cache"
-        ;;
-      3)
-        UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
-        ;;
-      4)
-        UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
-        ;;
-      5)
-        UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-        ;;
-      esac
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
       NPROC=$(nproc)
       echo "server:
@@ -905,20 +933,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Unbound: true" >>${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-        case $(shuf -i1-4 -n1) in
-        1)
-          UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
-          ;;
-        2)
-          UNBOUND_CONFIG_HOST_URL="https://cdn.statically.io/gh/complexorganizations/content-blocker/main/assets/hosts"
-          ;;
-        3)
-          UNBOUND_CONFIG_HOST_URL="https://cdn.jsdelivr.net/gh/complexorganizations/content-blocker/assets/hosts"
-          ;;
-        4)
-          UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
-          ;;
-        esac
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
@@ -1318,61 +1332,16 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       crontab -l | grep -v "${CURRENT_FILE_PATH}" | crontab -
       ;;
     9) # Update the script
-      case $(shuf -i1-4 -n1) in
-      1)
-        WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
-        ;;
-      2)
-        WIREGUARD_MANAGER_UPDATE="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
-        ;;
-      3)
-        WIREGUARD_MANAGER_UPDATE="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/wireguard-manager.sh"
-        ;;
-      4)
-        WIREGUARD_MANAGER_UPDATE="https://combinatronics.io/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
-        ;;
-      esac
       curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
       chmod +x "${CURRENT_FILE_PATH}"
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
         # Refresh the root hints
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          case $(shuf -i1-5 -n1) in
-          1)
-            UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
-            ;;
-          2)
-            UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.statically.io/gh/complexorganizations/wireguard-manager/main/assets/named.cache"
-            ;;
-          3)
-            UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
-            ;;
-          4)
-            UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
-            ;;
-          5)
-            UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
-            ;;
-          esac
           curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-          case $(shuf -i1-4 -n1) in
-          1)
-            UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
-            ;;
-          2)
-            UNBOUND_CONFIG_HOST_URL="https://cdn.statically.io/gh/complexorganizations/content-blocker/main/assets/hosts"
-            ;;
-          3)
-            UNBOUND_CONFIG_HOST_URL="https://cdn.jsdelivr.net/gh/complexorganizations/content-blocker/assets/hosts"
-            ;;
-          4)
-            UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
-            ;;
-          esac
           curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
