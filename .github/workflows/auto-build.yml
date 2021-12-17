@@ -11,7 +11,7 @@ jobs:
       - name: Check out code into the directory
         uses: actions/checkout@v2
       - name: Change systemd-detect-virt to enable the github workflow
-        run: sudo sed -i 's/"kvm" | "none" | "qemu"/"kvm" | "none" | "qemu" | "docker"/g' wireguard-manager.sh
+        run: sudo sed -i 's/"kvm" | "none" | "qemu"/"kvm" | "none" | "qemu" | "microsoft"/g' wireguard-manager.sh
       - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
       - name: Start wireguard service
