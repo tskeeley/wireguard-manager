@@ -267,14 +267,8 @@ Give a ⭐️ and 🍴 if this project helped you!
 	</a>
 </p>
 
-- BCH : `qzq9ae4jlewtz7v7mn4tv7kav3dc9rvjwsg5f36099`
-- BSV : ``
-- BTC : `3QgnfTBaW4gn4y8QPEdXNJY6Y74nBwRXfR`
-- DAI : `0x8DAd9f838d5F2Ab6B14795d47dD1Fa4ED7D1AcaB`
-- ETC : `0xd42D20D7E1fC0adb98B67d36691754E3F944478A`
-- ETH : `0xe000C5094398dd83A3ef8228613CF4aD134eB0EA`
-- LTC : `MVwkmnnaLDq7UccDeudcpQYwFnnDwDxxmq`
-- XRP : `rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg (1790476900)`
+- Monero : `86uFC3LEfQi73rCS2tq6N2YKckbcyvKMCiJKSXEcLyYVW19nHiL9ec2FfaY3iAQEwhSxC7mTEGiFaVbHywirDi4rJjtczfH`
+- Ethereum : ``
 
 ---
 ### ❤️ Credits
