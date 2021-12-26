@@ -101,7 +101,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
-case $(shuf -i1-5 -n1) in
+case $(shuf -i1-6 -n1) in
 1)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
   ;;
@@ -117,8 +117,11 @@ case $(shuf -i1-5 -n1) in
 5)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
   ;;
+6)
+  UNBOUND_ROOT_SERVER_CONFIG_URL="https://gitlab.com/prajwal-koirala/wireguard-manager/-/raw/main/assets/named.cache"
+  ;;
 esac
-case $(shuf -i1-4 -n1) in
+case $(shuf -i1-5 -n1) in
 1)
   UNBOUND_CONFIG_HOST_URL="https://raw.githubusercontent.com/complexorganizations/content-blocker/main/assets/hosts"
   ;;
@@ -131,8 +134,11 @@ case $(shuf -i1-4 -n1) in
 4)
   UNBOUND_CONFIG_HOST_URL="https://combinatronics.io/complexorganizations/content-blocker/main/assets/hosts"
   ;;
+5)
+  UNBOUND_CONFIG_HOST_URL="https://gitlab.com/prajwal-koirala/content-blocker/-/raw/main/assets/hosts"
+  ;;
 esac
-case $(shuf -i1-4 -n1) in
+case $(shuf -i1-5 -n1) in
 1)
   WIREGUARD_MANAGER_UPDATE="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
   ;;
@@ -144,6 +150,9 @@ case $(shuf -i1-4 -n1) in
   ;;
 4)
   WIREGUARD_MANAGER_UPDATE="https://combinatronics.io/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
+  ;;
+5)
+  WIREGUARD_MANAGER_UPDATE="https://gitlab.com/prajwal-koirala/wireguard-manager/-/raw/main/wireguard-manager.sh"
   ;;
 esac
 
