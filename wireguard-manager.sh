@@ -735,7 +735,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ -x "$(command -v pihole)" ]; then
           CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
         else
-          CLIENT_DNS="1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+          INSTALL_UNBOUND=true
+          INSTALL_BLOCK_LIST=true
         fi
         ;;
       esac
