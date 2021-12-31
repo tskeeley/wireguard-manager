@@ -942,7 +942,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Unbound: true" >>${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
+        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
       if pgrep systemd-journal; then
@@ -1352,7 +1352,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         # The block list should be updated.
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" redirect\nlocal-data: \""$1" IN A 0.0.0.0\""}' >${UNBOUND_CONFIG_HOST}
+          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
         if pgrep systemd-journal; then
