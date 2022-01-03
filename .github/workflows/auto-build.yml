@@ -36,6 +36,8 @@ jobs:
         run: sudo ./wireguard-manager.sh --purge
       - name: View unbound status.
         run: sudo systemctl status unbound
+      - name: View crontab rules
+        run: sudo crontab -l
       - name: View Unbound configuration.
         run: sudo cat /etc/unbound/unbound.conf
       - name: View unbound anchor file.
@@ -52,3 +54,7 @@ jobs:
         run: sudo ./wireguard-manager.sh --uninstall
       - name: Curl example.org
         run: curl -I https://www.example.org
+      - name: View the resolv.conf
+        run: sudo cat /etc/resolv.conf
+      - name: View crontab rules
+        run: sudo crontab -l
