@@ -53,7 +53,7 @@ function installing-system-requirements() {
   fi
 }
 
-# Run the function and check for requirements
+# check for requirements
 installing-system-requirements
 
 # Checking For Virtualization
