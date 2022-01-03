@@ -681,7 +681,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Ask To Install DNS
   ask-install-dns
 
-  # Use custom dns
+  # Let the users choose their custom dns provider.
   function custom-dns() {
     if [ "${CUSTOM_DNS}" == true ]; then
       echo "Which DNS do you want to use with the WireGuard connection?"
