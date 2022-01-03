@@ -1064,7 +1064,7 @@ else
     done
     case ${WIREGUARD_OPTIONS} in
     1) # WG Show
-      wg show
+      wg show ${WIREGUARD_PUB_NIC}
       ;;
     2) # Enable & Start WireGuard
       if pgrep systemd-journal; then
