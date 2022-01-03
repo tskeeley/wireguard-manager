@@ -46,8 +46,9 @@ jobs:
         run: sudo cat /etc/unbound/unbound.conf.d/hosts.conf
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
-      - name: Test the local network.
-        run: |
-          curl -I https://www.example.com
-          curl -I https://www.example.net
-          curl -I https://www.example.org
+      - name: Curl example.com
+        run: curl -I https://www.example.com
+      - name: Uninstall wireguard completely
+        run: sudo ./wireguard-manager.sh --uninstall
+      - name: Curl example.org
+        run: curl -I https://www.example.org
