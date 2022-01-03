@@ -478,7 +478,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     esac
   }
 
-  # Keepalive
+  # Keepalive interval
   nat-keepalive
 
   # Custom MTU or default settings
