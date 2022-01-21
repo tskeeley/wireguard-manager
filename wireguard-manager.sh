@@ -19,7 +19,6 @@ function system-information() {
     source /etc/os-release
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
-    CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
   fi
 }
 
@@ -73,12 +72,15 @@ virt-check
 
 # Lets check the kernel version
 function kernel-check() {
+  CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
   ALLOWED_KERNEL_VERSION="3.1"
   if (($(echo "${CURRENT_KERNEL_VERSION} <= ${ALLOWED_KERNEL_VERSION}" | bc -l))); then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
   fi
 }
+
+kernel-check
 
 # Global variables
 CURRENT_FILE_PATH=$(realpath "${0}")
@@ -89,7 +91,6 @@ WIREGUARD_PUB_NIC="wg0"
 WIREGUARD_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}.conf"
 WIREGUARD_ADD_PEER_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}-add-peer.conf"
 SYSTEM_BACKUP_PATH="/var/backups"
-CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
 WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
 WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
