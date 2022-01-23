@@ -740,7 +740,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function client-name() {
     if [ -z "${CLIENT_NAME}" ]; then
       echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-      read -rp "Client name:" -e -i "$(openssl rand -hex 25)" CLIENT_NAME
+      read -rp "Client name:" -e -i "$(openssl rand -hex 50)" CLIENT_NAME
     fi
     if [ -z "${CLIENT_NAME}" ]; then
       CLIENT_NAME="$(openssl rand -hex 50)"
@@ -1095,7 +1095,7 @@ else
     5) # WireGuard add Peer
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         echo "Let's name the WireGuard Peer. Use one word only, no special characters, no spaces."
-        read -rp "New client peer:" -e -i "$(openssl rand -hex 25)" NEW_CLIENT_NAME
+        read -rp "New client peer:" -e -i "$(openssl rand -hex 50)" NEW_CLIENT_NAME
       fi
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         NEW_CLIENT_NAME="$(openssl rand -hex 50)"
@@ -1360,7 +1360,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         rm -f ${WIREGUARD_CONFIG_BACKUP}
       fi
       if [ -d "${WIREGUARD_PATH}" ]; then
-        BACKUP_PASSWORD="$(openssl rand -hex 25)"
+        BACKUP_PASSWORD="$(openssl rand -hex 50)"
         echo "${BACKUP_PASSWORD}" >"${WIREGUARD_BACKUP_PASSWORD_PATH}"
         zip -P "${BACKUP_PASSWORD}" -rj ${WIREGUARD_CONFIG_BACKUP} ${WIREGUARD_CONFIG}
       fi
