@@ -157,7 +157,7 @@ case $(shuf -i1-5 -n1) in
   ;;
 esac
 
-# Usage Guide
+# Usage Guide of the application
 function usage-guide() {
   echo "usage: ./$(basename "${0}") <command>"
   echo "  --install     Install WireGuard Interface"
