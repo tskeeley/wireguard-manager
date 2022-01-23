@@ -1184,14 +1184,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
         } | crontab -
       fi
-      # Service Restart
-      if pgrep systemd-journal; then
-        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
-        service wg-quick@${WIREGUARD_PUB_NIC} enable
-        service wg-quick@${WIREGUARD_PUB_NIC} restart
-      fi
       qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
       ;;
