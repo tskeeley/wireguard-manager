@@ -24,8 +24,8 @@ jobs:
         run: sudo ./wireguard-manager.sh --restart
       - name: View WireGuard status
         run: sudo systemctl status wg-quick@wg0
-      - name: Add a new WireGuard peer
-        run: echo -e "\n" | sudo ./wireguard-manager.sh --add
+      - name: Add 500 wireguard peers to the mix
+        run: for i in {1..500}; do echo -e "\n" | sudo ./wireguard-manager.sh --add; done
       - name: Test wireguard-manager ddns.
         run: sudo ./wireguard-manager.sh --ddns
       - name: Test wireguard-manager backup.
