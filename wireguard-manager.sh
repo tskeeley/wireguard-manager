@@ -966,8 +966,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     SERVER_PUBKEY=$(echo "${SERVER_PRIVKEY}" | wg pubkey)
     CLIENT_PRIVKEY=$(wg genkey)
     CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
-    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).3
-    CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}3"
+    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).2
+    CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}2"
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
@@ -1103,8 +1103,8 @@ else
       LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
       LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d ":" -f 5 | cut -d "/" -f 1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
-        LASTIPV4="2"
-        LASTIPV6="2"
+        LASTIPV4="1"
+        LASTIPV6="1"
       fi
       if { [ "${LASTIPV4}" -ge 255 ] && [ "${LASTIPV6}" -ge 255 ]; }; then
         CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
