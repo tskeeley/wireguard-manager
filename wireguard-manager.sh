@@ -353,18 +353,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V4_SETTINGS} in
     1)
-      SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     2)
       read -rp "Custom IPv4:" SERVER_HOST_V4
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
@@ -383,18 +383,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V6_SETTINGS} in
     1)
-      SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     2)
       read -rp "Custom IPv6:" SERVER_HOST_V6
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
@@ -1381,9 +1381,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     12) # Change the IP address of your wireguard interface.
       OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
-      NEW_SERVER_HOST="$(curl -4 --connect-timeout 5.00 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      NEW_SERVER_HOST="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${NEW_SERVER_HOST}" ]; then
-        NEW_SERVER_HOST="$(curl -4 --connect-timeout 5.00 -s 'https://checkip.amazonaws.com')"
+        NEW_SERVER_HOST="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
       fi
       sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
       ;;
