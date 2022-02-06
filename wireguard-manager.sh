@@ -73,8 +73,8 @@ virt-check
 # Lets check the kernel version
 function kernel-check() {
   CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-  CURRENT_KERNEL_MAJOR_VERSION=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f1)
-  CURRENT_KERNEL_MINOR_VERSION=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f2)
+  CURRENT_KERNEL_MAJOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d'.' -f1)
+  CURRENT_KERNEL_MINOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d'.' -f2)
   ALLOWED_KERNEL_VERSION="3.1"
   ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
   ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
