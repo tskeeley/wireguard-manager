@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Check out code into the directory
         uses: actions/checkout@v2
-      - name: Change systemd-detect-virt to enable the github workflow
-        run: sudo sed -i 's/"kvm" | "none" | "qemu"/"kvm" | "none" | "qemu" | "microsoft"/g' wireguard-manager.sh
+      - name: Curl example.net
+        run: curl -I https://www.example.net
       - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
       - name: Start wireguard service
@@ -20,28 +20,41 @@ jobs:
         run: sudo ./wireguard-manager.sh --stop
       - name: Restart WireGuard service
         run: sudo ./wireguard-manager.sh --restart
-      - name: Add a new WireGuard peer
-        run: echo -e "\n" | sudo ./wireguard-manager.sh --add
+      - name: View WireGuard status
+        run: sudo systemctl status wg-quick@wg0
+      - name: Add 500 wireguard peers to the mix
+        run: for i in {1..500}; do echo -e "\n" | sudo ./wireguard-manager.sh --add; done
       - name: Test wireguard-manager ddns.
         run: sudo ./wireguard-manager.sh --ddns
       - name: Test wireguard-manager backup.
         run: sudo ./wireguard-manager.sh --backup
+      - name: View WireGuard peers.
+        run: sudo ./wireguard-manager.sh --list
       - name: View WireGuard configuration.
         run: sudo cat /etc/wireguard/wg0.conf
       - name: Test wireguard-manager purge.
         run: sudo ./wireguard-manager.sh --purge
       - name: View unbound status.
         run: sudo systemctl status unbound
+      - name: View crontab rules
+        run: sudo crontab -l
       - name: View Unbound configuration.
         run: sudo cat /etc/unbound/unbound.conf
       - name: View unbound anchor file.
         run: sudo cat /var/lib/unbound/root.key
       - name: View unbound root.hints.
         run: sudo cat /etc/unbound/root.hints
+      - name: View unbound blocklist
+        run: sudo cat /etc/unbound/unbound.conf.d/hosts.conf
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
-      - name: Test the local network.
-        run: |
-          curl -I https://www.example.com
-          curl -I https://www.example.net
-          curl -I https://www.example.org
+      - name: Curl example.com
+        run: curl -I https://www.example.com
+      - name: Uninstall wireguard completely
+        run: sudo ./wireguard-manager.sh --uninstall
+      - name: Curl example.org
+        run: curl -I https://www.example.org
+      - name: View the resolv.conf
+        run: sudo cat /etc/resolv.conf
+      - name: View crontab rules
+        run: sudo crontab -l
