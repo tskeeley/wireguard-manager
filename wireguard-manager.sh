@@ -73,11 +73,11 @@ virt-check
 # Lets check the kernel version
 function kernel-check() {
   CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-  CURRENT_KERNEL_VERSION_MAJOR=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f1)
-  CURRENT_KERNEL_VERSION_MINOR=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f2)
+  CURRENT_KERNEL_MAJOR_VERSION_=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f1)
+  CURRENT_KERNEL_MINOR_VERSION=$(echo ${CURRENT_KERNEL_VERSION} | cut -d'.' -f2)
   ALLOWED_KERNEL_VERSION="3.1"
-  ALLOWED_KERNEL_VERSION_MAJOR=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
-  ALLOWED_KERNEL_VERSION_MINOR=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
+  ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
+  ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
   if [ "${CURRENT_KERNEL_MAJOR_VERSION_}" -lt "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
