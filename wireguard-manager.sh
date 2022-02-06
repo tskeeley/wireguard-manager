@@ -78,11 +78,13 @@ function kernel-check() {
   ALLOWED_KERNEL_VERSION="3.1"
   ALLOWED_KERNEL_VERSION_MAJOR=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
   ALLOWED_KERNEL_VERSION_MINOR=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
-  if (($(echo "${CURRENT_KERNEL_VERSION_MAJOR} < ${ALLOWED_KERNEL_VERSION_MAJOR}" | bc -l))); then
-    echo "Error: Kernel ${CURRENT_KERNEL_VERSION_MAJOR}.${CURRENT_KERNEL_VERSION_MINOR} not supported, please update to ${ALLOWED_KERNEL_VERSION} or higher."
+  if [ "${CURRENT_KERNEL_MAJOR_VERSION_}" -lt "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
+    echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
-    if (($(echo "${CURRENT_KERNEL_VERSION_MINOR} < ${ALLOWED_KERNEL_VERSION_MINOR}" | bc -l))); then
-      echo "Error: Kernel ${CURRENT_KERNEL_VERSION_MAJOR}.${CURRENT_KERNEL_VERSION_MINOR} not supported, please update to ${ALLOWED_KERNEL_VERSION} or higher."
+  fi
+  if [ "${CURRENT_KERNEL_MAJOR_VERSION_}" == "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
+    if [ "${CURRENT_KERNEL_MINOR_VERSION}" -lt "${ALLOWED_KERNEL_MINOR_VERSION}" ]; then
+      echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
       exit
     fi
   fi
