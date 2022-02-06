@@ -807,7 +807,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed linux-headers
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        dnf update -y
+        dnf check-update
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
@@ -855,10 +855,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Syu --noconfirm --needed wireguard-tools
       elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 32 ]; then
-        dnf update -y
+        dnf check-update
         dnf install wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 31 ]; then
-        dnf update -y
+        dnf check-update
         dnf copr enable jdoss/wireguard -y
         dnf install wireguard-dkms wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
