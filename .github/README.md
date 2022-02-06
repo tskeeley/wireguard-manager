@@ -169,7 +169,10 @@ usage: ./wireguard-manager.sh <command>
 | Virtualization  | Supported          |
 | --------------  | ------------------ |
 | KVM             |:heavy_check_mark:  |
-| LXC             |:x:                 |
+| None            |:heavy_check_mark:  |
+| Qemu            |:heavy_check_mark:  |
+| LXC             |:heavy_check_mark:  |
+| Microsoft       |:heavy_check_mark:  |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
 
