@@ -793,6 +793,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if [ "${CURRENT_KERNEL_MINOR_VERSION}" -lt "${ALLOWED_KERNEL_MINOR_VERSION}" ]; then
         INSTALL_LINUX_HEADERS=true
       fi
+      if [ "${CURRENT_KERNEL_MINOR_VERSION}" -ge "${ALLOWED_KERNEL_MINOR_VERSION}" ]; then
+        INSTALL_LINUX_HEADERS=false
+      fi
     fi
     if [ "${INSTALL_LINUX_HEADERS}" == true ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
