@@ -787,6 +787,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
     ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
     if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -le "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
+      INSTALL_LINUX_HEADERS=true
+    fi
+    if [ "${CURRENT_KERNEL_MAJOR_VERSION}" == "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
+      if [ "${CURRENT_KERNEL_MINOR_VERSION}" -lt "${ALLOWED_KERNEL_MINOR_VERSION}" ]; then
+        INSTALL_LINUX_HEADERS=true
+      fi
+    fi
+    if [ "${INSTALL_LINUX_HEADERS}" == true ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install linux-headers-"$(uname -r)" -y
@@ -802,8 +810,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         yum update -y
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
-    else
-      echo "Correct: You do not need kernel headers." >>/dev/null
     fi
   }
 
