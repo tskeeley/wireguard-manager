@@ -37,7 +37,8 @@ function installing-system-requirements() {
         yum install epel-release elrepo-release -y
         yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pacman -Sy
+        pacman -S --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
@@ -805,7 +806,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed linux-headers
+        pacman -Sy
+        pacman -S --noconfirm --needed linux-headers
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
         dnf check-update
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
@@ -853,7 +855,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed wireguard-tools
+        pacman -Sy
+        pacman -S --noconfirm --needed wireguard-tools
       elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 32 ]; then
         dnf check-update
         dnf install wireguard-tools -y
@@ -913,7 +916,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm unbound resolvconf
+          pacman -S --noconfirm unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk add unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
