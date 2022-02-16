@@ -28,22 +28,22 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd -y
+        apt-get install curl coreutils jq iproute2 lsof cron gawk grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
         yum install epel-release elrepo-release -y
-        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
+        yum install curl coreutils jq iproute lsof cronie gawk grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
-        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        apk add curl coreutils jq iproute2 lsof cronie gawk grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
-        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pkg install curl coreutils jq iproute2 lsof cronie gawk grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       fi
     fi
   else
@@ -609,10 +609,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
@@ -640,10 +640,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
@@ -900,10 +900,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-            if pgrep systemd-journal; then
+            if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
-            else
+            elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
               service systemd-resolved stop
               service systemd-resolved disable
             fi
@@ -967,10 +967,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl reenable unbound
         systemctl restart unbound
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service unbound enable
         service unbound restart
       fi
@@ -1036,19 +1036,19 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         cat
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
     fi
     # Service Restart
-    if pgrep systemd-journal; then
+    if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
       systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-    else
+    elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
       service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
@@ -1089,27 +1089,27 @@ else
       wg show ${WIREGUARD_PUB_NIC}
       ;;
     2) # Enable & Start WireGuard
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
       fi
       ;;
     3) # Disable & Stop WireGuard
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       ;;
     4) # Restart WireGuard
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1241,11 +1241,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     8) # Uninstall WireGuard and purging files
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
         wg-quick down ${WIREGUARD_PUB_NIC}
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
         wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1274,10 +1274,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         apt-get remove --purge wireguard qrencode haveged -y
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode haveged -y
-        if pgrep systemd-journal; then
+        if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
           systemctl reenable systemd-resolved
           systemctl restart systemd-resolved
-        else
+        elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
           service systemd-resolved enable
           service systemd-resolved restart
         fi
@@ -1313,10 +1313,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
-        if pgrep systemd-journal; then
+        if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
           systemctl disable unbound
           systemctl stop unbound
-        else
+        elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
           service unbound disable
           service unbound stop
         fi
@@ -1369,9 +1369,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
-        if pgrep systemd-journal; then
+        if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
           systemctl restart unbound
-        else
+        elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
           service unbound restart
         fi
       fi
@@ -1392,10 +1392,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
-      if pgrep systemd-journal; then
+      if [[ "$(readlink -f /sbin/init)" == *"systemd"* ]]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [[ "$(readlink -f /sbin/init)" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
