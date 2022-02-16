@@ -114,7 +114,7 @@ UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
 UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
-case $(shuf -i1-6 -n1) in
+case $(shuf -i1-5 -n1) in
 1)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
   ;;
@@ -125,12 +125,9 @@ case $(shuf -i1-6 -n1) in
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://cdn.jsdelivr.net/gh/complexorganizations/wireguard-manager/assets/named.cache"
   ;;
 4)
-  UNBOUND_ROOT_SERVER_CONFIG_URL="https://combinatronics.io/complexorganizations/wireguard-manager/main/assets/named.cache"
-  ;;
-5)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://www.internic.net/domain/named.cache"
   ;;
-6)
+5)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://gitlab.com/prajwal-koirala/wireguard-manager/-/raw/main/assets/named.cache"
   ;;
 esac
