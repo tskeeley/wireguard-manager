@@ -28,16 +28,17 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v pgrep)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v ps)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum update -y
+        yum check-update
         yum install epel-release elrepo-release -y
         yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pacman -Sy
+        pacman -S --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
@@ -94,6 +95,7 @@ kernel-check
 
 # Global variables
 CURRENT_FILE_PATH=$(realpath "${0}")
+CURRENT_INIT_SYSTEM=$(ps --no-headers -o comm 1)
 WIREGUARD_WEBSITE_URL="https://www.wireguard.com"
 WIREGUARD_PATH="/etc/wireguard"
 WIREGUARD_CLIENT_PATH="${WIREGUARD_PATH}/clients"
@@ -363,18 +365,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V4_SETTINGS} in
     1)
-      SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
       fi
       ;;
     2)
       read -rp "Custom IPv4:" SERVER_HOST_V4
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
@@ -393,18 +395,18 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V6_SETTINGS} in
     1)
-      SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+      SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
       fi
       ;;
     2)
       read -rp "Custom IPv6:" SERVER_HOST_V6
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
       fi
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl -6 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
+        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
       fi
       ;;
     esac
@@ -609,10 +611,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
       fi
@@ -640,10 +642,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
       fi
@@ -800,9 +802,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -le "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
       INSTALL_LINUX_HEADERS=true
     fi
-    if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -gt "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
-      INSTALL_LINUX_HEADERS=false
-    fi
     if [ "${CURRENT_KERNEL_MAJOR_VERSION}" == "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
       if [ "${CURRENT_KERNEL_MINOR_VERSION}" -lt "${ALLOWED_KERNEL_MINOR_VERSION}" ]; then
         INSTALL_LINUX_HEADERS=true
@@ -819,12 +818,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get update
         apt-get install raspberrypi-kernel-headers -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed linux-headers
+        pacman -Sy
+        pacman -S --noconfirm --needed linux-headers
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        dnf update -y
+        dnf check-update
         dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum update -y
+        yum check-update
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       fi
     fi
@@ -867,28 +867,29 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Syu --noconfirm --needed wireguard-tools
+        pacman -Sy
+        pacman -S --noconfirm --needed wireguard-tools
       elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 32 ]; then
-        dnf update -y
+        dnf check-update
         dnf install wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 31 ]; then
-        dnf update -y
+        dnf check-update
         dnf copr enable jdoss/wireguard -y
         dnf install wireguard-dkms wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
-        yum update -y
+        yum check-update
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 7 ]; then
-        yum update -y
+        yum check-update
         yum install yum-plugin-elrepo -y
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 8 ]; then
-        yum update -y
+        yum check-update
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
-        yum update -y
+        yum check-update
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 7 ]; then
-        yum update -y
+        yum check-update
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -898,7 +899,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pkg update
         pkg install wireguard
       elif { [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum update -y
+        yum check-update
         yum install kmod-wireguard wireguard-tools -y
       fi
     fi
@@ -914,10 +915,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-            if pgrep systemd-journal; then
+            if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
-            else
+            elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
               service systemd-resolved stop
               service systemd-resolved disable
             fi
@@ -927,7 +928,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -Syu --noconfirm unbound resolvconf
+          pacman -S --noconfirm unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk add unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
@@ -981,10 +982,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl reenable unbound
         systemctl restart unbound
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service unbound enable
         service unbound restart
       fi
@@ -1050,24 +1051,24 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         cat
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl enable cron
         systemctl start cron
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
       fi
     fi
     # Service Restart
-    if pgrep systemd-journal; then
+    if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
       systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-    else
+    elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
       service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
     # Generate QR Code
-    qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+    qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     echo "Client Config --> ${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
   }
 
@@ -1103,27 +1104,27 @@ else
       wg show ${WIREGUARD_PUB_NIC}
       ;;
     2) # Enable & Start WireGuard
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
       fi
       ;;
     3) # Disable & Stop WireGuard
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       ;;
     4) # Restart WireGuard
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1219,7 +1220,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${NEW_CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
         } | crontab -
       fi
-      qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+      qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
       echo "Client config --> ${WIREGUARD_CLIENT_PATH}/${NEW_CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
       ;;
     6) # Remove WireGuard Peer
@@ -1255,11 +1256,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     8) # Uninstall WireGuard and purging files
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
         wg-quick down ${WIREGUARD_PUB_NIC}
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
         wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1288,10 +1289,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         apt-get remove --purge wireguard qrencode haveged -y
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode haveged -y
-        if pgrep systemd-journal; then
+        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
           systemctl reenable systemd-resolved
           systemctl restart systemd-resolved
-        else
+        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
           service systemd-resolved enable
           service systemd-resolved restart
         fi
@@ -1327,10 +1328,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
-        if pgrep systemd-journal; then
+        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
           systemctl disable unbound
           systemctl stop unbound
-        else
+        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
           service unbound disable
           service unbound stop
         fi
@@ -1383,9 +1384,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
-        if pgrep systemd-journal; then
+        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
           systemctl restart unbound
-        else
+        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
           service unbound restart
         fi
       fi
@@ -1406,19 +1407,31 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
-      if pgrep systemd-journal; then
+      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      else
+      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
     12) # Change the IP address of your wireguard interface.
       OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $1}')
-      NEW_SERVER_HOST="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://api.ipengine.dev' | jq -r '.network.ip')"
-      if [ -z "${NEW_SERVER_HOST}" ]; then
-        NEW_SERVER_HOST="$(curl -4 --connect-timeout 5 --tlsv1.3 -s 'https://checkip.amazonaws.com')"
+      if [[ "${OLD_SERVER_HOST}" == *"."* ]]; then
+        NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        if [ -z "${NEW_SERVER_HOST}" ]; then
+          NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
+        fi
+      elif [[ "${OLD_SERVER_HOST}" == *":"* ]]; then
+        NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        if [ -z "${NEW_SERVER_HOST}" ]; then
+          NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
+        fi
+      else
+        NEW_SERVER_HOST="$(curl --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
+        if [ -z "${NEW_SERVER_HOST}" ]; then
+          NEW_SERVER_HOST="$(curl --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
+        fi
       fi
       sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
       ;;
@@ -1453,7 +1466,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       grep start ${WIREGUARD_CONFIG} | awk '{print $2}'
       read -rp "Peer's name:" VIEW_CLIENT_INFO
       if [ -f "${WIREGUARD_CLIENT_PATH}/${VIEW_CLIENT_INFO}-${WIREGUARD_PUB_NIC}.conf" ]; then
-        qrencode -t ansiutf8 -r ${WIREGUARD_CLIENT_PATH}/"${VIEW_CLIENT_INFO}"-${WIREGUARD_PUB_NIC}.conf
+        qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${VIEW_CLIENT_INFO}"-${WIREGUARD_PUB_NIC}.conf
         echo "Peer's config --> ${WIREGUARD_CLIENT_PATH}/${VIEW_CLIENT_INFO}-${WIREGUARD_PUB_NIC}.conf"
       fi
       ;;
