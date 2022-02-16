@@ -707,8 +707,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "  7) Quad9"
       echo "  8) FDN"
       echo "  9) Custom (Advanced)"
-      until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 9 ]; do
-        read -rp "DNS [1-9]:" -e -i 1 CLIENT_DNS_SETTINGS
+      if [ -x "$(command -v pihole)" ]; then
+        echo "  10) Pi-Hole (Advanced)"
+      fi
+      until [[ "${CLIENT_DNS_SETTINGS}" =~ ^[0-9]+$ ]] && [ "${CLIENT_DNS_SETTINGS}" -ge 1 ] && [ "${CLIENT_DNS_SETTINGS}" -le 10 ]; do
+        read -rp "DNS [1-10]:" -e -i 1 CLIENT_DNS_SETTINGS
       done
       case ${CLIENT_DNS_SETTINGS} in
       1)
@@ -739,6 +742,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         read -rp "Custom DNS:" CLIENT_DNS
         if [ -z "${CLIENT_DNS}" ]; then
           CLIENT_DNS="8.8.8.8,8.8.4.4,2001:4860:4860::8888,2001:4860:4860::8844"
+        fi
+        ;;
+      10)
+        if [ -x "$(command -v pihole)" ]; then
+          CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
+        else
+          INSTALL_UNBOUND=true
+          INSTALL_BLOCK_LIST=true
         fi
         ;;
       esac
