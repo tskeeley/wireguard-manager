@@ -1144,7 +1144,7 @@ else
       USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n)
       while [ "${SMALLEST_USED_IPV4}" -le "${LARGEST_USED_IPV4}" ]; do
         if [[ ! ${USED_IPV4_LIST[*]} =~ ${SMALLEST_USED_IPV4} ]]; then
-          FIND_UNUSED_IPV4=$SMALLEST_USED_IPV4
+          FIND_UNUSED_IPV4=${SMALLEST_USED_IPV4}
           break
         fi
         SMALLEST_USED_IPV4=$((SMALLEST_USED_IPV4 + 1))
@@ -1154,7 +1154,7 @@ else
       USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n)
       while [ "${SMALLEST_USED_IPV6}" -le "${LARGEST_USED_IPV6}" ]; do
         if [[ ! ${USED_IPV6_LIST[*]} =~ ${SMALLEST_USED_IPV6} ]]; then
-          FIND_UNUSED_IPV6=$SMALLEST_USED_IPV6
+          FIND_UNUSED_IPV6=${SMALLEST_USED_IPV6}
           break
         fi
         SMALLEST_USED_IPV6=$((SMALLEST_USED_IPV6 + 1))
