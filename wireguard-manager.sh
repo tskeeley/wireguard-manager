@@ -1192,8 +1192,8 @@ else
         fi
         sed -i "1s|${CURRENT_IPV4_RANGE}|${FINAL_IPV4_RANGE}|" ${WIREGUARD_CONFIG}
         sed -i "1s|${CURRENT_IPV6_RANGE}|${FINAL_IPV6_RANGE}|" ${WIREGUARD_CONFIG}
-        LASTIPV4="2"
-        LASTIPV6="2"
+        LASTIPV4="1"
+        LASTIPV6="1"
       fi
       CLIENT_PRIVKEY=$(wg genkey)
       CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
