@@ -609,8 +609,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
       if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
       elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
@@ -640,8 +645,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
       if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
       elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
@@ -1049,8 +1059,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
       if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
       elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
         service cron enable
         service cron start
