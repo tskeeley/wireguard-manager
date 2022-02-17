@@ -1133,14 +1133,14 @@ else
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         NEW_CLIENT_NAME="$(openssl rand -hex 50)"
       fi
-      LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-      LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d ":" -f 5 | cut -d "/" -f 1)
+      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | tail -n1)
+      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | tail -n1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
         LASTIPV4="1"
         LASTIPV6="1"
       fi
-      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | head -1)
-      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | tail -1)
+      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | head -n1)
+      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | tail -n1)
       USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n)
       while [ "${SMALLEST_USED_IPV4}" -le "${LARGEST_USED_IPV4}" ]; do
         if [[ ! ${USED_IPV4_LIST[*]} =~ ${SMALLEST_USED_IPV4} ]]; then
@@ -1149,8 +1149,8 @@ else
         fi
         SMALLEST_USED_IPV4=$((SMALLEST_USED_IPV4 + 1))
       done
-      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | head -1)
-      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | tail -1)
+      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | head -n1)
+      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | tail -n1)
       USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n)
       while [ "${SMALLEST_USED_IPV6}" -le "${LARGEST_USED_IPV6}" ]; do
         if [[ ! ${USED_IPV6_LIST[*]} =~ ${SMALLEST_USED_IPV6} ]]; then
