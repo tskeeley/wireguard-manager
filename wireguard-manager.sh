@@ -1136,8 +1136,8 @@ else
       LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | tail -n1)
       LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | tail -n1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
-        LASTIPV4="1"
-        LASTIPV6="1"
+        LASTIPV4=1
+        LASTIPV6=1
       fi
       SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | head -n1)
       LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | tail -n1)
