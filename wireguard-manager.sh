@@ -1249,34 +1249,43 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       crontab -l | grep -v "${REMOVECLIENT}" | crontab -
       ;;
     7) # Reinstall WireGuard
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+        service wg-quick@${WIREGUARD_PUB_NIC} disable
+        service wg-quick@${WIREGUARD_PUB_NIC} stop
+      fi
+      wg-quick down ${WIREGUARD_PUB_NIC}
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
-        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum reinstall wireguard-tools -y
-        service wg-quick@${WIREGUARD_PUB_NIC} restart
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm wireguard-tools
-        systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk fix wireguard-tools
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg check wireguard
+      fi
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+        service wg-quick@${WIREGUARD_PUB_NIC} enable
+        service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
     8) # Uninstall WireGuard and purging files
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-        wg-quick down ${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
-        wg-quick down ${WIREGUARD_PUB_NIC}
       fi
+      wg-quick down ${WIREGUARD_PUB_NIC}
       # Removing Wireguard Files
       if [ -d "${WIREGUARD_PATH}" ]; then
         rm -rf ${WIREGUARD_PATH}
