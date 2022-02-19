@@ -1119,11 +1119,9 @@ else
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-        echo one
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
-        echo two
       fi
       ;;
     3) # Disable & Stop WireGuard
