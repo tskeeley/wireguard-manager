@@ -173,6 +173,7 @@ usage: ./wireguard-manager.sh <command>
 | Qemu            |:heavy_check_mark:  |
 | LXC             |:heavy_check_mark:  |
 | Microsoft       |:heavy_check_mark:  |
+| Vmware          |:heavy_check_mark:  |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
 
