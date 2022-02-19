@@ -60,7 +60,7 @@ installing-system-requirements
 function virt-check() {
   # Deny certain virtualization
   case $(systemd-detect-virt) in
-  "kvm" | "none" | "qemu" | "lxc" | "microsoft") ;;
+  "kvm" | "none" | "qemu" | "lxc" | "microsoft" | "vmware") ;;
   *)
     echo "$(systemd-detect-virt) virtualization is not supported (yet)."
     exit
@@ -608,10 +608,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
@@ -639,10 +644,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         cat
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
@@ -912,10 +922,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-            if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+            if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
               systemctl stop systemd-resolved
               systemctl disable systemd-resolved
-            elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+            elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
               service systemd-resolved stop
               service systemd-resolved disable
             fi
@@ -979,10 +989,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl reenable unbound
         systemctl restart unbound
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service unbound enable
         service unbound restart
       fi
@@ -1048,19 +1058,24 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         cat
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
-        systemctl enable cron
-        systemctl start cron
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          systemctl enable crond
+          systemctl start crond
+        else
+          systemctl enable cron
+          systemctl start cron
+        fi
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron enable
         service cron start
       fi
     fi
     # Service Restart
-    if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+    if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
       systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-    elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+    elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
       service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
@@ -1101,27 +1116,27 @@ else
       wg show ${WIREGUARD_PUB_NIC}
       ;;
     2) # Enable & Start WireGuard
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} start
       fi
       ;;
     3) # Disable & Stop WireGuard
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       ;;
     4) # Restart WireGuard
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1282,11 +1297,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     8) # Uninstall WireGuard and purging files
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
         wg-quick down ${WIREGUARD_PUB_NIC}
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
         wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1315,10 +1330,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         apt-get remove --purge wireguard qrencode haveged -y
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode haveged -y
-        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+        if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
           systemctl reenable systemd-resolved
           systemctl restart systemd-resolved
-        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+        elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved enable
           service systemd-resolved restart
         fi
@@ -1354,10 +1369,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
-        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+        if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
           systemctl disable unbound
           systemctl stop unbound
-        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+        elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service unbound disable
           service unbound stop
         fi
@@ -1410,9 +1425,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
         fi
         # Once everything is completed, restart the service.
-        if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+        if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
           systemctl restart unbound
-        elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+        elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service unbound restart
         fi
       fi
@@ -1433,10 +1448,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
-      if [ "${CURRENT_INIT_SYSTEM}" == "systemd" ]; then
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
-      elif [ "${CURRENT_INIT_SYSTEM}" == "init" ]; then
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
