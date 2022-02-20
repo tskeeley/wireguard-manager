@@ -14,10 +14,10 @@ jobs:
         run: curl -I https://www.example.net
       - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
-      - name: Start wireguard service
-        run: sudo ./wireguard-manager.sh --start
       - name: Stop WireGuard service
         run: sudo ./wireguard-manager.sh --stop
+      - name: Start wireguard service
+        run: sudo ./wireguard-manager.sh --start
       - name: Restart WireGuard service
         run: sudo ./wireguard-manager.sh --restart
       - name: View WireGuard status
