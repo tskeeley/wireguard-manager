@@ -1425,14 +1425,15 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     12) # Change the IP address of your wireguard interface.
-      if [[ $(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}') != *"["* ]]; then
+      CURRENT_IP_METHORD=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}')
+      if [[ ${CURRENT_IP_METHORD} != *"["* ]]; then
         OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | cut -d ':' -f1)
         NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${NEW_SERVER_HOST}" ]; then
           NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
         fi
       fi
-      if [[ $(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}') == *"["* ]]; then
+      if [[ ${CURRENT_IP_METHORD} == *"["* ]]; then
         OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | cut -d "[" -f2 | cut -d "]" -f1)
         NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${NEW_SERVER_HOST}" ]; then
