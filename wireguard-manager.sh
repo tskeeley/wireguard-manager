@@ -1126,23 +1126,11 @@ else
     1) # WG Show
       wg show ${WIREGUARD_PUB_NIC}
       ;;
-    2) # Enable & Start WireGuard
-      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} enable
-        service wg-quick@${WIREGUARD_PUB_NIC} start
-      fi
+    2) # Start WireGuard
+      wg-quick up ${WIREGUARD_PUB_NIC}
       ;;
-    3) # Disable & Stop WireGuard
-      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
-      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} disable
-        service wg-quick@${WIREGUARD_PUB_NIC} stop
-      fi
+    3) # Stop WireGuard
+      wg-quick down ${WIREGUARD_PUB_NIC}
       ;;
     4) # Restart WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
