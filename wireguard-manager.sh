@@ -942,7 +942,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum install unbound -y
-        elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
+        elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
           dnf install unbound resolvconf -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -S --noconfirm unbound resolvconf
@@ -950,6 +950,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apk add unbound resolvconf
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound resolvconf
+        elif [ "${CURRENT_DISTRO}" == "ol" ]; then
+          dnf install unbound -y
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
