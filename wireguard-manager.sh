@@ -47,7 +47,6 @@ function installing-system-requirements() {
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         dnf check-update
-        dnf install install epel-release elrepo-release -y
         dnf install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
       fi
     fi
