@@ -177,6 +177,7 @@ usage: ./wireguard-manager.sh <command>
 | Vmware          |:heavy_check_mark:  |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
+| Wsl             |:x:                 |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
