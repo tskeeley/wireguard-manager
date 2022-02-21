@@ -148,6 +148,7 @@ usage: ./wireguard-manager.sh <command>
 | FreeBSD         |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Neon            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Rocky           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
+| Oracle          |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
@@ -176,6 +177,7 @@ usage: ./wireguard-manager.sh <command>
 | Vmware          |:heavy_check_mark:  |
 | OpenVZ          |:x:                 |
 | Docker          |:x:                 |
+| Wsl             |:x:                 |
 
 ### 💻 Compatibility with Linux Kernel
 | Kernel                 | Supported              |
