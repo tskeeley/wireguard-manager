@@ -116,7 +116,8 @@ UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
 UNBOUND_ANCHOR="/var/lib/unbound/root.key"
-UNBOUND_CONFIG_HOST="${UNBOUND_ROOT}/unbound.conf.d/hosts.conf"
+UNBOUND_CONFIG_DIRECTORY="${UNBOUND_ROOT}/unbound.conf.d"
+UNBOUND_CONFIG_HOST="${UNBOUND_CONFIG_DIRECTORY}/hosts.conf"
 case $(shuf -i1-5 -n1) in
 1)
   UNBOUND_ROOT_SERVER_CONFIG_URL="https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/assets/named.cache"
@@ -620,7 +621,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           systemctl start cron
         fi
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron enable
         service cron start
       fi
       ;;
@@ -656,7 +656,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           systemctl start cron
         fi
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron enable
         service cron start
       fi
       ;;
@@ -937,7 +936,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
               systemctl disable systemd-resolved
             elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
               service systemd-resolved stop
-              service systemd-resolved disable
             fi
           fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
@@ -974,6 +972,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     private-address: ${PRIVATE_SUBNET_V4}
     private-address: ${PRIVATE_SUBNET_V6}
     do-tcp: no
+    chroot: \"\"
     hide-identity: yes
     hide-version: yes
     harden-glue: yes
@@ -998,6 +997,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "Unbound: true" >>${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
+          mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
+        fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       # restart unbound
@@ -1005,7 +1007,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         systemctl reenable unbound
         systemctl restart unbound
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service unbound enable
         service unbound restart
       fi
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
@@ -1079,7 +1080,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
           systemctl start cron
         fi
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron enable
         service cron start
       fi
     fi
@@ -1088,7 +1088,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
     elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-      service wg-quick@${WIREGUARD_PUB_NIC} enable
       service wg-quick@${WIREGUARD_PUB_NIC} restart
     fi
     # Generate QR Code
@@ -1282,7 +1281,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1304,7 +1302,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
@@ -1313,7 +1310,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} disable
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
       wg-quick down ${WIREGUARD_PUB_NIC}
@@ -1345,7 +1341,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           systemctl reenable systemd-resolved
           systemctl restart systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-          service systemd-resolved enable
           service systemd-resolved restart
         fi
       elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
@@ -1386,7 +1381,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           systemctl disable unbound
           systemctl stop unbound
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-          service unbound disable
           service unbound stop
         fi
         if [ -f "${RESOLV_CONFIG_OLD}" ]; then
@@ -1465,7 +1459,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} enable
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
