@@ -972,6 +972,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     private-address: ${PRIVATE_SUBNET_V4}
     private-address: ${PRIVATE_SUBNET_V6}
     do-tcp: no
+    chroot: \"\"
     hide-identity: yes
     hide-version: yes
     harden-glue: yes
