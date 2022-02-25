@@ -196,59 +196,59 @@ function usage() {
     case ${1} in
     --install)
       shift
-      HEADLESS_INSTALL=${HEADLESS_INSTALL:-true}
+      HEADLESS_INSTALL=${HEADLESS_INSTALL=true}
       ;;
     --start)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-2}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=2}
       ;;
     --stop)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-3}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=3}
       ;;
     --restart)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-4}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=4}
       ;;
     --list)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-1}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=1}
       ;;
     --add)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-5}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=5}
       ;;
     --remove)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-6}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=6}
       ;;
     --reinstall)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-7}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=7}
       ;;
     --uninstall)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-8}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=8}
       ;;
     --update)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-9}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=9}
       ;;
     --backup)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-10}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=10}
       ;;
     --restore)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=11}
       ;;
     --ddns)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=12}
       ;;
     --purge)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-14}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=14}
       ;;
     --help)
       shift
