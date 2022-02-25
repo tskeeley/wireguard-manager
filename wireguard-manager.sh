@@ -196,59 +196,59 @@ function usage() {
     case ${1} in
     --install)
       shift
-      HEADLESS_INSTALL=${HEADLESS_INSTALL:-true}
+      HEADLESS_INSTALL=${HEADLESS_INSTALL=true}
       ;;
     --start)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-2}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=2}
       ;;
     --stop)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-3}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=3}
       ;;
     --restart)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-4}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=4}
       ;;
     --list)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-1}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=1}
       ;;
     --add)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-5}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=5}
       ;;
     --remove)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-6}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=6}
       ;;
     --reinstall)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-7}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=7}
       ;;
     --uninstall)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-8}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=8}
       ;;
     --update)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-9}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=9}
       ;;
     --backup)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-10}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=10}
       ;;
     --restore)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-11}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=11}
       ;;
     --ddns)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-12}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=12}
       ;;
     --purge)
       shift
-      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS:-14}
+      WIREGUARD_OPTIONS=${WIREGUARD_OPTIONS=14}
       ;;
     --help)
       shift
@@ -268,24 +268,24 @@ usage "$@"
 # All questions are skipped, and wireguard is installed and a configuration is generated.
 function headless-install() {
   if [ "${HEADLESS_INSTALL}" == true ]; then
-    INTERFACE_OR_PEER=${INTERFACE_OR_PEER:-1}
-    IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS:-1}
-    IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS:-1}
-    SERVER_HOST_V4_SETTINGS=${SERVER_HOST_V4_SETTINGS:-1}
-    SERVER_HOST_V6_SETTINGS=${SERVER_HOST_V6_SETTINGS:-1}
-    SERVER_PUB_NIC_SETTINGS=${SERVER_PUB_NIC_SETTINGS:-1}
-    SERVER_PORT_SETTINGS=${SERVER_PORT_SETTINGS:-1}
-    NAT_CHOICE_SETTINGS=${NAT_CHOICE_SETTINGS:-1}
-    MTU_CHOICE_SETTINGS=${MTU_CHOICE_SETTINGS:-1}
-    SERVER_HOST_SETTINGS=${SERVER_HOST_SETTINGS:-1}
-    DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS:-1}
-    CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS:-1}
-    AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS:-1}
-    AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS:-1}
-    DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS:-1}
-    CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS:-1}
-    CLIENT_NAME=${CLIENT_NAME:-$(openssl rand -hex 50)}
-    AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER:-1}
+    INTERFACE_OR_PEER=${INTERFACE_OR_PEER=1}
+    PRIVATE_SUBNET_V4_SETTINGS=${PRIVATE_SUBNET_V4_SETTINGS=1}
+    PRIVATE_SUBNET_V6_SETTINGS=${PRIVATE_SUBNET_V6_SETTINGS=1}
+    SERVER_HOST_V4_SETTINGS=${SERVER_HOST_V4_SETTINGS=1}
+    SERVER_HOST_V6_SETTINGS=${SERVER_HOST_V6_SETTINGS=1}
+    SERVER_PUB_NIC_SETTINGS=${SERVER_PUB_NIC_SETTINGS=1}
+    SERVER_PORT_SETTINGS=${SERVER_PORT_SETTINGS=1}
+    NAT_CHOICE_SETTINGS=${NAT_CHOICE_SETTINGS=1}
+    MTU_CHOICE_SETTINGS=${MTU_CHOICE_SETTINGS=1}
+    SERVER_HOST_SETTINGS=${SERVER_HOST_SETTINGS=1}
+    DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS=1}
+    CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS=1}
+    AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS=1}
+    AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS=1}
+    DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS=1}
+    CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS=1}
+    CLIENT_NAME=${CLIENT_NAME=$(openssl rand -hex 50)}
+    AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER=1}
   fi
 }
 
@@ -300,17 +300,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     echo "What IPv4 subnet do you want to use?"
     echo "  1) 10.0.0.0/8 (Recommended)"
     echo "  2) Custom (Advanced)"
-    until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
-      read -rp "Subnet Choice [1-2]:" -e -i 1 IPV4_SUBNET_SETTINGS
+    until [[ "${PRIVATE_SUBNET_V4_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "Subnet Choice [1-2]:" -e -i 1 PRIVATE_SUBNET_V4_SETTINGS
     done
-    case ${IPV4_SUBNET_SETTINGS} in
+    case ${PRIVATE_SUBNET_V4_SETTINGS} in
     1)
-      IPV4_SUBNET="10.0.0.0/8"
+      PRIVATE_SUBNET_V4="10.0.0.0/8"
       ;;
     2)
-      read -rp "Custom IPv4 Subnet:" IPV4_SUBNET
-      if [ -z "${IPV4_SUBNET}" ]; then
-        IPV4_SUBNET="10.0.0.0/8"
+      read -rp "Custom IPv4 Subnet:" PRIVATE_SUBNET_V4
+      if [ -z "${PRIVATE_SUBNET_V4}" ]; then
+        PRIVATE_SUBNET_V4="10.0.0.0/8"
       fi
       ;;
     esac
@@ -319,22 +319,23 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom IPv4 Subnet
   set-ipv4-subnet
 
+
   # Custom IPv6 subnet
   function set-ipv6-subnet() {
     echo "What IPv6 subnet do you want to use?"
     echo "  1) fd00:00:00::0/8 (Recommended)"
     echo "  2) Custom (Advanced)"
-    until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
-      read -rp "Subnet Choice [1-2]:" -e -i 1 IPV6_SUBNET_SETTINGS
+    until [[ "${PRIVATE_SUBNET_V6_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "Subnet Choice [1-2]:" -e -i 1 PRIVATE_SUBNET_V6_SETTINGS
     done
-    case ${IPV6_SUBNET_SETTINGS} in
+    case ${PRIVATE_SUBNET_V6_SETTINGS} in
     1)
-      IPV6_SUBNET="fd00:00:00::0/8"
+      PRIVATE_SUBNET_V6="fd00:00:00::0/8"
       ;;
     2)
-      read -rp "Custom IPv6 Subnet:" IPV6_SUBNET
-      if [ -z "${IPV6_SUBNET}" ]; then
-        IPV6_SUBNET="fd00:00:00::0/8"
+      read -rp "Custom IPv6 Subnet:" PRIVATE_SUBNET_V6
+      if [ -z "${PRIVATE_SUBNET_V6}" ]; then
+        PRIVATE_SUBNET_V6="fd00:00:00::0/8"
       fi
       ;;
     esac
@@ -343,18 +344,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom IPv6 Subnet
   set-ipv6-subnet
 
-  # Private Subnet Ipv4
-  PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"${IPV4_SUBNET}"}
   # Private Subnet Mask IPv4
   PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
   # IPv4 Getaway
   GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).1
-  # Private Subnet Ipv6
-  PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"${IPV6_SUBNET}"}
   # Private Subnet Mask IPv6
   PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
   # IPv6 Getaway
-  GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}1"
+  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-3)::1
 
   # Get the IPv4
   function test-connectivity-v4() {
@@ -1023,7 +1020,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     CLIENT_PRIVKEY=$(wg genkey)
     CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
     CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).2
-    CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}2"
+    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):2
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
