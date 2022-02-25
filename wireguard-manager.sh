@@ -1238,7 +1238,11 @@ AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
       if { [ -z "${FIND_UNUSED_IPV4}" ] && [ -z "${FIND_UNUSED_IPV6}" ]; }; then
         echo "${WIREGUARD_TEMP_NEW_CLIENT_INFO}" >>${WIREGUARD_CONFIG}
       elif { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
-        sed -i "$((6 * LASTIPV4 - 6 + 11))i/${WIREGUARD_TEMP_NEW_CLIENT_INFO}" ${WIREGUARD_CONFIG}
+        WIREGUARD_HEADLESS_CONFIG=$(head -n10 ${WIREGUARD_CONFIG})
+        # Note: Find all the peers that are before this missing peer and append them to the file.
+        echo "${WIREGUARD_HEADLESS_CONFIG}" >${WIREGUARD_CONFIG}
+        # Note: Add the missing peer to the file.
+        # Note: Add the rest of the peers in the file.
       fi
       rm -f ${WIREGUARD_ADD_PEER_CONFIG}
       echo "# ${WIREGUARD_WEBSITE_URL}
