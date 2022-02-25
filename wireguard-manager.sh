@@ -354,7 +354,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Private Subnet Mask IPv6
   PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
   # IPv6 Getaway
-  GATEWAY_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}1"
+  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-3)::1
 
   # Get the IPv4
   function test-connectivity-v4() {
