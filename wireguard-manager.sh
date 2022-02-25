@@ -1020,7 +1020,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     CLIENT_PRIVKEY=$(wg genkey)
     CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
     CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).2
-    CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}2"
+    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):2
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
