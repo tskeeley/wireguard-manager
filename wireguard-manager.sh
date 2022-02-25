@@ -269,8 +269,8 @@ usage "$@"
 function headless-install() {
   if [ "${HEADLESS_INSTALL}" == true ]; then
     INTERFACE_OR_PEER=${INTERFACE_OR_PEER=1}
-    IPV4_SUBNET_SETTINGS=${IPV4_SUBNET_SETTINGS=1}
-    IPV6_SUBNET_SETTINGS=${IPV6_SUBNET_SETTINGS=1}
+    PRIVATE_SUBNET_V4_SETTINGS=${PRIVATE_SUBNET_V4_SETTINGS=1}
+    PRIVATE_SUBNET_V6_SETTINGS=${PRIVATE_SUBNET_V6_SETTINGS=1}
     SERVER_HOST_V4_SETTINGS=${SERVER_HOST_V4_SETTINGS=1}
     SERVER_HOST_V6_SETTINGS=${SERVER_HOST_V6_SETTINGS=1}
     SERVER_PUB_NIC_SETTINGS=${SERVER_PUB_NIC_SETTINGS=1}
@@ -300,17 +300,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     echo "What IPv4 subnet do you want to use?"
     echo "  1) 10.0.0.0/8 (Recommended)"
     echo "  2) Custom (Advanced)"
-    until [[ "${IPV4_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
-      read -rp "Subnet Choice [1-2]:" -e -i 1 IPV4_SUBNET_SETTINGS
+    until [[ "${PRIVATE_SUBNET_V4_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "Subnet Choice [1-2]:" -e -i 1 PRIVATE_SUBNET_V4_SETTINGS
     done
-    case ${IPV4_SUBNET_SETTINGS} in
+    case ${PRIVATE_SUBNET_V4_SETTINGS} in
     1)
-      IPV4_SUBNET="10.0.0.0/8"
+      PRIVATE_SUBNET_V4="10.0.0.0/8"
       ;;
     2)
-      read -rp "Custom IPv4 Subnet:" IPV4_SUBNET
-      if [ -z "${IPV4_SUBNET}" ]; then
-        IPV4_SUBNET="10.0.0.0/8"
+      read -rp "Custom IPv4 Subnet:" PRIVATE_SUBNET_V4
+      if [ -z "${PRIVATE_SUBNET_V4}" ]; then
+        PRIVATE_SUBNET_V4="10.0.0.0/8"
       fi
       ;;
     esac
@@ -319,22 +319,23 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom IPv4 Subnet
   set-ipv4-subnet
 
+
   # Custom IPv6 subnet
   function set-ipv6-subnet() {
     echo "What IPv6 subnet do you want to use?"
     echo "  1) fd00:00:00::0/8 (Recommended)"
     echo "  2) Custom (Advanced)"
-    until [[ "${IPV6_SUBNET_SETTINGS}" =~ ^[1-2]$ ]]; do
-      read -rp "Subnet Choice [1-2]:" -e -i 1 IPV6_SUBNET_SETTINGS
+    until [[ "${PRIVATE_SUBNET_V6_SETTINGS}" =~ ^[1-2]$ ]]; do
+      read -rp "Subnet Choice [1-2]:" -e -i 1 PRIVATE_SUBNET_V6_SETTINGS
     done
-    case ${IPV6_SUBNET_SETTINGS} in
+    case ${PRIVATE_SUBNET_V6_SETTINGS} in
     1)
-      IPV6_SUBNET="fd00:00:00::0/8"
+      PRIVATE_SUBNET_V6="fd00:00:00::0/8"
       ;;
     2)
-      read -rp "Custom IPv6 Subnet:" IPV6_SUBNET
-      if [ -z "${IPV6_SUBNET}" ]; then
-        IPV6_SUBNET="fd00:00:00::0/8"
+      read -rp "Custom IPv6 Subnet:" PRIVATE_SUBNET_V6
+      if [ -z "${PRIVATE_SUBNET_V6}" ]; then
+        PRIVATE_SUBNET_V6="fd00:00:00::0/8"
       fi
       ;;
     esac
@@ -343,14 +344,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom IPv6 Subnet
   set-ipv6-subnet
 
-  # Private Subnet Ipv4
-  PRIVATE_SUBNET_V4=${PRIVATE_SUBNET_V4:-"${IPV4_SUBNET}"}
   # Private Subnet Mask IPv4
   PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f 2)
   # IPv4 Getaway
   GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).1
-  # Private Subnet Ipv6
-  PRIVATE_SUBNET_V6=${PRIVATE_SUBNET_V6:-"${IPV6_SUBNET}"}
   # Private Subnet Mask IPv6
   PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f 2)
   # IPv6 Getaway
