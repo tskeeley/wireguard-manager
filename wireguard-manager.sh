@@ -1224,8 +1224,8 @@ else
       CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):$((LASTIPV6 + 1))
       # Check for any unused IP address.
       if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
-        CLIENT_ADDRESS_V4="${PRIVATE_SUBNET_V4::-3}${LASTIPV4}"
-        CLIENT_ADDRESS_V6="${PRIVATE_SUBNET_V6::-3}${LASTIPV6}"
+        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d'.' -f1-3).${LASTIPV4}
+        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d':' -f1-4):${LASTIPV6}
       fi
       WIREGUARD_TEMP_NEW_CLIENT_INFO="# ${NEW_CLIENT_NAME} start
 [Peer]
