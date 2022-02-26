@@ -319,7 +319,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom IPv4 Subnet
   set-ipv4-subnet
 
-
   # Custom IPv6 subnet
   function set-ipv6-subnet() {
     echo "What IPv6 subnet do you want to use?"
@@ -842,13 +841,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
-      if [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 21 ]; then
-        apt-get update
-        apt-get install wireguard -y
-      elif [ "${CURRENT_DISTRO}" == "ubuntu" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 20 ]; then
-        apt-get update
-        apt-get install software-properties-common -y
-        add-apt-repository ppa:wireguard/wireguard -y
+      if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
+        if [ "${CURRENT_DISTRO_VERSION%.*}" -le 20 ]; then
+          apt-get install software-properties-common -y
+          add-apt-repository ppa:wireguard/wireguard -y
+        fi
         apt-get update
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
@@ -1240,7 +1237,7 @@ AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
       elif { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
         sed -i "s|$|\\\n|" "${WIREGUARD_ADD_PEER_CONFIG}"
         sed -i "6s|\\\n||" "${WIREGUARD_ADD_PEER_CONFIG}"
-        WIREGUARD_TEMPORARY_PEER_DATA=$(tr -d "\n" < "${WIREGUARD_ADD_PEER_CONFIG}")
+        WIREGUARD_TEMPORARY_PEER_DATA=$(tr -d "\n" <"${WIREGUARD_ADD_PEER_CONFIG}")
         TEMP_WRITE_LINE=$((LASTIPV4 - 2))
         sed -i $((TEMP_WRITE_LINE * 6 + 11))i"${WIREGUARD_TEMPORARY_PEER_DATA}" ${WIREGUARD_CONFIG}
       fi
