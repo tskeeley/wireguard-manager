@@ -1429,17 +1429,17 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
-        CURRENT_ROOT_HINTS_HASH=$(sha512sum ${UNBOUND_ROOT_HINTS} | cut -d " " -f 1)
-        NEW_ROOT_HINTS_HASH=$(curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} | sha512sum | cut -d " " -f 1)
-        if [ "${CURRENT_ROOT_HINTS_HASH}" != "${NEW_ROOT_HINTS_HASH}" ]; then
-          if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+          CURRENT_ROOT_HINTS_HASH=$(sha512sum ${UNBOUND_ROOT_HINTS} | cut -d " " -f 1)
+          NEW_ROOT_HINTS_HASH=$(curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} | sha512sum | cut -d " " -f 1)
+          if [ "${CURRENT_ROOT_HINTS_HASH}" != "${NEW_ROOT_HINTS_HASH}" ]; then
             curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
           fi
         fi
-        CURRENT_UNBOUND_HOSTS_HASH=$(sha512sum ${UNBOUND_CONFIG_HOST} | cut -d " " -f 1)
-        NEW_UNBOUND_HOSTS_HASH=$(curl ${UNBOUND_CONFIG_HOST_URL} | sha512sum | cut -d " " -f 1)
-        if [ "${CURRENT_UNBOUND_HOSTS_HASH}" != "${NEW_UNBOUND_HOSTS_HASH}" ]; then
-          if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+        if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+          CURRENT_UNBOUND_HOSTS_HASH=$(sha512sum ${UNBOUND_CONFIG_HOST} | cut -d " " -f 1)
+          NEW_UNBOUND_HOSTS_HASH=$(curl ${UNBOUND_CONFIG_HOST_URL} | sha512sum | cut -d " " -f 1)
+          if [ "${CURRENT_UNBOUND_HOSTS_HASH}" != "${NEW_UNBOUND_HOSTS_HASH}" ]; then
             curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
           fi
         fi
