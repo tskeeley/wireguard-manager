@@ -1144,11 +1144,35 @@ else
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         NEW_CLIENT_NAME="$(openssl rand -hex 50)"
       fi
-      LASTIPV4=$(grep "/32" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d "/" -f 1 | cut -d "." -f 4)
-      LASTIPV6=$(grep "/128" ${WIREGUARD_CONFIG} | tail -n1 | awk '{print $3}' | cut -d ":" -f 5 | cut -d "/" -f 1)
+      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | tail -n1)
+      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | tail -n1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
-        LASTIPV4="1"
-        LASTIPV6="1"
+        LASTIPV4=1
+        LASTIPV6=1
+      fi
+      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | head -n1)
+      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n | tail -n1)
+      USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f 1 | cut -d '.' -f 4 | sort -n)
+      while [ "${SMALLEST_USED_IPV4}" -le "${LARGEST_USED_IPV4}" ]; do
+        if [[ ! ${USED_IPV4_LIST[*]} =~ ${SMALLEST_USED_IPV4} ]]; then
+          FIND_UNUSED_IPV4=${SMALLEST_USED_IPV4}
+          break
+        fi
+        SMALLEST_USED_IPV4=$((SMALLEST_USED_IPV4 + 1))
+      done
+      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | head -n1)
+      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n | tail -n1)
+      USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f 2 | cut -d '/' -f 1 | cut -d ':' -f 5 | sort -n)
+      while [ "${SMALLEST_USED_IPV6}" -le "${LARGEST_USED_IPV6}" ]; do
+        if [[ ! ${USED_IPV6_LIST[*]} =~ ${SMALLEST_USED_IPV6} ]]; then
+          FIND_UNUSED_IPV6=${SMALLEST_USED_IPV6}
+          break
+        fi
+        SMALLEST_USED_IPV6=$((SMALLEST_USED_IPV6 + 1))
+      done
+      if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
+        LASTIPV4=$(echo "${FIND_UNUSED_IPV4}" | head -n 1)
+        LASTIPV6=$(echo "${FIND_UNUSED_IPV6}" | head -n 1)
       fi
       if { [ "${LASTIPV4}" -ge 255 ] && [ "${LASTIPV6}" -ge 255 ]; }; then
         CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
@@ -1179,8 +1203,8 @@ else
         fi
         sed -i "1s|${CURRENT_IPV4_RANGE}|${FINAL_IPV4_RANGE}|" ${WIREGUARD_CONFIG}
         sed -i "1s|${CURRENT_IPV6_RANGE}|${FINAL_IPV6_RANGE}|" ${WIREGUARD_CONFIG}
-        LASTIPV4="2"
-        LASTIPV6="2"
+        LASTIPV4=1
+        LASTIPV6=1
       fi
       CLIENT_PRIVKEY=$(wg genkey)
       CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
@@ -1198,14 +1222,28 @@ else
       CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
       CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).$((LASTIPV4 + 1))
       CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):$((LASTIPV6 + 1))
-      echo "# ${NEW_CLIENT_NAME} start
+      # Check for any unused IP address.
+      if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
+        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d'.' -f1-3).${LASTIPV4}
+        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d':' -f1-4):${LASTIPV6}
+      fi
+      WIREGUARD_TEMP_NEW_CLIENT_INFO="# ${NEW_CLIENT_NAME} start
 [Peer]
 PublicKey = ${CLIENT_PUBKEY}
 PresharedKey = ${PRESHARED_KEY}
 AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
-# ${NEW_CLIENT_NAME} end" >${WIREGUARD_ADD_PEER_CONFIG}
+# ${NEW_CLIENT_NAME} end"
+      echo "${WIREGUARD_TEMP_NEW_CLIENT_INFO}" >${WIREGUARD_ADD_PEER_CONFIG}
       wg addconf ${WIREGUARD_PUB_NIC} ${WIREGUARD_ADD_PEER_CONFIG}
-      cat ${WIREGUARD_ADD_PEER_CONFIG} >>${WIREGUARD_CONFIG}
+      if { [ -z "${FIND_UNUSED_IPV4}" ] && [ -z "${FIND_UNUSED_IPV6}" ]; }; then
+        echo "${WIREGUARD_TEMP_NEW_CLIENT_INFO}" >>${WIREGUARD_CONFIG}
+      elif { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
+        sed -i "s|$|\\\n|" "${WIREGUARD_ADD_PEER_CONFIG}"
+        sed -i "6s|\\\n||" "${WIREGUARD_ADD_PEER_CONFIG}"
+        WIREGUARD_TEMPORARY_PEER_DATA=$(tr -d "\n" < "${WIREGUARD_ADD_PEER_CONFIG}")
+        TEMP_WRITE_LINE=$((LASTIPV4 - 2))
+        sed -i $((TEMP_WRITE_LINE * 6 + 11))i"${WIREGUARD_TEMPORARY_PEER_DATA}" ${WIREGUARD_CONFIG}
+      fi
       rm -f ${WIREGUARD_ADD_PEER_CONFIG}
       echo "# ${WIREGUARD_WEBSITE_URL}
 [Interface]
