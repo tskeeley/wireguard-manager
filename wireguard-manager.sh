@@ -998,7 +998,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       # restart unbound
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl reenable unbound
+        systemctl enable unbound
         systemctl restart unbound
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service unbound restart
@@ -1079,7 +1079,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
     fi
     # Service Restart
     if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-      systemctl reenable wg-quick@${WIREGUARD_PUB_NIC}
+      systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
       systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
     elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
       service wg-quick@${WIREGUARD_PUB_NIC} restart
@@ -1341,7 +1341,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode haveged -y
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl reenable systemd-resolved
+          systemctl enable systemd-resolved
           systemctl restart systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved restart
