@@ -988,10 +988,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         chattr -i ${RESOLV_CONFIG}
         mv ${RESOLV_CONFIG} ${RESOLV_CONFIG_OLD}
       fi
-      echo "nameserver 127.0.0.1" >>${RESOLV_CONFIG}
+      echo "nameserver 127.0.0.1" >${RESOLV_CONFIG}
       echo "nameserver ::1" >>${RESOLV_CONFIG}
       chattr +i ${RESOLV_CONFIG}
-      echo "Unbound: true" >>${UNBOUND_MANAGER}
+      echo "Unbound: true" >${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
