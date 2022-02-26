@@ -1421,17 +1421,27 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       crontab -l | grep -v "${CURRENT_FILE_PATH}" | crontab -
       ;;
     9) # Update the script
-      curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
-      chmod +x "${CURRENT_FILE_PATH}"
+      CURRENT_WIREGUARD_MANAGER_HASH=$(sha512sum "${CURRENT_FILE_PATH}" | cut -d " " -f 1)
+      NEW_WIREGUARD_MANAGER_HASH=$(curl ${WIREGUARD_MANAGER_UPDATE} | sha512sum | cut -d " " -f 1)
+      if [ "${CURRENT_WIREGUARD_MANAGER_HASH}" != "${NEW_WIREGUARD_MANAGER_HASH}" ]; then
+        curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
+        chmod +x "${CURRENT_FILE_PATH}"
+      fi
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
-        # Refresh the root hints
-        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+        CURRENT_ROOT_HINTS_HASH=$(sha512sum ${UNBOUND_ROOT_HINTS} | cut -d " " -f 1)
+        NEW_ROOT_HINTS_HASH=$(curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} | sha512sum | cut -d " " -f 1)
+        if [ "${CURRENT_ROOT_HINTS_HASH}" != "${NEW_ROOT_HINTS_HASH}" ]; then
+          if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
+            curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
+          fi
         fi
-        # The block list should be updated.
-        if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-          curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+        CURRENT_UNBOUND_HOSTS_HASH=$(sha512sum ${UNBOUND_CONFIG_HOST} | cut -d " " -f 1)
+        NEW_UNBOUND_HOSTS_HASH=$(curl ${UNBOUND_CONFIG_HOST_URL} | sha512sum | cut -d " " -f 1)
+        if [ "${CURRENT_UNBOUND_HOSTS_HASH}" != "${NEW_UNBOUND_HOSTS_HASH}" ]; then
+          if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
+            curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+          fi
         fi
         # Once everything is completed, restart the service.
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
@@ -1480,7 +1490,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://checkip.amazonaws.com')"
         fi
       fi
-      sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
+      if [ "${OLD_SERVER_HOST}" != "${NEW_SERVER_HOST}" ]; then
+        sed -i "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
+      fi
       ;;
     13) # Change the wireguard interface's port number.
       OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
