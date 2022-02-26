@@ -1075,9 +1075,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         fi
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable iptables
+        systemctl start iptables
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron start
         service wg-quick@${WIREGUARD_PUB_NIC} start
+        service iptables start
       fi
     fi
     # Generate QR Code
