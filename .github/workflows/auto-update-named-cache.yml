@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Update the named.cache
         run: curl "https://www.internic.net/domain/named.cache" -o "assets/named.cache"
       - name: Push the named.cache to github
