@@ -1035,8 +1035,8 @@ DNS = ${CLIENT_DNS}
 ListenPort = ${SERVER_PORT}
 MTU = ${MTU_CHOICE}
 PrivateKey = ${SERVER_PRIVKEY}
-PostUp = ${nftables_POSTUP}
-PostDown = ${nftables_POSTDOWN}
+PostUp = ${NFTABLES_POSTUP}
+PostDown = ${FTABLES_POSTDOWN}
 SaveConfig = false
 # ${CLIENT_NAME} start
 [Peer]
