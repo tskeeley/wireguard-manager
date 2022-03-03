@@ -1431,8 +1431,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       crontab -l | grep -v "${CURRENT_FILE_PATH}" | crontab -
       ;;
     9) # Update the script
-      CURRENT_WIREGUARD_MANAGER_HASH=$(sha512sum "${CURRENT_FILE_PATH}" | cut -d " " -f 1)
-      NEW_WIREGUARD_MANAGER_HASH=$(curl ${WIREGUARD_MANAGER_UPDATE} | sha512sum | cut -d " " -f 1)
+      CURRENT_WIREGUARD_MANAGER_HASH=$(openssl dgst -sha3-512 "${CURRENT_FILE_PATH}" | cut -d " " -f 2)
+      NEW_WIREGUARD_MANAGER_HASH=$(curl ${WIREGUARD_MANAGER_UPDATE} | openssl dgst -sha3-512 | cut -d " " -f 2)
       if [ "${CURRENT_WIREGUARD_MANAGER_HASH}" != "${NEW_WIREGUARD_MANAGER_HASH}" ]; then
         curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
         chmod +x "${CURRENT_FILE_PATH}"
@@ -1440,15 +1440,15 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       # Update the unbound configs
       if [ -x "$(command -v unbound)" ]; then
         if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          CURRENT_ROOT_HINTS_HASH=$(sha512sum ${UNBOUND_ROOT_HINTS} | cut -d " " -f 1)
-          NEW_ROOT_HINTS_HASH=$(curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} | sha512sum | cut -d " " -f 1)
+          CURRENT_ROOT_HINTS_HASH=$(openssl dgst -sha3-512 "${UNBOUND_ROOT_HINTS}" | cut -d " " -f 2)
+          NEW_ROOT_HINTS_HASH=$(curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} | openssl dgst -sha3-512 | cut -d " " -f 2)
           if [ "${CURRENT_ROOT_HINTS_HASH}" != "${NEW_ROOT_HINTS_HASH}" ]; then
             curl ${UNBOUND_ROOT_SERVER_CONFIG_URL} -o ${UNBOUND_ROOT_HINTS}
           fi
         fi
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
-          CURRENT_UNBOUND_HOSTS_HASH=$(sha512sum ${UNBOUND_CONFIG_HOST} | cut -d " " -f 1)
-          NEW_UNBOUND_HOSTS_HASH=$(curl ${UNBOUND_CONFIG_HOST_URL} | sha512sum | cut -d " " -f 1)
+          CURRENT_UNBOUND_HOSTS_HASH=$(openssl dgst -sha3-512 "${UNBOUND_CONFIG_HOST}" | cut -d " " -f 2)
+          NEW_UNBOUND_HOSTS_HASH=$(curl ${UNBOUND_CONFIG_HOST_URL} | openssl dgst -sha3-512 | cut -d " " -f 2)
           if [ "${CURRENT_UNBOUND_HOSTS_HASH}" != "${NEW_UNBOUND_HOSTS_HASH}" ]; then
             curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
           fi
