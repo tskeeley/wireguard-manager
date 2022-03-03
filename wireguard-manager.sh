@@ -1344,42 +1344,37 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum remove wireguard qrencode haveged -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
+        yum remove wireguard qrencode -y
+      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
         apt-get remove --purge wireguard qrencode -y
+        apt-key del 04EE7237B7D453EC
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
       elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get remove --purge wireguard qrencode haveged -y
+        apt-get remove --purge wireguard qrencode -y
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        apt-get remove --purge wireguard qrencode haveged -y
+        apt-get remove --purge wireguard qrencode -y
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
           systemctl enable systemd-resolved
           systemctl restart systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved restart
         fi
-      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
-        apt-key del 04EE7237B7D453EC
-        apt-get remove --purge wireguard qrencode haveged -y
-        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
-          rm -f /etc/apt/sources.list.d/backports.list
-        fi
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Rs --noconfirm wireguard-tools qrencode haveged
+        pacman -Rs --noconfirm wireguard-tools qrencode
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        dnf remove wireguard qrencode haveged -y
+        dnf remove wireguard qrencode -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
-        yum remove wireguard qrencode haveged -y
+        yum remove wireguard qrencode -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-        apk del wireguard-tools libqrencode haveged
+        apk del wireguard-tools libqrencode
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg delete wireguard libqrencode
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
