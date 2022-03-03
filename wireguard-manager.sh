@@ -962,12 +962,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 \tinterface: 0.0.0.0
 \tinterface: ::0
 \tmax-udp-size: 3072
-\taccess-control: 0.0.0.0/0                 refuse
-\taccess-control: ::0                       refuse
-\taccess-control: ${PRIVATE_SUBNET_V4}                allow
-\taccess-control: ${PRIVATE_SUBNET_V6}           allow
-\taccess-control: 127.0.0.1                 allow
-\taccess-control: ::1                       allow
+\taccess-control: 0.0.0.0/0\trefuse
+\taccess-control: ::0\trefuse
+\taccess-control: ${PRIVATE_SUBNET_V4}\tallow
+\taccess-control: ${PRIVATE_SUBNET_V6}\tallow
+\taccess-control: 127.0.0.1\tallow
+\taccess-control: ::1\tallow
 \tprivate-address: ${PRIVATE_SUBNET_V4}
 \tprivate-address: ${PRIVATE_SUBNET_V6}
 \tdo-tcp: no
