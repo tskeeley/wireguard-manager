@@ -682,17 +682,17 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         ;;
       esac
       echo "Do you want the peers to have access to the other devices in the interface?"
-      echo "  1) Yes (Recommended)"
-      echo "  2) No"
+      echo "  1) No (Recommended)"
+      echo "  2) Yes"
       until [[ "${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS}" =~ ^[1-2]$ ]]; do
         read -rp "Allow acess to other devices [1-2]:" -e -i 1 ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS
       done
       case ${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS} in
       1)
-        ALLOW_ACESS_TO_OTHER_DEVICES=true
+        ALLOW_ACESS_TO_OTHER_DEVICES=false
         ;;
       2)
-        ALLOW_ACESS_TO_OTHER_DEVICES=false
+        ALLOW_ACESS_TO_OTHER_DEVICES=true
         ;;
       esac
       ;;
