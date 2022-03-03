@@ -275,6 +275,7 @@ function headless-install() {
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS=1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS=1}
     CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS=1}
+    ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=1}
     CLIENT_NAME=${CLIENT_NAME=$(openssl rand -hex 50)}
     AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER=1}
   fi
@@ -680,6 +681,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         INSTALL_BLOCK_LIST=false
         ;;
       esac
+      echo "Do you want the peers to have access to the other devices in the interface?"
+      echo "  1) No (Recommended)"
+      echo "  2) Yes"
+      until [[ "${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Allow acess to other devices [1-2]:" -e -i 1 ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS
+      done
+      case ${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS} in
+      1)
+        ALLOW_ACESS_TO_OTHER_DEVICES=false
+        ;;
+      2)
+        ALLOW_ACESS_TO_OTHER_DEVICES=true
+        ;;
+      esac
       ;;
     2)
       CUSTOM_DNS=true
@@ -939,36 +954,35 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
-      NPROC=$(nproc)
-      echo "server:
-    num-threads: ${NPROC}
-    verbosity: 1
-    root-hints: ${UNBOUND_ROOT_HINTS}
-    auto-trust-anchor-file: ${UNBOUND_ANCHOR}
-    interface: 0.0.0.0
-    interface: ::0
-    max-udp-size: 3072
-    access-control: 0.0.0.0/0                 refuse
-    access-control: ::0                       refuse
-    access-control: ${PRIVATE_SUBNET_V4}                allow
-    access-control: ${PRIVATE_SUBNET_V6}           allow
-    access-control: 127.0.0.1                 allow
-    access-control: ::1                       allow
-    private-address: ${PRIVATE_SUBNET_V4}
-    private-address: ${PRIVATE_SUBNET_V6}
-    do-tcp: no
-    chroot: \"\"
-    hide-identity: yes
-    hide-version: yes
-    harden-glue: yes
-    harden-dnssec-stripped: yes
-    harden-referral-path: yes
-    unwanted-reply-threshold: 10000000
-    cache-min-ttl: 1800
-    cache-max-ttl: 14400
-    prefetch: yes
-    qname-minimisation: yes
-    prefetch-key: yes" >${UNBOUND_CONFIG}
+      echo -e "server:
+\tnum-threads: $(nproc)
+\tverbosity: 1
+\troot-hints: ${UNBOUND_ROOT_HINTS}
+\tauto-trust-anchor-file: ${UNBOUND_ANCHOR}
+\tinterface: 0.0.0.0
+\tinterface: ::0
+\tmax-udp-size: 3072
+\taccess-control: 0.0.0.0/0\trefuse
+\taccess-control: ::0\trefuse
+\taccess-control: ${PRIVATE_SUBNET_V4}\tallow
+\taccess-control: ${PRIVATE_SUBNET_V6}\tallow
+\taccess-control: 127.0.0.1\tallow
+\taccess-control: ::1\tallow
+\tprivate-address: ${PRIVATE_SUBNET_V4}
+\tprivate-address: ${PRIVATE_SUBNET_V6}
+\tdo-tcp: no
+\tchroot: \"\"
+\thide-identity: yes
+\thide-version: yes
+\tharden-glue: yes
+\tharden-dnssec-stripped: yes
+\tharden-referral-path: yes
+\tunwanted-reply-threshold: 10000000
+\tcache-min-ttl: 1800
+\tcache-max-ttl: 14400
+\tprefetch: yes
+\tqname-minimisation: yes
+\tprefetch-key: yes" >${UNBOUND_CONFIG}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
         rm -f ${RESOLV_CONFIG_OLD}
       fi
@@ -981,11 +995,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       chattr +i ${RESOLV_CONFIG}
       echo "Unbound: true" >${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-        echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        echo -e "\tinclude: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
           mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+      fi
+      if [ "${ALLOW_ACESS_TO_OTHER_DEVICES}" == false ]; then
+        echo -e "\tprivate-address: 10.0.0.0/8
+\tprivate-address: 127.0.0.0/8
+\tprivate-address: 169.254.0.0/16
+\tprivate-address: 172.16.0.0/12
+\tprivate-address: 192.168.0.0/16
+\tprivate-address: ::ffff:0:0/96
+\tprivate-address: fd00::/8
+\tprivate-address: fe80::/10" >>${UNBOUND_CONFIG}
       fi
       # Start unbound
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
@@ -1320,42 +1344,37 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum remove wireguard qrencode haveged -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
+        yum remove wireguard qrencode -y
+      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
         apt-get remove --purge wireguard qrencode -y
+        apt-key del 04EE7237B7D453EC
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
         fi
       elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get remove --purge wireguard qrencode haveged -y
+        apt-get remove --purge wireguard qrencode -y
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        apt-get remove --purge wireguard qrencode haveged -y
+        apt-get remove --purge wireguard qrencode -y
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
           systemctl enable systemd-resolved
           systemctl restart systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved restart
         fi
-      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
-        apt-key del 04EE7237B7D453EC
-        apt-get remove --purge wireguard qrencode haveged -y
-        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
-          rm -f /etc/apt/sources.list.d/backports.list
-        fi
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -Rs --noconfirm wireguard-tools qrencode haveged
+        pacman -Rs --noconfirm wireguard-tools qrencode
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        dnf remove wireguard qrencode haveged -y
+        dnf remove wireguard qrencode -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
-        yum remove wireguard qrencode haveged -y
+        yum remove wireguard qrencode -y
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm -f /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-        apk del wireguard-tools libqrencode haveged
+        apk del wireguard-tools libqrencode
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg delete wireguard libqrencode
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
