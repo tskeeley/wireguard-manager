@@ -939,7 +939,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
-      echo -e "server:
+      UNBOUND_TEMP_INTERFACE_INFO="server:
 \tnum-threads: $(nproc)
 \tverbosity: 1
 \troot-hints: ${UNBOUND_ROOT_HINTS}
@@ -975,7 +975,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 \tcache-max-ttl: 14400
 \tprefetch: yes
 \tqname-minimisation: yes
-\tprefetch-key: yes" >${UNBOUND_CONFIG}
+\tprefetch-key: yes"
+      echo -e "${UNBOUND_TEMP_INTERFACE_INFO}" | awk '!seen[$0]++' >${UNBOUND_CONFIG}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
         rm -f ${RESOLV_CONFIG_OLD}
       fi
