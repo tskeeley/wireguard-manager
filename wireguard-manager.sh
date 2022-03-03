@@ -275,7 +275,6 @@ function headless-install() {
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS=1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS=1}
     CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS=1}
-    ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=1}
     CLIENT_NAME=${CLIENT_NAME=$(openssl rand -hex 50)}
     AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER=1}
   fi
@@ -681,20 +680,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         INSTALL_BLOCK_LIST=false
         ;;
       esac
-      echo "Do you want the peers to have access to the other devices in the interface?"
-      echo "  1) No (Recommended)"
-      echo "  2) Yes"
-      until [[ "${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS}" =~ ^[1-2]$ ]]; do
-        read -rp "Allow acess to other devices [1-2]:" -e -i 1 ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS
-      done
-      case ${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS} in
-      1)
-        ALLOW_ACESS_TO_OTHER_DEVICES=false
-        ;;
-      2)
-        ALLOW_ACESS_TO_OTHER_DEVICES=true
-        ;;
-      esac
       ;;
     2)
       CUSTOM_DNS=true
@@ -970,6 +955,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 \taccess-control: ::1\tallow
 \tprivate-address: ${PRIVATE_SUBNET_V4}
 \tprivate-address: ${PRIVATE_SUBNET_V6}
+\tprivate-address: 10.0.0.0/8
+\tprivate-address: 127.0.0.0/8
+\tprivate-address: 169.254.0.0/16
+\tprivate-address: 172.16.0.0/12
+\tprivate-address: 192.168.0.0/16
+\tprivate-address: ::ffff:0:0/96
+\tprivate-address: fd00::/8
+\tprivate-address: fe80::/10
 \tdo-tcp: no
 \tchroot: \"\"
 \thide-identity: yes
@@ -1000,16 +993,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
-      fi
-      if [ "${ALLOW_ACESS_TO_OTHER_DEVICES}" == false ]; then
-        echo -e "\tprivate-address: 10.0.0.0/8
-\tprivate-address: 127.0.0.0/8
-\tprivate-address: 169.254.0.0/16
-\tprivate-address: 172.16.0.0/12
-\tprivate-address: 192.168.0.0/16
-\tprivate-address: ::ffff:0:0/96
-\tprivate-address: fd00::/8
-\tprivate-address: fe80::/10" >>${UNBOUND_CONFIG}
       fi
       # Start unbound
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
