@@ -275,6 +275,7 @@ function headless-install() {
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS=1}
     DNS_PROVIDER_SETTINGS=${DNS_PROVIDER_SETTINGS=1}
     CONTENT_BLOCKER_SETTINGS=${CONTENT_BLOCKER_SETTINGS=1}
+    ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS=1}
     CLIENT_NAME=${CLIENT_NAME=$(openssl rand -hex 50)}
     AUTOMATIC_CONFIG_REMOVER=${AUTOMATIC_CONFIG_REMOVER=1}
   fi
@@ -680,6 +681,20 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         INSTALL_BLOCK_LIST=false
         ;;
       esac
+      echo "Do you want the peers to have access to the other devices in the interface?"
+      echo "  1) Yes (Recommended)"
+      echo "  2) No"
+      until [[ "${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS}" =~ ^[1-2]$ ]]; do
+        read -rp "Allow acess to other devices [1-2]:" -e -i 1 ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS
+      done
+      case ${ALLOW_ACESS_TO_OTHER_DEVICES_SETTINGS} in
+      1)
+        ALLOW_ACESS_TO_OTHER_DEVICES=true
+        ;;
+      2)
+        ALLOW_ACESS_TO_OTHER_DEVICES=false
+        ;;
+      esac
       ;;
     2)
       CUSTOM_DNS=true
@@ -939,9 +954,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
-      NPROC=$(nproc)
       echo "server:
-    num-threads: ${NPROC}
+    num-threads: $(nproc)
     verbosity: 1
     root-hints: ${UNBOUND_ROOT_HINTS}
     auto-trust-anchor-file: ${UNBOUND_ANCHOR}
@@ -981,11 +995,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       chattr +i ${RESOLV_CONFIG}
       echo "Unbound: true" >${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-        echo "include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        echo "    include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
           mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+      fi
+      if [ "${ALLOW_ACESS_TO_OTHER_DEVICES}" == false ]; then
+        echo "    private-address: 10.0.0.0/8
+    private-address: 127.0.0.0/8
+    private-address: 169.254.0.0/16
+    private-address: 172.16.0.0/12
+    private-address: 192.168.0.0/16
+    private-address: ::ffff:0:0/96
+    private-address: fd00::/8
+    private-address: fe80::/10" >>${UNBOUND_CONFIG}
       fi
       # Start unbound
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
