@@ -954,35 +954,35 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
-      echo "server:
-    num-threads: $(nproc)
-    verbosity: 1
-    root-hints: ${UNBOUND_ROOT_HINTS}
-    auto-trust-anchor-file: ${UNBOUND_ANCHOR}
-    interface: 0.0.0.0
-    interface: ::0
-    max-udp-size: 3072
-    access-control: 0.0.0.0/0                 refuse
-    access-control: ::0                       refuse
-    access-control: ${PRIVATE_SUBNET_V4}                allow
-    access-control: ${PRIVATE_SUBNET_V6}           allow
-    access-control: 127.0.0.1                 allow
-    access-control: ::1                       allow
-    private-address: ${PRIVATE_SUBNET_V4}
-    private-address: ${PRIVATE_SUBNET_V6}
-    do-tcp: no
-    chroot: \"\"
-    hide-identity: yes
-    hide-version: yes
-    harden-glue: yes
-    harden-dnssec-stripped: yes
-    harden-referral-path: yes
-    unwanted-reply-threshold: 10000000
-    cache-min-ttl: 1800
-    cache-max-ttl: 14400
-    prefetch: yes
-    qname-minimisation: yes
-    prefetch-key: yes" >${UNBOUND_CONFIG}
+      echo -e "server:
+\tnum-threads: $(nproc)
+\tverbosity: 1
+\troot-hints: ${UNBOUND_ROOT_HINTS}
+\tauto-trust-anchor-file: ${UNBOUND_ANCHOR}
+\tinterface: 0.0.0.0
+\tinterface: ::0
+\tmax-udp-size: 3072
+\taccess-control: 0.0.0.0/0                 refuse
+\taccess-control: ::0                       refuse
+\taccess-control: ${PRIVATE_SUBNET_V4}                allow
+\taccess-control: ${PRIVATE_SUBNET_V6}           allow
+\taccess-control: 127.0.0.1                 allow
+\taccess-control: ::1                       allow
+\tprivate-address: ${PRIVATE_SUBNET_V4}
+\tprivate-address: ${PRIVATE_SUBNET_V6}
+\tdo-tcp: no
+\tchroot: \"\"
+\thide-identity: yes
+\thide-version: yes
+\tharden-glue: yes
+\tharden-dnssec-stripped: yes
+\tharden-referral-path: yes
+\tunwanted-reply-threshold: 10000000
+\tcache-min-ttl: 1800
+\tcache-max-ttl: 14400
+\tprefetch: yes
+\tqname-minimisation: yes
+\tprefetch-key: yes" >${UNBOUND_CONFIG}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
         rm -f ${RESOLV_CONFIG_OLD}
       fi
@@ -995,21 +995,21 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       chattr +i ${RESOLV_CONFIG}
       echo "Unbound: true" >${UNBOUND_MANAGER}
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-        echo "    include: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        echo -e "\tinclude: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
           mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       if [ "${ALLOW_ACESS_TO_OTHER_DEVICES}" == false ]; then
-        echo "    private-address: 10.0.0.0/8
-    private-address: 127.0.0.0/8
-    private-address: 169.254.0.0/16
-    private-address: 172.16.0.0/12
-    private-address: 192.168.0.0/16
-    private-address: ::ffff:0:0/96
-    private-address: fd00::/8
-    private-address: fe80::/10" >>${UNBOUND_CONFIG}
+        echo -e "\tprivate-address: 10.0.0.0/8
+\tprivate-address: 127.0.0.0/8
+\tprivate-address: 169.254.0.0/16
+\tprivate-address: 172.16.0.0/12
+\tprivate-address: 192.168.0.0/16
+\tprivate-address: ::ffff:0:0/96
+\tprivate-address: fd00::/8
+\tprivate-address: fe80::/10" >>${UNBOUND_CONFIG}
       fi
       # Start unbound
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
