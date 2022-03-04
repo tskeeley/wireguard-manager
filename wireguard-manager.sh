@@ -1496,7 +1496,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ "$(lsof -i UDP:"${NEW_SERVER_PORT}")" ]; then
         echo "Error: The port ${NEW_SERVER_PORT} is already used by a different application, please use a different port."
       fi
-      sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
+      if [ "${OLD_SERVER_PORT}" != "${NEW_SERVER_PORT}" ]; then
+        sed -i "s/${OLD_SERVER_PORT}/${NEW_SERVER_PORT}/g" ${WIREGUARD_CONFIG}
+      fi
       ;;
     14) # All wireguard peers should be removed from your interface
       COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{print $2}')
