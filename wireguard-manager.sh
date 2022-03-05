@@ -160,6 +160,13 @@ case $(shuf -i1-4 -n1) in
   WIREGUARD_MANAGER_UPDATE="https://combinatronics.io/complexorganizations/wireguard-manager/main/wireguard-manager.sh"
   ;;
 esac
+if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+  SYSTEM_CRON_NAME="crond"
+elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+  SYSTEM_CRON_NAME="cronie"
+else
+  SYSTEM_CRON_NAME="cron"
+fi
 
 # Usage Guide of the application
 function usage-guide() {
@@ -600,18 +607,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          systemctl enable crond
-          systemctl start crond
-        fi
-        if [ "${CURRENT_DISTRO}" == "arch" ]; then
-          systemctl enable cronie
-          systemctl start cronie
-        fi
-        systemctl enable cron
-        systemctl start cron
+        systemctl enable ${SYSTEM_CRON_NAME}
+        systemctl start ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron start
+        service ${SYSTEM_CRON_NAME} start
       fi
       ;;
     2)
@@ -638,14 +637,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          systemctl enable crond
-          systemctl start crond
-        fi
-        systemctl enable cron
-        systemctl start cron
+        systemctl enable ${SYSTEM_CRON_NAME}
+        systemctl start ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron start
+        service ${SYSTEM_CRON_NAME} start
       fi
       ;;
     2)
@@ -1067,19 +1062,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          systemctl enable crond
-          systemctl start crond
-        else
-          systemctl enable cron
-          systemctl start cron
-        fi
+        systemctl enable ${SYSTEM_CRON_NAME}
+        systemctl start ${SYSTEM_CRON_NAME}
         systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
         systemctl start wg-quick@${WIREGUARD_PUB_NIC}
         systemctl enable iptables
         systemctl start iptables
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service cron start
+        service ${SYSTEM_CRON_NAME} start
         service wg-quick@${WIREGUARD_PUB_NIC} start
         service iptables start
       fi
