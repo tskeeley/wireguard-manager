@@ -115,8 +115,7 @@ UNBOUND_ROOT="/etc/unbound"
 UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
-UNBOUND_ANCHOR_ROOT="/var/lib/unbound"
-UNBOUND_ANCHOR="${UNBOUND_ANCHOR_ROOT}/root.key"
+UNBOUND_ANCHOR="${UNBOUND_ROOT}/root.key"
 UNBOUND_CONFIG_DIRECTORY="${UNBOUND_ROOT}/unbound.conf.d"
 UNBOUND_CONFIG_HOST="${UNBOUND_CONFIG_DIRECTORY}/hosts.conf"
 case $(shuf -i1-4 -n1) in
@@ -935,11 +934,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           dnf install unbound -y
         fi
       fi
-      if [ ! -d "${UNBOUND_ANCHOR_ROOT}" ]; then
-        mkdir -p ${UNBOUND_ANCHOR_ROOT}
-      fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
-      chown unbound:unbound ${UNBOUND_ANCHOR_ROOT}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
       UNBOUND_TEMP_INTERFACE_INFO="server:
 \tnum-threads: $(nproc)
@@ -997,7 +992,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
-      # Start unbound
+      chown -R unbound:unbound ${UNBOUND_ROOT}
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable unbound
         systemctl start unbound
