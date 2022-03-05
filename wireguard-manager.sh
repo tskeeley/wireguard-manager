@@ -935,6 +935,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           dnf install unbound -y
         fi
       fi
+      if [ ! -d "${UNBOUND_ANCHOR_ROOT}" ]; then
+        mkdir -p ${UNBOUND_ANCHOR_ROOT}
+      fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
       chown unbound:unbound ${UNBOUND_ANCHOR_ROOT}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
