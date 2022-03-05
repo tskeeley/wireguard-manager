@@ -935,6 +935,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
+      chown unbound:unbound ${UNBOUND_ANCHOR}
       curl "${UNBOUND_ROOT_SERVER_CONFIG_URL}" --create-dirs -o ${UNBOUND_ROOT_HINTS}
       UNBOUND_TEMP_INTERFACE_INFO="server:
 \tnum-threads: $(nproc)
