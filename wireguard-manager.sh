@@ -603,10 +603,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           systemctl enable crond
           systemctl start crond
-        else
-          systemctl enable cron
-          systemctl start cron
         fi
+        if [ "${CURRENT_DISTRO}" == "arch" ]; then
+          systemctl enable cronie
+          systemctl start cronie
+        fi
+        systemctl enable cron
+        systemctl start cron
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron start
       fi
@@ -638,10 +641,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           systemctl enable crond
           systemctl start crond
-        else
-          systemctl enable cron
-          systemctl start cron
         fi
+        systemctl enable cron
+        systemctl start cron
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service cron start
       fi
