@@ -108,7 +108,6 @@ WIREGUARD_ADD_PEER_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}-add-peer.conf"
 SYSTEM_BACKUP_PATH="/var/backups"
 WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
-WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="${RESOLV_CONFIG}.old"
 UNBOUND_ROOT="/etc/unbound"
@@ -1288,9 +1287,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       if [ -f "${WIREGUARD_CONFIG}" ]; then
         rm -f ${WIREGUARD_CONFIG}
-      fi
-      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode -y
