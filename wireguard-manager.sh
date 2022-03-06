@@ -541,33 +541,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # IPv4 or IPv6 Selector
   ipvx-select
 
-  # Do you want to disable IPv4 or IPv6 or leave them both enabled?
-  function disable-ipvx() {
-    echo "Do you want to disable IPv4 or IPv6 on the server?"
-    echo "  1) No (Recommended)"
-    echo "  2) Disable IPv4"
-    echo "  3) Disable IPv6"
-    until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-      read -rp "Disable Host Choice [1-3]:" -e -i 1 DISABLE_HOST_SETTINGS
-    done
-    case ${DISABLE_HOST_SETTINGS} in
-    1)
-      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    2)
-      echo "net.ipv6.conf.all.forwarding=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    3)
-      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    esac
-    sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
-  }
-
-  # Disable IPv4 or IPv6
-  disable-ipvx
-
   # Would you like to allow connections to your LAN neighbors?
   function client-allowed-ip() {
     echo "What traffic do you want the client to forward through WireGuard?"
@@ -1018,11 +991,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      NFTABLES_POSTUP=""
-      NFTABLES_POSTDOWN=""
+      NFTABLES_POSTUP="sysctl -w net.ipv4.ip_forward=1; sysctl -w net.ipv6.conf.all.forwarding=1"
+      NFTABLES_POSTDOWN="sysctl -w net.ipv4.ip_forward=0; sysctl -w net.ipv6.conf.all.forwarding=0"
     else
-      NFTABLES_POSTUP=""
-      NFTABLES_POSTDOWN=""
+      NFTABLES_POSTUP="sysctl -w net.ipv4.ip_forward=1; sysctl -w net.ipv6.conf.all.forwarding=1"
+      NFTABLES_POSTDOWN="sysctl -w net.ipv4.ip_forward=0; sysctl -w net.ipv6.conf.all.forwarding=0"
     fi
     # Set WireGuard settings for this host and first peer.
     echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
