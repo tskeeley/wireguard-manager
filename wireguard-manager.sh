@@ -579,8 +579,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
+        systemctl enable --now ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
       fi
@@ -609,8 +608,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
+        systemctl enable --now ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
       fi
@@ -886,8 +884,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-              systemctl stop systemd-resolved
-              systemctl disable systemd-resolved
+              systemctl disable --now systemd-resolved
             elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
               service systemd-resolved stop
             fi
@@ -966,8 +963,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       fi
       chown -R unbound:unbound ${UNBOUND_ROOT}
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable unbound
-        systemctl start unbound
+        systemctl enable --now unbound
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service unbound start
       fi
@@ -1034,12 +1030,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl enable nftables
-        systemctl start nftables
+        systemctl enable --now ${SYSTEM_CRON_NAME}
+        systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable --now nftables
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
         service wg-quick@${WIREGUARD_PUB_NIC} start
@@ -1243,8 +1236,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     7) # Reinstall WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl disable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
@@ -1264,16 +1256,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         dnf reinstall wireguard-tools -y
       fi
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
     8) # Uninstall WireGuard and purging files
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl disable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
@@ -1301,8 +1291,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode -y
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl enable systemd-resolved
-          systemctl restart systemd-resolved
+          systemctl enable --now systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved restart
         fi
@@ -1335,8 +1324,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl disable unbound
-          systemctl stop unbound
+          systemctl disable --now unbound
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service unbound stop
         fi
@@ -1423,8 +1411,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
