@@ -114,7 +114,10 @@ UNBOUND_ROOT="/etc/unbound"
 UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
-UNBOUND_ANCHOR="${UNBOUND_ROOT}/root.key"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
+if { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+  UNBOUND_ANCHOR="${UNBOUND_ROOT}/root.key"
+fi
 UNBOUND_CONFIG_DIRECTORY="${UNBOUND_ROOT}/unbound.conf.d"
 UNBOUND_CONFIG_HOST="${UNBOUND_CONFIG_DIRECTORY}/hosts.conf"
 case $(shuf -i1-4 -n1) in
