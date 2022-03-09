@@ -960,7 +960,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
-      chown -R unbound:unbound ${UNBOUND_ROOT}
+      chown -R root:root ${UNBOUND_ROOT}
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable --now unbound
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
@@ -1038,7 +1038,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
         service nftables start
       fi
     fi
-    chmod 600 -R ${WIREGUARD_PATH}
+    chown -R root:root ${WIREGUARD_PATH}
     qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     echo "Client Config --> ${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
   }
