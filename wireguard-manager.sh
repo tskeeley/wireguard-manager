@@ -1037,12 +1037,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
       if [ "${INSTALL_UNBOUND}" == true ]; then
         systemctl enable --now unbound
+        systemctl restart unbound
       fi
     elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
       service nftables start
       service wg-quick@${WIREGUARD_PUB_NIC} start
       if [ "${INSTALL_UNBOUND}" == true ]; then
-        service unbound start
+        service unbound restart
       fi
     fi
     qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
