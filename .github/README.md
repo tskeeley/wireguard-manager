@@ -99,28 +99,29 @@ usage: ./wireguard-manager.sh <command>
 - (IPv4|IPv6) Supported, Leak Protection
 - Variety of Public DNS to be pushed to the peers
 - Choice to use a self-hosted resolver with Unbound **Prevent DNS Leaks, DNSSEC Supported**
-- Iptables rules and forwarding managed in a seamless way
+- Nftables rules and forwarding managed in a seamless way
 - Remove & Uninstall WireGuard Interface
 - Preshared-key for an extra layer of security. **Required**
 - Many other little things!
 
 ---
 ### 💡 Options
-* `PRIVATE_SUBNET_V4` - By default, the private IPv4 subnet configuration is `10.0.0.0/8`.
-* `PRIVATE_SUBNET_V6` - `fd00:00:00::0/8` is the default private IPv6 subnet.
-* `SERVER_HOST_V4` - Curl detects a public IPv4 address by default.
-* `SERVER_HOST_V6` - Curl by default finds a public IPv6 address.
-* `SERVER_PUB_NIC` - Using the ip command, to find the local public network interface.
-* `SERVER_PORT` - `51820` is the default public port for the wireguard interface.
-* `DISABLE_HOST` - Determine whether or not IPv4 or IPv6 should be disabled.
-* `CLIENT_ALLOWED_IP` - Using an IP range, choose what should be sent to the VPN.
-* `NAT_CHOICE` - Determine whether or not to use the vpn tunnel's keep alive feature.
-* `INSTALL_UNBOUND` - Whether or not to install unbound is up to you.
-* `UNINSTALL_UNBOUND` - If you need to remove Unbound for whatever reason, you can do so.
-* `REMOVE_WIREGUARD` - It is entirely up to you whether or not to remove wireguard altogether.
-* `DNS_CHOICE` - You'll have to utilize another DNS if you don't have Unbound.
+* `PRIVATE_SUBNET_V4_SETTINGS` - By default, the private IPv4 subnet configuration is `10.0.0.0/8`.
+* `PRIVATE_SUBNET_V6_SETTINGS` - `fd00:00:00::0/8` is the default private IPv6 subnet.
+* `SERVER_HOST_V4_SETTINGS` - Curl detects a public IPv4 address by default.
+* `SERVER_HOST_V6_SETTINGS` - Curl by default finds a public IPv6 address.
+* `SERVER_PUB_NIC_SETTINGS` - Using the ip command, to find the local public network interface.
+* `SERVER_PORT_SETTINGS` - `51820` is the default public port for the wireguard interface.
+* `NAT_CHOICE_SETTINGS` - Determine whether or not to use the vpn tunnel's keep alive feature.
+* `MTU_CHOICE_SETTINGS` - The wireguard peers will utilize this MTU.
+* `SERVER_HOST_SETTINGS` -
+* `CLIENT_ALLOWED_IP_SETTINGS` - Using an IP range, choose what should be sent to the VPN.
+* `AUTOMATIC_UPDATES_SETTINGS` -
+* `AUTOMATIC_BACKUP_SETTINGS` -
+* `DNS_PROVIDER_SETTINGS` - You'll have to utilize another DNS if you don't have Unbound.
+* `CONTENT_BLOCKER_SETTINGS` -
 * `CLIENT_NAME` - The wireguard peer's name.
-* `MTU_CHOICE` - The wireguard peers will utilize this MTU.
+* `AUTOMATIC_CONFIG_REMOVER` -
 
 ---
 ### 👉👈 Compatibility with Linux Distro
