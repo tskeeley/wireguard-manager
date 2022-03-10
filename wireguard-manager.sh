@@ -1034,10 +1034,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable --now ${SYSTEM_CRON_NAME}
         systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
         systemctl enable --now nftables
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
-        service wg-quick@${WIREGUARD_PUB_NIC} start
+        service wg-quick@${WIREGUARD_PUB_NIC} restart
         service nftables start
       fi
     fi
