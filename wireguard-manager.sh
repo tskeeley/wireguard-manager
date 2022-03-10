@@ -1277,12 +1277,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -d "${WIREGUARD_PATH}" ]; then
         rm -rf ${WIREGUARD_PATH}
       fi
-      if [ -d "${WIREGUARD_CLIENT_PATH}" ]; then
-        rm -rf ${WIREGUARD_CLIENT_PATH}
-      fi
-      if [ -f "${WIREGUARD_CONFIG}" ]; then
-        rm -f ${WIREGUARD_CONFIG}
-      fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode -y
       elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
@@ -1357,12 +1351,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         if [ -f "${UNBOUND_ANCHOR}" ]; then
           rm -f ${UNBOUND_ANCHOR}
-        fi
-        if [ -f "${UNBOUND_ROOT_HINTS}" ]; then
-          rm -f ${UNBOUND_ROOT_HINTS}
-        fi
-        if [ -f "${UNBOUND_CONFIG}" ]; then
-          rm -f ${UNBOUND_CONFIG}
         fi
       fi
       # If any cronjobs are identified, they should be removed.
