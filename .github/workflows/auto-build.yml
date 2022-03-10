@@ -43,7 +43,7 @@ jobs:
       - name: View Unbound configuration.
         run: sudo cat /etc/unbound/unbound.conf
       - name: View unbound anchor file.
-        run: sudo cat /etc/unbound/root.key
+        run: sudo cat /var/lib/unbound/root.key
       - name: View unbound root.hints.
         run: sudo cat /etc/unbound/root.hints
       - name: View unbound blocklist
