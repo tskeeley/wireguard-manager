@@ -28,26 +28,26 @@ system-information
 # Pre-Checks system requirements
 function installing-system-requirements() {
   if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v ps)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v iptables)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
+    if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v ps)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v nft)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd -y
+        apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
         yum install epel-release elrepo-release -y
-        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
+        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
-        pacman -S --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pacman -S --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
-        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        apk add curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg update
-        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl iptables ifupdown e2fsprogs gnupg systemd
+        pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         dnf check-update
-        dnf install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl iptables NetworkManager e2fsprogs gnupg systemd -y
+        dnf install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
       fi
     fi
   else
@@ -108,14 +108,16 @@ WIREGUARD_ADD_PEER_CONFIG="${WIREGUARD_PATH}/${WIREGUARD_PUB_NIC}-add-peer.conf"
 SYSTEM_BACKUP_PATH="/var/backups"
 WIREGUARD_CONFIG_BACKUP="${SYSTEM_BACKUP_PATH}/wireguard-manager.zip"
 WIREGUARD_BACKUP_PASSWORD_PATH="${HOME}/.wireguard-manager"
-WIREGUARD_IP_FORWARDING_CONFIG="/etc/sysctl.d/wireguard.conf"
 RESOLV_CONFIG="/etc/resolv.conf"
 RESOLV_CONFIG_OLD="${RESOLV_CONFIG}.old"
 UNBOUND_ROOT="/etc/unbound"
 UNBOUND_MANAGER="${UNBOUND_ROOT}/wireguard-manager"
 UNBOUND_CONFIG="${UNBOUND_ROOT}/unbound.conf"
 UNBOUND_ROOT_HINTS="${UNBOUND_ROOT}/root.hints"
-UNBOUND_ANCHOR="${UNBOUND_ROOT}/root.key"
+UNBOUND_ANCHOR="/var/lib/unbound/root.key"
+if { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+  UNBOUND_ANCHOR="${UNBOUND_ROOT}/root.key"
+fi
 UNBOUND_CONFIG_DIRECTORY="${UNBOUND_ROOT}/unbound.conf.d"
 UNBOUND_CONFIG_HOST="${UNBOUND_CONFIG_DIRECTORY}/hosts.conf"
 case $(shuf -i1-4 -n1) in
@@ -276,7 +278,6 @@ function headless-install() {
     NAT_CHOICE_SETTINGS=${NAT_CHOICE_SETTINGS=1}
     MTU_CHOICE_SETTINGS=${MTU_CHOICE_SETTINGS=1}
     SERVER_HOST_SETTINGS=${SERVER_HOST_SETTINGS=1}
-    DISABLE_HOST_SETTINGS=${DISABLE_HOST_SETTINGS=1}
     CLIENT_ALLOWED_IP_SETTINGS=${CLIENT_ALLOWED_IP_SETTINGS=1}
     AUTOMATIC_UPDATES_SETTINGS=${AUTOMATIC_UPDATES_SETTINGS=1}
     AUTOMATIC_BACKUP_SETTINGS=${AUTOMATIC_BACKUP_SETTINGS=1}
@@ -541,33 +542,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # IPv4 or IPv6 Selector
   ipvx-select
 
-  # Do you want to disable IPv4 or IPv6 or leave them both enabled?
-  function disable-ipvx() {
-    echo "Do you want to disable IPv4 or IPv6 on the server?"
-    echo "  1) No (Recommended)"
-    echo "  2) Disable IPv4"
-    echo "  3) Disable IPv6"
-    until [[ "${DISABLE_HOST_SETTINGS}" =~ ^[1-3]$ ]]; do
-      read -rp "Disable Host Choice [1-3]:" -e -i 1 DISABLE_HOST_SETTINGS
-    done
-    case ${DISABLE_HOST_SETTINGS} in
-    1)
-      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      echo "net.ipv6.conf.all.forwarding=1" >>${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    2)
-      echo "net.ipv6.conf.all.forwarding=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    3)
-      echo "net.ipv4.ip_forward=1" >${WIREGUARD_IP_FORWARDING_CONFIG}
-      ;;
-    esac
-    sysctl -p ${WIREGUARD_IP_FORWARDING_CONFIG}
-  }
-
-  # Disable IPv4 or IPv6
-  disable-ipvx
-
   # Would you like to allow connections to your LAN neighbors?
   function client-allowed-ip() {
     echo "What traffic do you want the client to forward through WireGuard?"
@@ -607,8 +581,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --update"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
+        systemctl enable --now ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
       fi
@@ -637,8 +610,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         echo "0 0 * * * ${CURRENT_FILE_PATH} --backup"
       } | crontab -
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
+        systemctl enable --now ${SYSTEM_CRON_NAME}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service ${SYSTEM_CRON_NAME} start
       fi
@@ -777,6 +749,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     case ${AUTOMATIC_CONFIG_REMOVER} in
     1)
       AUTOMATIC_WIREGUARD_EXPIRATION=true
+      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+        systemctl enable --now ${SYSTEM_CRON_NAME}
+      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+        service ${SYSTEM_CRON_NAME} start
+      fi
       ;;
     2)
       AUTOMATIC_WIREGUARD_EXPIRATION=false
@@ -914,8 +891,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           apt-get install unbound resolvconf -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-              systemctl stop systemd-resolved
-              systemctl disable systemd-resolved
+              systemctl disable --now systemd-resolved
             elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
               service systemd-resolved stop
             fi
@@ -992,13 +968,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
-      chown -R unbound:unbound ${UNBOUND_ROOT}
-      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable unbound
-        systemctl start unbound
-      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service unbound start
-      fi
+      chown -R root:root ${UNBOUND_ROOT}
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
   }
@@ -1018,11 +988,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -A INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -A INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
-      IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; iptables -D INPUT -s ${PRIVATE_SUBNET_V4} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT; ip6tables -D INPUT -s ${PRIVATE_SUBNET_V6} -p udp -m udp --dport 53 -m conntrack --ctstate NEW -j ACCEPT"
+      NFTABLES_POSTUP="sysctl -w net.ipv4.ip_forward=1; sysctl -w net.ipv6.conf.all.forwarding=1; nft add table inet wireguard-${WIREGUARD_PUB_NIC}; nft add chain inet wireguard-${WIREGUARD_PUB_NIC} wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule inet wireguard-${WIREGUARD_PUB_NIC} wireguard_chain oifname ${SERVER_PUB_NIC} counter packets 0 bytes 0 masquerade"
+      NFTABLES_POSTDOWN="sysctl -w net.ipv4.ip_forward=0; sysctl -w net.ipv6.conf.all.forwarding=0; nft delete table inet wireguard-${WIREGUARD_PUB_NIC}"
     else
-      IPTABLES_POSTUP="iptables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -A FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -A POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE"
-      IPTABLES_POSTDOWN="iptables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; iptables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE; ip6tables -D FORWARD -i ${WIREGUARD_PUB_NIC} -j ACCEPT; ip6tables -t nat -D POSTROUTING -o ${SERVER_PUB_NIC} -j MASQUERADE"
+      NFTABLES_POSTUP="sysctl -w net.ipv4.ip_forward=1; sysctl -w net.ipv6.conf.all.forwarding=1; nft add table inet wireguard-${WIREGUARD_PUB_NIC}; nft add chain inet wireguard-${WIREGUARD_PUB_NIC} PREROUTING { type nat hook prerouting priority 0 \; }; nft add chain inet wireguard-${WIREGUARD_PUB_NIC} POSTROUTING { type nat hook postrouting priority 100 \; }; nft add rule inet wireguard-${WIREGUARD_PUB_NIC} POSTROUTING ip saddr ${PRIVATE_SUBNET_V4} oifname ${SERVER_PUB_NIC} masquerade; nft add rule inet wireguard-${WIREGUARD_PUB_NIC} POSTROUTING ip6 saddr ${PRIVATE_SUBNET_V6} oifname ${SERVER_PUB_NIC} masquerade"
+      NFTABLES_POSTDOWN="sysctl -w net.ipv4.ip_forward=0; sysctl -w net.ipv6.conf.all.forwarding=0; nft delete table inet wireguard-${WIREGUARD_PUB_NIC}"
     fi
     # Set WireGuard settings for this host and first peer.
     echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
@@ -1032,8 +1002,8 @@ DNS = ${CLIENT_DNS}
 ListenPort = ${SERVER_PORT}
 MTU = ${MTU_CHOICE}
 PrivateKey = ${SERVER_PRIVKEY}
-PostUp = ${IPTABLES_POSTUP}
-PostDown = ${IPTABLES_POSTDOWN}
+PostUp = ${NFTABLES_POSTUP}
+PostDown = ${NFTABLES_POSTDOWN}
 SaveConfig = false
 # ${CLIENT_NAME} start
 [Peer]
@@ -1055,26 +1025,27 @@ Endpoint = ${SERVER_HOST}:${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
-    # If automaic wireguard expiration is enabled than set the expiration date.
+    chown -R root:root ${WIREGUARD_PATH}
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
         echo "$(date +%M) $(date +%H) $(date +%d) $(date +%m) * echo -e \"${CLIENT_NAME}\" | ${CURRENT_FILE_PATH} --remove"
       } | crontab -
-      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable ${SYSTEM_CRON_NAME}
-        systemctl start ${SYSTEM_CRON_NAME}
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl start wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl enable iptables
-        systemctl start iptables
-      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service ${SYSTEM_CRON_NAME} start
-        service wg-quick@${WIREGUARD_PUB_NIC} start
-        service iptables start
+    fi
+    if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+      systemctl enable --now nftables
+      systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
+      if [ "${INSTALL_UNBOUND}" == true ]; then
+        systemctl enable --now unbound
+        systemctl restart unbound
+      fi
+    elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+      service nftables start
+      service wg-quick@${WIREGUARD_PUB_NIC} start
+      if [ "${INSTALL_UNBOUND}" == true ]; then
+        service unbound restart
       fi
     fi
-    # Generate QR Code
     qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     echo "Client Config --> ${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
   }
@@ -1271,8 +1242,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     7) # Reinstall WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl disable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
@@ -1292,16 +1262,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         dnf reinstall wireguard-tools -y
       fi
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
       ;;
     8) # Uninstall WireGuard and purging files
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl disable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl stop wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl disable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} stop
       fi
@@ -1316,9 +1284,6 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       if [ -f "${WIREGUARD_CONFIG}" ]; then
         rm -f ${WIREGUARD_CONFIG}
       fi
-      if [ -f "${WIREGUARD_IP_FORWARDING_CONFIG}" ]; then
-        rm -f ${WIREGUARD_IP_FORWARDING_CONFIG}
-      fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode -y
       elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
@@ -1332,8 +1297,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
         apt-get remove --purge wireguard qrencode -y
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl enable systemd-resolved
-          systemctl restart systemd-resolved
+          systemctl enable --now systemd-resolved
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service systemd-resolved restart
         fi
@@ -1366,8 +1330,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       # Uninstall unbound
       if [ -x "$(command -v unbound)" ]; then
         if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl disable unbound
-          systemctl stop unbound
+          systemctl disable --now unbound
         elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
           service unbound stop
         fi
@@ -1454,8 +1417,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable wg-quick@${WIREGUARD_PUB_NIC}
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
         service wg-quick@${WIREGUARD_PUB_NIC} restart
       fi
