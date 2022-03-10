@@ -169,11 +169,6 @@ elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ]
 else
   SYSTEM_CRON_NAME="cron"
 fi
-if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-  systemctl enable --now nftables
-elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-  service nftables start
-fi
 
 # Usage Guide of the application
 function usage-guide() {
@@ -974,11 +969,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       chown -R root:root ${UNBOUND_ROOT}
-      if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl enable --now unbound
-      elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service unbound start
-      fi
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
   }
@@ -1043,9 +1033,17 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIRE
       } | crontab -
     fi
     if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+      systemctl enable --now nftables
       systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
+      if [ "${INSTALL_UNBOUND}" == true ]; then
+        systemctl enable --now unbound
+      fi
     elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+      service nftables start
       service wg-quick@${WIREGUARD_PUB_NIC} start
+      if [ "${INSTALL_UNBOUND}" == true ]; then
+        service unbound start
+      fi
     fi
     qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
     echo "Client Config --> ${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf"
