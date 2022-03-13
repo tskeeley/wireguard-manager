@@ -428,7 +428,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     2)
       read -rp "Custom NAT:" SERVER_PUB_NIC
       if [ -z "${SERVER_PUB_NIC}" ]; then
-        SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+        SERVER_PUB_NIC="$(ip -4 route | head -1 | cut -d " " -f5)"
       fi
       ;;
     esac
