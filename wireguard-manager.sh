@@ -420,7 +420,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_PUB_NIC_SETTINGS} in
     1)
-      SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+      SERVER_PUB_NIC="$(ip -4 route | head -1 | cut -d " " -f5)"
       if [ -z "${SERVER_PUB_NIC}" ]; then
         echo "Error: Your server's public network interface could not be found."
       fi
