@@ -1361,7 +1361,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     9) # Update the script
       CURRENT_WIREGUARD_MANAGER_HASH=$(openssl dgst -sha3-512 "${CURRENT_FILE_PATH}" | cut -d " " -f2)
-      NEW_WIREGUARD_MANAGER_HASH=$(curl  --silent${WIREGUARD_MANAGER_UPDATE} | openssl dgst -sha3-512 | cut -d " " -f2)
+      NEW_WIREGUARD_MANAGER_HASH=$(curl --silent ${WIREGUARD_MANAGER_UPDATE} | openssl dgst -sha3-512 | cut -d " " -f2)
       if [ "${CURRENT_WIREGUARD_MANAGER_HASH}" != "${NEW_WIREGUARD_MANAGER_HASH}" ]; then
         curl ${WIREGUARD_MANAGER_UPDATE} -o "${CURRENT_FILE_PATH}"
         chmod +x "${CURRENT_FILE_PATH}"
