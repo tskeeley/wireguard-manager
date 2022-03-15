@@ -43,15 +43,15 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 ---
 ### 🐧 Installation
 Lets first use `curl` and save the file in `/usr/local/bin/`
-```
+``` bash
 curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
 ```
 Then let's make the script user executable
-```
+``` bash
 chmod +x /usr/local/bin/wireguard-manager.sh
 ```
 It's finally time to execute the script
-```
+``` bash
 bash /usr/local/bin/wireguard-manager.sh
 ```
 
@@ -249,9 +249,9 @@ Developing the code without having to clone the repository
 ### 🐛 Debugging
 After cloning the repo, Then start debugging the code.
 
-```
+``` bash
 git clone https://github.com/complexorganizations/wireguard-manager /root/
-bash -x /root/wireguard-manager/wireguard-manager.sh >> /root/wireguard-manager/wireguard-manager.log
+bash -x /root/wireguard-manager/wireguard-manager.sh >>/root/wireguard-manager/wireguard-manager.log
 ```
 
 ---
