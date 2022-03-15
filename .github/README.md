@@ -250,8 +250,8 @@ Developing the code without having to clone the repository
 After cloning the repo, Then start debugging the code.
 
 ```
-git clone https://github.com/complexorganizations/wireguard-manager /usr/local/bin/
-bash -x /usr/local/bin/wireguard-manager.sh >> /usr/local/bin/wireguard-manager.log
+git clone https://github.com/complexorganizations/wireguard-manager /root/
+bash -x /root/wireguard-manager/wireguard-manager.sh >> /root/wireguard-manager/wireguard-manager.log
 ```
 
 ---
