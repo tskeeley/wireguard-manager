@@ -888,9 +888,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      if { [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
+      if [ ! -x "$(command -v unbound)" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install unbound resolvconf -y
+          apt-get install unbound -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
               systemctl disable --now systemd-resolved
@@ -901,13 +901,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum install unbound -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          dnf install unbound resolvconf -y
+          dnf install unbound -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -S --noconfirm unbound openresolv
+          pacman -S --noconfirm --needed unbound
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-          apk add unbound resolvconf
+          apk add unbound
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-          pkg install unbound resolvconf
+          pkg install unbound
         elif [ "${CURRENT_DISTRO}" == "ol" ]; then
           dnf install unbound -y
         fi
@@ -977,6 +977,29 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Running Install Unbound
   install-unbound
+  
+  # Install resolvconf OR openresolv
+  function install-resolvconf-or-openresolv() {
+    if [ ! -x "$(command -v resolvconf)" ]; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+          apt-get install resolvconf -y
+        elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+          yum install resolvconf -y
+        elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
+          dnf install resolvconf -y
+        elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+          pacman -S --noconfirm --needed resolvconf
+        elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
+          apk add resolvconf
+        elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
+          pkg install resolvconf
+        elif [ "${CURRENT_DISTRO}" == "ol" ]; then
+          dnf install resolvconf -y
+        fi
+    fi
+  }
+  
+  install-resolvconf-or-openresolv
 
   # WireGuard Set Config
   function wireguard-setconf() {
