@@ -977,34 +977,34 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Running Install Unbound
   install-unbound
-  
+
   # Install resolvconf OR openresolv
   function install-resolvconf-or-openresolv() {
     if [ ! -x "$(command -v resolvconf)" ]; then
-        if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install resolvconf -y
-        elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum install openresolv -y
-        elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          if [ "${CURRENT_DISTRO_VERSION%.*}" -ge 35 ]; then
-            dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/35/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-2.fc35.noarch.rpm
-          fi
-          if [ "${CURRENT_DISTRO_VERSION%.*}" -le 34 ]; then
-            dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-1.fc34.noarch.rpm
-          fi
-          dnf install openresolv -y
-        elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -S --noconfirm --needed resolvconf
-        elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-          apk add resolvconf
-        elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-          pkg install resolvconf
-        elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-          dnf install resolvconf -y
+      if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+        apt-get install resolvconf -y
+      elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+        yum install openresolv -y
+      elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
+        if [ "${CURRENT_DISTRO_VERSION%.*}" -ge 35 ]; then
+          dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/35/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-2.fc35.noarch.rpm
         fi
+        if [ "${CURRENT_DISTRO_VERSION%.*}" -le 34 ]; then
+          dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-1.fc34.noarch.rpm
+        fi
+        dnf install openresolv -y
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+        pacman -S --noconfirm --needed resolvconf
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
+        apk add resolvconf
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
+        pkg install resolvconf
+      elif [ "${CURRENT_DISTRO}" == "ol" ]; then
+        dnf install resolvconf -y
+      fi
     fi
   }
-  
+
   install-resolvconf-or-openresolv
 
   # WireGuard Set Config
