@@ -36,22 +36,22 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 🌲 Prerequisite
-- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky
+- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky, Oracle
 - Linux `Kernel 3.1` or newer
 - You will need superuser access or a user account with `sudo` privilege.
 
 ---
 ### 🐧 Installation
 Lets first use `curl` and save the file in `/usr/local/bin/`
-```
+``` bash
 curl https://raw.githubusercontent.com/complexorganizations/wireguard-manager/main/wireguard-manager.sh --create-dirs -o /usr/local/bin/wireguard-manager.sh
 ```
 Then let's make the script user executable
-```
+``` bash
 chmod +x /usr/local/bin/wireguard-manager.sh
 ```
 It's finally time to execute the script
-```
+``` bash
 bash /usr/local/bin/wireguard-manager.sh
 ```
 
@@ -249,20 +249,10 @@ Developing the code without having to clone the repository
 ### 🐛 Debugging
 After cloning the repo, Then start debugging the code.
 
+``` bash
+git clone https://github.com/complexorganizations/wireguard-manager /root/
+bash -x /root/wireguard-manager/wireguard-manager.sh >>/root/wireguard-manager/wireguard-manager.log
 ```
-git clone https://github.com/complexorganizations/wireguard-manager /usr/local/bin/
-bash -x /usr/local/bin/wireguard-manager.sh >> /usr/local/bin/wireguard-manager.log
-```
-
----
-### 👤 Author
-* Name: Prajwal Koirala
-* Website: [prajwalkoirala.com](https://www.prajwalkoirala.com)
-* Github: [@prajwal-koirala](https://github.com/prajwal-koirala)
-* LinkedIn: [@prajwal-koirala](https://www.linkedin.com/in/prajwal-koirala)
-* Twitter: [@Prajwal_K23](https://twitter.com/Prajwal_K23)
-* Reddit: [@prajwalkoirala23](https://www.reddit.com/user/prajwalkoirala23)
-* Twitch: [@prajwalkoirala23](https://www.twitch.tv/prajwalkoirala23)
 
 ---
 ### ⛑️ Support
