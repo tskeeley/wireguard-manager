@@ -19,6 +19,7 @@ function system-information() {
     source /etc/os-release
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
+    CURRENT_DISTRO_MAJOR_VERSION=$(echo "${CURRENT_DISTRO_VERSION}" | cut -d'.' -f1)
   fi
 }
 
@@ -809,7 +810,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
       if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        if [ "${CURRENT_DISTRO_VERSION%.*}" -le 20 ]; then
+        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 20 ]; then
           apt-get install software-properties-common -y
           add-apt-repository ppa:wireguard/wireguard -y
         fi
@@ -820,7 +821,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
         apt-get update
-        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 11 ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 11 ]; }; then
           if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
             echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
             apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -839,26 +840,26 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
         pacman -S --noconfirm --needed wireguard-tools
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 32 ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 32 ]; then
         dnf check-update
         dnf install wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 31 ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 31 ]; then
         dnf check-update
         dnf copr enable jdoss/wireguard -y
         dnf install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -ge 8 ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 8 ]; then
         yum check-update
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_VERSION%.*}" -le 7 ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 7 ]; then
         yum check-update
         yum install yum-plugin-elrepo -y
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 8 ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 8 ]; then
         yum check-update
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
         yum check-update
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_VERSION%.*}" == 7 ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
         yum check-update
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
         yum install kmod-wireguard wireguard-tools -y
@@ -986,9 +987,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum install openresolv -y
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        if [ "${CURRENT_DISTRO_VERSION%.*}" -ge 35 ]; then
+        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 35 ]; then
           dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/35/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-2.fc35.noarch.rpm
-        elif [ "${CURRENT_DISTRO_VERSION%.*}" -le 34 ]; then
+        elif [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 34 ]; then
           dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-1.fc34.noarch.rpm
         fi
         dnf install openresolv -y
