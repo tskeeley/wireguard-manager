@@ -35,7 +35,7 @@ function installing-system-requirements() {
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
-        yum install epel-release elrepo-release -y
+        yum install epel-release elrepo-release yum-utils yum-plugin-elrepo -y
         yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
@@ -840,19 +840,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
         pacman -S --noconfirm --needed wireguard-tools
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 32 ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ]; then
         dnf check-update
         dnf install wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 31 ]; then
-        dnf check-update
-        dnf copr enable jdoss/wireguard -y
-        dnf install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 8 ]; then
+      elif [ "${CURRENT_DISTRO}" == "centos" ]; then
         yum check-update
-        yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 7 ]; then
-        yum check-update
-        yum install yum-plugin-elrepo -y
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 8 ]; then
         yum check-update
@@ -985,6 +977,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get install resolvconf -y
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+        if { [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 7 ]; then
+          yum copr enable macieks/openresolv -y
+        fi
         yum install openresolv -y
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
         if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 35 ]; then
