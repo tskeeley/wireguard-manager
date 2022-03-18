@@ -967,8 +967,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apk add resolvconf
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg install resolvconf
-      elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        dnf install resolvconf -y
       fi
     fi
   }
