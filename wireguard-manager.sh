@@ -959,7 +959,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           yum copr enable macieks/openresolv -y
         fi
         yum install openresolv -y
-      elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
+      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
         dnf install openresolv -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm --needed resolvconf
