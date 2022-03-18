@@ -828,14 +828,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif [ "${CURRENT_DISTRO}" == "centos" ]; then
         yum check-update
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 8 ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
         yum check-update
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 8 ]; then
+          yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+        elif [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
+          yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+        fi
         yum check-update
-        yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
-        yum check-update
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
