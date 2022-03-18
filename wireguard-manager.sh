@@ -811,9 +811,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ ! -x "$(command -v wg)" ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
-          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
-          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+        if [[ "$(cat /etc/apt/sources.list)" != *"sid main"* ]]; then
+          echo "deb http://deb.debian.org/debian sid main" >>/etc/apt/sources.list
           apt-get update
         fi
         apt-get install wireguard -y
