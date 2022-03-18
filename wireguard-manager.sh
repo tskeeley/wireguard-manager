@@ -809,27 +809,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Install WireGuard Server
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
-      if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 20 ]; then
-          apt-get install software-properties-common -y
-          add-apt-repository ppa:wireguard/wireguard -y
-        fi
-        apt-get update
-        apt-get install wireguard -y
-      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get update
-        apt-get install wireguard -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
-        apt-get update
-        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 11 ]; }; then
-          if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
-            echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
-            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
-            apt-get update
-          fi
-        fi
-        apt-get install wireguard -y
-      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
           echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
