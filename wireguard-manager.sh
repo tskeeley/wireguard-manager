@@ -811,6 +811,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ ! -x "$(command -v wg)" ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
+        sed -i "/^#/d" /etc/apt/sources.list
+        sed -i "/^$/d" /etc/apt/sources.list
         if [[ "$(cat /etc/apt/sources.list)" != *"sid main"* ]]; then
           echo "deb http://deb.debian.org/debian sid main" >>/etc/apt/sources.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
@@ -1287,21 +1289,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
         apt-get remove --purge wireguard qrencode -y
-        apt-key del 04EE7237B7D453EC
-        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
-          rm -f /etc/apt/sources.list.d/backports.list
-        fi
-      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get remove --purge wireguard qrencode -y
-      elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        apt-get remove --purge wireguard qrencode -y
-        if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl enable --now systemd-resolved
-        elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-          service systemd-resolved restart
-        fi
+        sed -i "s|deb http://deb.debian.org/debian sid main||g" /etc/apt/sources.list
+        apt-key del 648ACFD622F3D138
+        apt-key del 0E98404D386FA1D9
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools qrencode
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
@@ -1344,6 +1336,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum remove unbound -y
         elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+          if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
+            if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+              systemctl enable --now systemd-resolved
+            elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+              service systemd-resolved restart
+            fi
+          fi
           apt-get remove --purge unbound -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -Rs --noconfirm unbound
