@@ -813,8 +813,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get update
         if [[ "$(cat /etc/apt/sources.list)" != *"sid main"* ]]; then
           echo "deb http://deb.debian.org/debian sid main" >>/etc/apt/sources.list
-          apt-key adv --keyserver keyring.debian.org --recv-keys 648ACFD622F3D138
-          apt-key adv --keyserver keyring.debian.org --recv-keys 0E98404D386FA1D9
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9
           apt-get update
         fi
         apt-get install wireguard -y
