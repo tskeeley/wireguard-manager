@@ -823,6 +823,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pacman -S --noconfirm --needed wireguard-tools
       elif [ "${CURRENT_DISTRO}" = "fedora" ]; then
         dnf check-update
+        dnf copr enable jdoss/wireguard -y
         dnf install wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "centos" ]; then
         yum check-update
@@ -963,11 +964,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         yum install openresolv -y
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 35 ]; then
-          dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/35/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-2.fc35.noarch.rpm
-        elif [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 34 ]; then
-          dnf install https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Everything/"$(arch)"/os/Packages/o/openresolv-3.12.0-1.fc34.noarch.rpm
-        fi
         dnf install openresolv -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm --needed resolvconf
