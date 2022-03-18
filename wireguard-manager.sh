@@ -811,10 +811,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     if [ ! -x "$(command -v wg)" ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
-        sed -i "/^#/d" /etc/apt/sources.list
-        sed -i "/^$/d" /etc/apt/sources.list
-        if [[ "$(cat /etc/apt/sources.list)" != *"sid main"* ]]; then
-          echo "deb http://deb.debian.org/debian sid main" >>/etc/apt/sources.list
+        if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
+          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9
           apt-get update
@@ -1291,9 +1289,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         yum remove wireguard qrencode -y
       elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
         apt-get remove --purge wireguard qrencode -y
-        sed -i "s|deb http://deb.debian.org/debian sid main||g" /etc/apt/sources.list
-        apt-key del 648ACFD622F3D138
-        apt-key del 0E98404D386FA1D9
+        if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
+          rm -f /etc/apt/sources.list.d/backports.list
+          apt-key del 648ACFD622F3D138
+          apt-key del 0E98404D386FA1D9
+        fi
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools qrencode
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
