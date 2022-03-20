@@ -189,14 +189,14 @@ usage: ./wireguard-manager.sh <command>
 ---
 ### 🙋 Q&A
 Which hosting provider do you recommend?
-- [VirMach](https://virmach.com/): Worldwide locations, IPv4 & IPv6 support, starting at $1.00/month
+- [VirMach](https://virmach.com): Worldwide locations, IPv4 & IPv6 support, starting at $1.00/month
 - [Vultr](https://www.vultr.com/?ref=8586251-6G): Worldwide locations, IPv4 & IPv6 support, starting at $3.50/month
 - [Digital Ocean](https://m.do.co/c/fb46acb2b3b1): Worldwide locations, IPv4 & IPv6 support, starting at $5/month
 - [Linode](https://www.linode.com): Worldwide locations, IPv4 & IPv6 support, starting at $5/month
 - [Google Cloud](https://gcpsignup.page.link/H9XL): Worldwide locations, IPv4 support, starting at $3.50/month
 
 Which WireGuard client do you recommend?
-- Windows: [WireGuard](https://www.wireguard.com/install/).
+- Windows: [WireGuard](https://www.wireguard.com/install).
 - Android: [WireGuard](https://play.google.com/store/apps/details?id=com.wireguard.android).
 - macOS: [WireGuard](https://itunes.apple.com/us/app/wireguard/id1451685025).
 - iOS: [WireGuard](https://itunes.apple.com/us/app/wireguard/id1441195209).
@@ -208,7 +208,7 @@ How do I install a wireguard without the questions? (Headless Install)
 - ```./wireguard-manager.sh --install```
 
 Are there any good alternative to self-hosting vpn?
-- [CloudFlare Warp](https://1.1.1.1/)
+- [CloudFlare Warp](https://1.1.1.1)
 
 Why is all the code in one place?
 - Consider a remote control, you can have thirty different remotes each doing a different job, or you may have a single remote that does everything.
@@ -224,6 +224,15 @@ What is blocked if I enable the content blocker?
 
 What kind of information is collected and how is it gathered?
 - We do not collect or retain any logs; everything takes place on the system, and logs are never sent outside of it.
+
+If I want to set up my own VPN server, what should I purchase?
+- [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w)
+- [Raspberry Pi Zero 2 W SD Card](https://www.amazon.com/dp/B0012Y2LLE)
+- [Raspberry Pi Zero 2 W Power Supply](https://www.raspberrypi.com/products/micro-usb-power-supply)
+- [Raspberry Pi Zero 2 W Case](https://www.raspberrypi.com/products/raspberry-pi-zero-case)
+
+How much should the entire cost of constructing your own VPN be?
+- The hardware has a one-time cost of roughly $35 USD, as well as monthly costs of energy and internet.
 
 Official Links
 - Homepage: https://www.wireguard.com
