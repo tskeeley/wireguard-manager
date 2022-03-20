@@ -812,7 +812,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
-          echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
+          echo "deb http://deb.debian.org/debian bullseye-backports main" >>/etc/apt/sources.list.d/backports.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9
           apt-get update
