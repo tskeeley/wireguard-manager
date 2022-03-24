@@ -35,7 +35,7 @@ function installing-system-requirements() {
         apt-get install curl coreutils jq iproute2 lsof cron gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
-        yum install epel-release elrepo-release -y
+        yum install epel-release elrepo-release yum-utils yum-plugin-elrepo -y
         yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
@@ -806,62 +806,56 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Kernel Version
   install-kernel-headers
 
+  # Install resolvconf OR openresolv
+  function install-resolvconf-or-openresolv() {
+    if [ ! -x "$(command -v resolvconf)" ]; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+        apt-get install resolvconf -y
+      elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+        if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
+          yum copr enable macieks/openresolv -y
+        fi
+        yum install openresolv -y
+      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
+        dnf install openresolv -y
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+        pacman -S --noconfirm --needed resolvconf
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
+        apk add resolvconf
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
+        pkg install resolvconf
+      fi
+    fi
+  }
+
+  install-resolvconf-or-openresolv
+
   # Install WireGuard Server
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
-      if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        if [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 20 ]; then
-          apt-get install software-properties-common -y
-          add-apt-repository ppa:wireguard/wireguard -y
-        fi
-        apt-get update
-        apt-get install wireguard -y
-      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get update
-        apt-get install wireguard -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ]; }; then
-        apt-get update
-        if { [ "${CURRENT_DISTRO}" == "debian" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 11 ]; }; then
-          if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
-            echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
-            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
-            apt-get update
-          fi
-        fi
-        apt-get install wireguard -y
-      elif [ "${CURRENT_DISTRO}" == "raspbian" ]; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
         if [ ! -f "/etc/apt/sources.list.d/backports.list" ]; then
           echo "deb http://deb.debian.org/debian buster-backports main" >>/etc/apt/sources.list.d/backports.list
           apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138
+          apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9
           apt-get update
         fi
         apt-get install wireguard -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
         pacman -S --noconfirm --needed wireguard-tools
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 32 ]; then
-        dnf check-update
-        dnf install wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" = "fedora" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 31 ]; then
+      elif [ "${CURRENT_DISTRO}" = "fedora" ]; then
         dnf check-update
         dnf copr enable jdoss/wireguard -y
-        dnf install wireguard-dkms wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 8 ]; then
+        dnf install wireguard-tools -y
+      elif [ "${CURRENT_DISTRO}" == "centos" ]; then
         yum check-update
         yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -le 7 ]; then
+      elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
         yum check-update
-        yum install yum-plugin-elrepo -y
-        yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 8 ]; then
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${CURRENT_DISTRO_MAJOR_VERSION}".noarch.rpm https://www.elrepo.org/elrepo-release-"${CURRENT_DISTRO_MAJOR_VERSION}".el"${CURRENT_DISTRO_MAJOR_VERSION}".elrepo.noarch.rpm
         yum check-update
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
-        yum check-update
-        yum install kmod-wireguard wireguard-tools -y
-      elif [ "${CURRENT_DISTRO}" == "rhel" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
-        yum check-update
-        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
@@ -889,9 +883,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Function to install Unbound
   function install-unbound() {
     if [ "${INSTALL_UNBOUND}" == true ]; then
-      if { [ ! -x "$(command -v unbound)" ] || [ ! -x "$(command -v resolvconf)" ]; }; then
+      if [ ! -x "$(command -v unbound)" ]; then
         if { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-          apt-get install unbound resolvconf -y
+          apt-get install unbound -y
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
               systemctl disable --now systemd-resolved
@@ -902,13 +896,13 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum install unbound -y
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          dnf install unbound resolvconf -y
+          dnf install unbound -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-          pacman -S --noconfirm unbound openresolv
+          pacman -S --noconfirm --needed unbound
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-          apk add unbound resolvconf
+          apk add unbound
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-          pkg install unbound resolvconf
+          pkg install unbound
         elif [ "${CURRENT_DISTRO}" == "ol" ]; then
           dnf install unbound -y
         fi
@@ -1283,20 +1277,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode -y
-      elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "raspbian" ]; }; then
+      elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get remove --purge wireguard qrencode -y
-        apt-key del 04EE7237B7D453EC
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
           rm -f /etc/apt/sources.list.d/backports.list
-        fi
-      elif { [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get remove --purge wireguard qrencode -y
-      elif [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
-        apt-get remove --purge wireguard qrencode -y
-        if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-          systemctl enable --now systemd-resolved
-        elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-          service systemd-resolved restart
+          apt-key del 648ACFD622F3D138
+          apt-key del 0E98404D386FA1D9
         fi
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools qrencode
@@ -1339,7 +1325,14 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
           yum remove unbound -y
-        elif { [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+        elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+          if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
+            if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
+              systemctl enable --now systemd-resolved
+            elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
+              service systemd-resolved restart
+            fi
+          fi
           apt-get remove --purge unbound -y
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -Rs --noconfirm unbound
