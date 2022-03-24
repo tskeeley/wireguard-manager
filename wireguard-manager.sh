@@ -15,7 +15,7 @@ super-user-check
 # Get the current system information
 function system-information() {
   if [ -f /etc/os-release ]; then
-    # shellcheck disable=SC1091
+    # shellcheck source=/dev/null
     source /etc/os-release
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
