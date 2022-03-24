@@ -806,6 +806,30 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Kernel Version
   install-kernel-headers
 
+  # Install resolvconf OR openresolv
+  function install-resolvconf-or-openresolv() {
+    if [ ! -x "$(command -v resolvconf)" ]; then
+      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
+        apt-get install resolvconf -y
+      elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
+        if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
+          yum copr enable macieks/openresolv -y
+        fi
+        yum install openresolv -y
+      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
+        dnf install openresolv -y
+      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
+        pacman -S --noconfirm --needed resolvconf
+      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
+        apk add resolvconf
+      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
+        pkg install resolvconf
+      fi
+    fi
+  }
+
+  install-resolvconf-or-openresolv
+
   # Install WireGuard Server
   function install-wireguard-server() {
     if [ ! -x "$(command -v wg)" ]; then
@@ -948,30 +972,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 
   # Running Install Unbound
   install-unbound
-
-  # Install resolvconf OR openresolv
-  function install-resolvconf-or-openresolv() {
-    if [ ! -x "$(command -v resolvconf)" ]; then
-      if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
-        apt-get install resolvconf -y
-      elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
-          yum copr enable macieks/openresolv -y
-        fi
-        yum install openresolv -y
-      elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-        dnf install openresolv -y
-      elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
-        pacman -S --noconfirm --needed resolvconf
-      elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
-        apk add resolvconf
-      elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
-        pkg install resolvconf
-      fi
-    fi
-  }
-
-  install-resolvconf-or-openresolv
 
   # WireGuard Set Config
   function wireguard-setconf() {
