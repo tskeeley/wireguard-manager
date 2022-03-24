@@ -19,7 +19,7 @@
 		<img alt="License" src="https://img.shields.io/github/license/complexorganizations/wireguard-manager" target="_blank" />
 	</a>
 	<a href="https://signal.group/#CjQKIIU_YFbm27-G08aYUzncE9AQZQ4RIJF_xvTfGy-721GdEhAsu9_5KuzNhgxNE5yDiKfH">
-		<img alt="Sponsors" src="https://img.shields.io/static/v1?label=GroupChat&message=%E2%9D%A4&logo=Signal&color=3A76F0" target="_blank" />
+		<img alt="Sponsors" src="https://img.shields.io/static/v1?label=GroupChat&message=Signal&logo=Signal&color=3A76F0" target="_blank" />
 	</a>
 </p>
 
