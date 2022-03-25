@@ -229,13 +229,13 @@ What kind of information is collected and how is it gathered?
 - We do not collect or retain any logs; everything takes place on the system, and logs are never sent outside of it.
 
 If I want to set up my own VPN server, what should I purchase?
-- [Raspberry Pi Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w)
-- [Raspberry Pi Zero 2 W SD Card](https://www.amazon.com/dp/B0012Y2LLE)
-- [Raspberry Pi Zero 2 W Power Supply](https://www.raspberrypi.com/products/micro-usb-power-supply)
-- [Raspberry Pi Zero 2 W Case](https://www.raspberrypi.com/products/raspberry-pi-zero-case)
+- [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b)
+- [Micro SD](https://www.amazon.com/dp/B06XWMQ81P)
+- [Raspberry Pi Power Supply](https://www.raspberrypi.com/products/type-c-power-supply)
+- [Raspberry Pi Case](https://www.raspberrypi.com/products/raspberry-pi-4-case)
 
 How much should the entire cost of constructing your own VPN be?
-- The hardware has a one-time cost of roughly $35 USD, as well as monthly costs of energy and internet.
+- The hardware has a one-time cost of roughly $75 USD, as well as monthly costs of energy and internet.
 
 Official Links
 - Homepage: https://www.wireguard.com
