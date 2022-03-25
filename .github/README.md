@@ -230,9 +230,11 @@ What kind of information is collected and how is it gathered?
 
 If I want to set up my own VPN server, what should I purchase?
 - [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b)
-- [Micro SD](https://www.amazon.com/dp/B06XWMQ81P)
 - [Raspberry Pi Power Supply](https://www.raspberrypi.com/products/type-c-power-supply)
 - [Raspberry Pi Case](https://www.raspberrypi.com/products/raspberry-pi-4-case)
+- [Micro SD](https://www.amazon.com/dp/B06XWMQ81P)
+- [Micro SD Card Reader](https://www.amazon.com/dp/B0957HQ4D1)
+- [Ethernet Cable](https://www.amazon.com/dp/B00N2VIALK)
 
 How much should the entire cost of constructing your own VPN be?
 - The hardware has a one-time cost of roughly $75 USD, as well as monthly costs of energy and internet.
