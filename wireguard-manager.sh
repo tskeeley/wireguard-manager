@@ -52,8 +52,8 @@ function installing-system-requirements() {
         pkg update
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        dnf check-update
-        dnf install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
+        yum check-update
+        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
       fi
     fi
   else
@@ -799,8 +799,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pacman -Sy
         pacman -S --noconfirm --needed linux-headers
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-        dnf check-update
-        dnf install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
+        yum check-update
+        yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
         yum install kernel-headers-"$(uname -r)" kernel-devel-"$(uname -r)" -y
@@ -822,7 +822,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         yum install openresolv -y
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-        dnf install openresolv -y
+        yum install openresolv -y
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm --needed resolvconf
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -909,7 +909,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound
         elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-          dnf install unbound -y
+          yum install unbound -y
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
@@ -1261,7 +1261,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg check wireguard
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        dnf reinstall wireguard-tools -y
+        yum reinstall wireguard-tools -y
       fi
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
@@ -1306,7 +1306,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg delete wireguard libqrencode
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        dnf remove wireguard qrencode -y
+        yum remove wireguard qrencode -y
       fi
       # Delete WireGuard backup
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
@@ -1342,7 +1342,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -Rs --noconfirm unbound
         elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-          dnf remove unbound -y
+          yum remove unbound -y
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk del unbound
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
