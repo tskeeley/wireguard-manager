@@ -872,12 +872,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         yum check-update
         yum install kmod-wireguard wireguard-tools -y
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        dnf check-update
-        dnf install oraclelinux-developer-release-el8 -y
-        dnf config-manager --disable ol8_developer
-        dnf config-manager --enable ol8_developer_UEKR6
-        dnf config-manager --save --setopt=ol8_developer_UEKR6.includepkgs='wireguard-tools*'
-        dnf install wireguard-tools -y
+        yum check-update
+        yum install oraclelinux-developer-release-el"${CURRENT_DISTRO_MAJOR_VERSION}" -y
+        yum config-manager --disable ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer
+        yum config-manager --enable ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6
+        yum config-manager --save --setopt=ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6.includepkgs='wireguard-tools*'
+        yum install wireguard-tools -y
       fi
     fi
   }
