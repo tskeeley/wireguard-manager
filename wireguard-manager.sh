@@ -1459,7 +1459,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           rm -f ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
         fi
         wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-        crontab -l | grep -v "${REMOVECLIENT}" | crontab -
+        crontab -l | grep -v "${CLIENT_NAME}" | crontab -
       done
       ;;
     15) # Generate QR code.
