@@ -1082,13 +1082,13 @@ else
     done
     case ${WIREGUARD_OPTIONS} in
     1) # WG Show
-      wg show ${WIREGUARD_CONFIG}
+      wg show ${WIREGUARD_PUB_NIC}
       ;;
     2) # Start WireGuard
-      wg-quick up ${WIREGUARD_CONFIG}
+      wg-quick up ${WIREGUARD_PUB_NIC}
       ;;
     3) # Stop WireGuard
-      wg-quick down ${WIREGUARD_CONFIG}
+      wg-quick down ${WIREGUARD_PUB_NIC}
       ;;
     4) # Restart WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
