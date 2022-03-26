@@ -1082,19 +1082,19 @@ else
     done
     case ${WIREGUARD_OPTIONS} in
     1) # WG Show
-      wg show ${WIREGUARD_PUB_NIC}
+      wg show ${WIREGUARD_CONFIG}
       ;;
     2) # Start WireGuard
-      wg-quick up ${WIREGUARD_PUB_NIC}
+      wg-quick up ${WIREGUARD_CONFIG}
       ;;
     3) # Stop WireGuard
-      wg-quick down ${WIREGUARD_PUB_NIC}
+      wg-quick down ${WIREGUARD_CONFIG}
       ;;
     4) # Restart WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
-        systemctl restart wg-quick@${WIREGUARD_PUB_NIC}
+        systemctl restart wg-quick@${WIREGUARD_CONFIG}
       elif [[ "${CURRENT_INIT_SYSTEM}" == *"init"* ]]; then
-        service wg-quick@${WIREGUARD_PUB_NIC} restart
+        service wg-quick@${WIREGUARD_CONFIG} restart
       fi
       ;;
     5) # WireGuard add Peer
