@@ -30,16 +30,12 @@ jobs:
         run: sudo ./wireguard-manager.sh --backup
       - name: View WireGuard peers.
         run: sudo ./wireguard-manager.sh --list
-      - name: View WireGuard configuration.
-        run: sudo cat /etc/wireguard/wg0.conf
-      - name: Test wireguard-manager purge.
-        run: sudo ./wireguard-manager.sh --purge
       - name: Test wireguard-manager update.
         run: sudo ./wireguard-manager.sh --update
+      - name: View WireGuard configuration.
+        run: sudo cat /etc/wireguard/wg0.conf
       - name: View unbound status.
         run: sudo systemctl status unbound
-      - name: View crontab rules
-        run: sudo crontab -l
       - name: View Unbound configuration.
         run: sudo cat /etc/unbound/unbound.conf
       - name: View unbound anchor file.
@@ -48,12 +44,24 @@ jobs:
         run: sudo cat /etc/unbound/root.hints
       - name: View unbound blocklist
         run: sudo cat /etc/unbound/unbound.conf.d/hosts.conf
+      - name: View crontab rules
+        run: sudo crontab -l
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
       - name: Curl example.com
         run: curl -I https://www.example.com
+      - name: Test wireguard-manager purge.
+        run: sudo ./wireguard-manager.sh --purge
+      - name: View WireGuard peers.
+        run: sudo ./wireguard-manager.sh --list
+      - name: View WireGuard configuration.
+        run: sudo cat /etc/wireguard/wg0.conf
+      - name: View crontab rules
+        run: sudo crontab -l
       - name: Uninstall wireguard completely
         run: sudo ./wireguard-manager.sh --uninstall
+      - name: View crontab rules
+        run: sudo crontab -l
       - name: Curl example.org
         run: curl -I https://www.example.org
       - name: View the resolv.conf
