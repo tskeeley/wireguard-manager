@@ -77,7 +77,7 @@ function virt-check() {
   esac
 }
 
-# Virtualization Check.
+# Virtualization Check
 virt-check
 
 # Lets check the kernel version
