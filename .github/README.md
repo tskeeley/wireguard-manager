@@ -192,11 +192,11 @@ usage: ./wireguard-manager.sh <command>
 ---
 ### 🙋 Q&A
 Which hosting provider do you recommend?
-- [VirMach](https://virmach.com): Worldwide locations, IPv4 & IPv6 support, starting at $1.00/month
-- [Vultr](https://www.vultr.com/?ref=8586251-6G): Worldwide locations, IPv4 & IPv6 support, starting at $3.50/month
-- [Digital Ocean](https://m.do.co/c/fb46acb2b3b1): Worldwide locations, IPv4 & IPv6 support, starting at $5/month
-- [Linode](https://www.linode.com): Worldwide locations, IPv4 & IPv6 support, starting at $5/month
-- [Google Cloud](https://gcpsignup.page.link/H9XL): Worldwide locations, IPv4 support, starting at $3.50/month
+- [Google Cloud](https://cloud.google.com): Worldwide locations, IPv4 support, starting at $3.50/month
+- [Amazon Web Services](https://aws.amazon.com): Worldwide locations, IPv4 support, starting at $5.00/month
+- [Microsoft Azure](https://azure.microsoft.com): Worldwide locations, IPv4 support, starting at $5.00/month
+- [Linode](https://www.linode.com): Worldwide locations, IPv4 & IPv6 support, starting at $5.00/month
+- [Vultr](https://www.vultr.com): Worldwide locations, IPv4 & IPv6 support, starting at $3.50/month
 
 Which WireGuard client do you recommend?
 - Windows: [WireGuard](https://www.wireguard.com/install).
