@@ -833,6 +833,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     fi
   }
 
+  # Install resolvconf OR openresolv
   install-resolvconf-or-openresolv
 
   # Install WireGuard Server
