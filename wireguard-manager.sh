@@ -114,7 +114,7 @@ function check-current-init-system() {
   esac
 }
 
-# Check if the current init system is supported.
+# Check if the current init system is supported
 check-current-init-system
 
 # Global variables
