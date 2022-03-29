@@ -62,7 +62,7 @@ function installing-system-requirements() {
   fi
 }
 
-# check for requirements
+# check for requirements.
 installing-system-requirements
 
 # Checking For Virtualization
@@ -102,9 +102,23 @@ function kernel-check() {
 
 kernel-check
 
+# Check the current init system.
+function check-current-init-system() {
+  CURRENT_INIT_SYSTEM=$(ps --no-headers -o comm 1)
+  case ${CURRENT_INIT_SYSTEM} in
+  *"systemd"* | *"init"*) ;;
+  *)
+    echo "${CURRENT_INIT_SYSTEM} init is not supported (yet)."
+    exit
+    ;;
+  esac
+}
+
+# Check if the current init system is supported
+check-current-init-system
+
 # Global variables
 CURRENT_FILE_PATH=$(realpath "${0}")
-CURRENT_INIT_SYSTEM=$(ps --no-headers -o comm 1)
 WIREGUARD_WEBSITE_URL="https://www.wireguard.com"
 WIREGUARD_PATH="/etc/wireguard"
 WIREGUARD_CLIENT_PATH="${WIREGUARD_PATH}/clients"
