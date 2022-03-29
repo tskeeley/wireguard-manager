@@ -1,6 +1,7 @@
 name: Build the latest version
 on:
   push:
+  pull_request:
     paths:
       - "**.sh"
 jobs:
