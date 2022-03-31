@@ -526,8 +526,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       PEER_MTU_CHOICE="1280"
       ;;
     2)
-      until [[ "${MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${MTU_CHOICE}" -ge 1 ] && [ "${MTU_CHOICE}" -le 65535 ]; do
-        read -rp "Custom MTU [1-65535]:" MTU_CHOICE
+      until [[ "${INTERFACE_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${INTERFACE_MTU_CHOICE}" -ge 1 ] && [ "${INTERFACE_MTU_CHOICE}" -le 65535 ]; do
+        read -rp "Custom Interface MTU [1-65535]:" INTERFACE_MTU_CHOICE
+      done
+      until [[ "${PEER_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${PEER_MTU_CHOICE}" -ge 1 ] && [ "${PEER_MTU_CHOICE}" -le 65535 ]; do
+        read -rp "Custom Peer MTU [1-65535]:" PEER_MTU_CHOICE
       done
       ;;
     esac
