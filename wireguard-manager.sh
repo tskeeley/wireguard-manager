@@ -515,18 +515,22 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Custom MTU or default settings
   function mtu-set() {
     echo "What MTU do you want to use?"
-    echo "  1) 1420 (Recommended)"
+    echo "  1) 1420|1280 (Recommended)"
     echo "  2) Custom (Advanced)"
     until [[ "${MTU_CHOICE_SETTINGS}" =~ ^[1-2]$ ]]; do
       read -rp "MTU Choice [1-2]:" -e -i 1 MTU_CHOICE_SETTINGS
     done
     case ${MTU_CHOICE_SETTINGS} in
     1)
-      MTU_CHOICE="1420"
+      INTERFACE_MTU_CHOICE="1420"
+      PEER_MTU_CHOICE="1280"
       ;;
     2)
-      until [[ "${MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${MTU_CHOICE}" -ge 1 ] && [ "${MTU_CHOICE}" -le 65535 ]; do
-        read -rp "Custom MTU [1-65535]:" MTU_CHOICE
+      until [[ "${INTERFACE_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${INTERFACE_MTU_CHOICE}" -ge 1 ] && [ "${INTERFACE_MTU_CHOICE}" -le 65535 ]; do
+        read -rp "Custom Interface MTU [1-65535]:" INTERFACE_MTU_CHOICE
+      done
+      until [[ "${PEER_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${PEER_MTU_CHOICE}" -ge 1 ] && [ "${PEER_MTU_CHOICE}" -le 65535 ]; do
+        read -rp "Custom Peer MTU [1-65535]:" PEER_MTU_CHOICE
       done
       ;;
     esac
@@ -1012,12 +1016,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       NFTABLES_POSTDOWN="sysctl --write net.ipv4.ip_forward=0; sysctl --write net.ipv6.conf.all.forwarding=0; nft delete table inet wireguard-${WIREGUARD_PUB_NIC}"
     fi
     # Set WireGuard settings for this host and first peer.
-    echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
+    echo "# ${PRIVATE_SUBNET_V4} ${PRIVATE_SUBNET_V6} ${SERVER_HOST}:${SERVER_PORT} ${SERVER_PUBKEY} ${CLIENT_DNS} ${PEER_MTU_CHOICE} ${NAT_CHOICE} ${CLIENT_ALLOWED_IP}
 [Interface]
 Address = ${GATEWAY_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${GATEWAY_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 DNS = ${CLIENT_DNS}
 ListenPort = ${SERVER_PORT}
-MTU = ${MTU_CHOICE}
+MTU = ${INTERFACE_MTU_CHOICE}
 PrivateKey = ${SERVER_PRIVKEY}
 PostUp = ${NFTABLES_POSTUP}
 PostDown = ${NFTABLES_POSTDOWN}
@@ -1034,7 +1038,7 @@ AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
 Address = ${CLIENT_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${CLIENT_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
 DNS = ${CLIENT_DNS}
 ListenPort = ${PEER_PORT}
-MTU = ${MTU_CHOICE}
+MTU = ${PEER_MTU_CHOICE}
 PrivateKey = ${CLIENT_PRIVKEY}
 [Peer]
 AllowedIPs = ${CLIENT_ALLOWED_IP}
