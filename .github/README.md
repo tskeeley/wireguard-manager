@@ -52,7 +52,7 @@ chmod +x /usr/local/bin/wireguard-manager.sh
 ```
 It's finally time to execute the script
 ``` bash
-bash /usr/local/bin/wireguard-manager.sh --install
+bash /usr/local/bin/wireguard-manager.sh
 ```
 
 In your `/etc/wireguard/clients` directory, you will have `.conf` files. These are the peer configuration files. Download them from your WireGuard Interface and connect using your favorite WireGuard Peer.
