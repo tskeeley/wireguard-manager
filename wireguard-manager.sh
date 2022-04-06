@@ -67,11 +67,11 @@ installing-system-requirements
 
 # Checking For Virtualization
 function virt-check() {
-  # Deny certain virtualization
-  case $(systemd-detect-virt) in
+  CURRENT_SYSTEM_VIRTUALIZATION=$(systemd-detect-virt)
+  case ${CURRENT_SYSTEM_VIRTUALIZATION} in
   "kvm" | "none" | "qemu" | "lxc" | "microsoft" | "vmware") ;;
   *)
-    echo "$(systemd-detect-virt) virtualization is not supported (yet)."
+    echo "${CURRENT_SYSTEM_VIRTUALIZATION} virtualization is not supported (yet)."
     exit
     ;;
   esac
