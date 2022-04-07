@@ -987,7 +987,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
           mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
         fi
-        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
       chown -R root:root ${UNBOUND_ROOT}
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
@@ -1394,9 +1394,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         if [ -f "${UNBOUND_CONFIG_HOST}" ]; then
           CURRENT_UNBOUND_HOSTS_HASH=$(openssl dgst -sha3-512 "${UNBOUND_CONFIG_HOST}" | cut -d " " -f2)
-          NEW_UNBOUND_HOSTS_HASH=$(curl --silent ${UNBOUND_CONFIG_HOST_URL} | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' | openssl dgst -sha3-512 | cut -d " " -f2)
+          NEW_UNBOUND_HOSTS_HASH=$(curl --silent ${UNBOUND_CONFIG_HOST_URL} | awk '{print "local-zone: \""$1"\" always_refuse"}' | openssl dgst -sha3-512 | cut -d " " -f2)
           if [ "${CURRENT_UNBOUND_HOSTS_HASH}" != "${NEW_UNBOUND_HOSTS_HASH}" ]; then
-            curl "${UNBOUND_CONFIG_HOST_URL}" | awk '$1' | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+            curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
           fi
         fi
         # Once everything is completed, restart the service.
