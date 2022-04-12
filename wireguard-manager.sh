@@ -19,7 +19,7 @@ function system-information() {
     source /etc/os-release
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
-    CURRENT_DISTRO_MAJOR_VERSION=$(echo "${CURRENT_DISTRO_VERSION}" | cut -d"." -f1)
+    CURRENT_DISTRO_MAJOR_VERSION=$(echo "${CURRENT_DISTRO_VERSION}" | cut -d "." -f1)
   fi
 }
 
@@ -82,12 +82,12 @@ virt-check
 
 # Lets check the kernel version
 function kernel-check() {
-  CURRENT_KERNEL_VERSION=$(uname -r | cut -d"." -f1-2)
-  CURRENT_KERNEL_MAJOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d"." -f1)
-  CURRENT_KERNEL_MINOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d"." -f2)
+  CURRENT_KERNEL_VERSION=$(uname -r | cut -d "." -f1-2)
+  CURRENT_KERNEL_MAJOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d "." -f1)
+  CURRENT_KERNEL_MINOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d "." -f2)
   ALLOWED_KERNEL_VERSION="3.1"
-  ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d"." -f1)
-  ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d"." -f2)
+  ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f1)
+  ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f2)
   if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -lt "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
@@ -364,11 +364,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Private Subnet Mask IPv4
   PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f2)
   # IPv4 Getaway
-  GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d"." -f1-3).1
+  GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).1
   # Private Subnet Mask IPv6
   PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f2)
   # IPv6 Getaway
-  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d":" -f1-3)::1
+  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-3)::1
 
   # Get the IPv4
   function test-connectivity-v4() {
@@ -793,8 +793,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     ALLOWED_KERNEL_VERSION="5.6"
-    ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d"." -f1)
-    ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d"." -f2)
+    ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f1)
+    ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f2)
     if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -le "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
       INSTALL_LINUX_HEADERS=true
     fi
@@ -1003,8 +1003,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     SERVER_PUBKEY=$(echo "${SERVER_PRIVKEY}" | wg pubkey)
     CLIENT_PRIVKEY=$(wg genkey)
     CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
-    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d"." -f1-3).2
-    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d":" -f1-4):2
+    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).2
+    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-4):2
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
@@ -1198,12 +1198,12 @@ else
       MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f7)
       NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f8)
       CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f9)
-      CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d"." -f1-3).$((LASTIPV4 + 1))
-      CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d":" -f1-4):$((LASTIPV6 + 1))
+      CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).$((LASTIPV4 + 1))
+      CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-4):$((LASTIPV6 + 1))
       # Check for any unused IP address.
       if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
-        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d"." -f1-3).${LASTIPV4}
-        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d":" -f1-4):${LASTIPV6}
+        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d "." -f1-3).${LASTIPV4}
+        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d ":" -f1-4):${LASTIPV6}
       fi
       WIREGUARD_TEMP_NEW_CLIENT_INFO="# ${NEW_CLIENT_NAME} start
 [Peer]
