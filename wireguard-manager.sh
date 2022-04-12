@@ -19,7 +19,7 @@ function system-information() {
     source /etc/os-release
     CURRENT_DISTRO=${ID}
     CURRENT_DISTRO_VERSION=${VERSION_ID}
-    CURRENT_DISTRO_MAJOR_VERSION=$(echo "${CURRENT_DISTRO_VERSION}" | cut -d'.' -f1)
+    CURRENT_DISTRO_MAJOR_VERSION=$(echo "${CURRENT_DISTRO_VERSION}" | cut -d "." -f1)
   fi
 }
 
@@ -82,12 +82,12 @@ virt-check
 
 # Lets check the kernel version
 function kernel-check() {
-  CURRENT_KERNEL_VERSION=$(uname -r | cut -d'.' -f1-2)
-  CURRENT_KERNEL_MAJOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d'.' -f1)
-  CURRENT_KERNEL_MINOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d'.' -f2)
+  CURRENT_KERNEL_VERSION=$(uname -r | cut -d "." -f1-2)
+  CURRENT_KERNEL_MAJOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d "." -f1)
+  CURRENT_KERNEL_MINOR_VERSION=$(echo "${CURRENT_KERNEL_VERSION}" | cut -d "." -f2)
   ALLOWED_KERNEL_VERSION="3.1"
-  ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
-  ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
+  ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f1)
+  ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f2)
   if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -lt "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
     echo "Error: Kernel ${CURRENT_KERNEL_VERSION} not supported, please update to ${ALLOWED_KERNEL_VERSION}."
     exit
@@ -364,11 +364,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Private Subnet Mask IPv4
   PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f2)
   # IPv4 Getaway
-  GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).1
+  GATEWAY_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).1
   # Private Subnet Mask IPv6
   PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f2)
   # IPv6 Getaway
-  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-3)::1
+  GATEWAY_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-3)::1
 
   # Get the IPv4
   function test-connectivity-v4() {
@@ -793,8 +793,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
   # Lets check the kernel version and check if headers are required
   function install-kernel-headers() {
     ALLOWED_KERNEL_VERSION="5.6"
-    ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f1)
-    ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d'.' -f2)
+    ALLOWED_KERNEL_MAJOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f1)
+    ALLOWED_KERNEL_MINOR_VERSION=$(echo ${ALLOWED_KERNEL_VERSION} | cut -d "." -f2)
     if [ "${CURRENT_KERNEL_MAJOR_VERSION}" -le "${ALLOWED_KERNEL_MAJOR_VERSION}" ]; then
       INSTALL_LINUX_HEADERS=true
     fi
@@ -1003,8 +1003,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     SERVER_PUBKEY=$(echo "${SERVER_PRIVKEY}" | wg pubkey)
     CLIENT_PRIVKEY=$(wg genkey)
     CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
-    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).2
-    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):2
+    CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).2
+    CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-4):2
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf -i1024-65535 -n1)
     mkdir -p ${WIREGUARD_CLIENT_PATH}
@@ -1122,15 +1122,15 @@ else
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         NEW_CLIENT_NAME="$(openssl rand -hex 50)"
       fi
-      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f1 | cut -d '.' -f4 | tail -n1)
-      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | tail -n1)
+      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | tail -n1)
+      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | tail -n1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
         LASTIPV4=1
         LASTIPV6=1
       fi
-      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f1 | cut -d '.' -f4 | sort -n | head -n1)
-      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f1 | cut -d '.' -f4 | sort -n | tail -n1)
-      USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d '/' -f1 | cut -d '.' -f4 | sort -n)
+      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n | head -n1)
+      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n | tail -n1)
+      USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n)
       while [ "${SMALLEST_USED_IPV4}" -le "${LARGEST_USED_IPV4}" ]; do
         if [[ ! ${USED_IPV4_LIST[*]} =~ ${SMALLEST_USED_IPV4} ]]; then
           FIND_UNUSED_IPV4=${SMALLEST_USED_IPV4}
@@ -1138,9 +1138,9 @@ else
         fi
         SMALLEST_USED_IPV4=$((SMALLEST_USED_IPV4 + 1))
       done
-      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n | head -n1)
-      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n | tail -n1)
-      USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n)
+      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n | head -n1)
+      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n | tail -n1)
+      USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n)
       while [ "${SMALLEST_USED_IPV6}" -le "${LARGEST_USED_IPV6}" ]; do
         if [[ ! ${USED_IPV6_LIST[*]} =~ ${SMALLEST_USED_IPV6} ]]; then
           FIND_UNUSED_IPV6=${SMALLEST_USED_IPV6}
@@ -1153,20 +1153,20 @@ else
         LASTIPV6=$(echo "${FIND_UNUSED_IPV6}" | head -n 1)
       fi
       if { [ "${LASTIPV4}" -ge 255 ] && [ "${LASTIPV6}" -ge 255 ]; }; then
-        CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
-        CURRENT_IPV6_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}')
+        CURRENT_IPV4_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f2)
+        CURRENT_IPV6_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f3)
         IPV4_BEFORE_BACKSLASH=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f1 | cut -d "." -f4)
         IPV6_BEFORE_BACKSLASH=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f1 | cut -d ":" -f5)
         IPV4_AFTER_FIRST=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f1 | cut -d "." -f2)
         IPV6_AFTER_FIRST=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f1 | cut -d ":" -f2)
-        SECOND_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f1 | cut -d "." -f2)
-        SECOND_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f1 | cut -d ":" -f2)
-        THIRD_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f1 | cut -d "." -f3)
-        THIRD_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f1 | cut -d ":" -f3)
+        SECOND_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f2 | cut -d "/" -f1 | cut -d "." -f2)
+        SECOND_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d ":" -f2)
+        THIRD_IPV4_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f2 | cut -d "/" -f1 | cut -d "." -f3)
+        THIRD_IPV6_IN_RANGE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d ":" -f3)
         NEXT_IPV4_RANGE=$((THIRD_IPV4_IN_RANGE + 1))
         NEXT_IPV6_RANGE=$((THIRD_IPV6_IN_RANGE + 1))
-        CURRENT_IPV4_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}' | cut -d "/" -f2)
-        CURRENT_IPV6_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}' | cut -d "/" -f2)
+        CURRENT_IPV4_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f2 | cut -d "/" -f2)
+        CURRENT_IPV6_RANGE_CIDR=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f2)
         FINAL_IPV4_RANGE=$(echo "${CURRENT_IPV4_RANGE}" | cut -d "/" -f1 | cut -d "." -f 1,2)".${NEXT_IPV4_RANGE}.${IPV4_BEFORE_BACKSLASH}/${CURRENT_IPV4_RANGE_CIDR}"
         FINAL_IPV6_RANGE=$(echo "${CURRENT_IPV6_RANGE}" | cut -d "/" -f1 | cut -d ":" -f 1,2)":${NEXT_IPV6_RANGE}::${IPV6_BEFORE_BACKSLASH}/${CURRENT_IPV6_RANGE_CIDR}"
         if { [ "${THIRD_IPV4_IN_RANGE}" -ge 255 ] && [ "${THIRD_IPV6_IN_RANGE}" -ge 255 ]; }; then
@@ -1188,22 +1188,22 @@ else
       CLIENT_PUBKEY=$(echo "${CLIENT_PRIVKEY}" | wg pubkey)
       PRESHARED_KEY=$(wg genpsk)
       PEER_PORT=$(shuf -i1024-65535 -n1)
-      PRIVATE_SUBNET_V4=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $2}')
+      PRIVATE_SUBNET_V4=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f2)
       PRIVATE_SUBNET_MASK_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "/" -f2)
-      PRIVATE_SUBNET_V6=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $3}')
+      PRIVATE_SUBNET_V6=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f3)
       PRIVATE_SUBNET_MASK_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d "/" -f2)
-      SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}')
-      SERVER_PUBKEY=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $5}')
-      CLIENT_DNS=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $6}')
-      MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $7}')
-      NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $8}')
-      CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $9}')
-      CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d'.' -f1-3).$((LASTIPV4 + 1))
-      CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d':' -f1-4):$((LASTIPV6 + 1))
+      SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4)
+      SERVER_PUBKEY=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f5)
+      CLIENT_DNS=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f6)
+      MTU_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f7)
+      NAT_CHOICE=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f8)
+      CLIENT_ALLOWED_IP=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f9)
+      CLIENT_ADDRESS_V4=$(echo "${PRIVATE_SUBNET_V4}" | cut -d "." -f1-3).$((LASTIPV4 + 1))
+      CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut -d ":" -f1-4):$((LASTIPV6 + 1))
       # Check for any unused IP address.
       if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
-        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d'.' -f1-3).${LASTIPV4}
-        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d':' -f1-4):${LASTIPV6}
+        CLIENT_ADDRESS_V4=$(echo "${CLIENT_ADDRESS_V4}" | cut -d "." -f1-3).${LASTIPV4}
+        CLIENT_ADDRESS_V6=$(echo "${CLIENT_ADDRESS_V6}" | cut -d ":" -f1-4):${LASTIPV6}
       fi
       WIREGUARD_TEMP_NEW_CLIENT_INFO="# ${NEW_CLIENT_NAME} start
 [Peer]
@@ -1249,9 +1249,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     6) # Remove WireGuard Peer
       echo "Which WireGuard peer would you like to remove?"
-      grep start ${WIREGUARD_CONFIG} | awk '{print $2}'
+      grep start ${WIREGUARD_CONFIG} | cut -d " " -f2
       read -rp "Peer's name:" REMOVECLIENT
-      CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk '{print $3}')
+      CLIENTKEY=$(sed -n "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | cut -d " " -f3)
       wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
       sed --in-place "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
       if [ -f "${WIREGUARD_CLIENT_PATH}/${REMOVECLIENT}-${WIREGUARD_PUB_NIC}.conf" ]; then
@@ -1430,16 +1430,16 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     12) # Change the IP address of your wireguard interface.
-      CURRENT_IP_METHORD=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}')
+      CURRENT_IP_METHORD=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4)
       if [[ ${CURRENT_IP_METHORD} != *"["* ]]; then
-        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | cut -d ':' -f1)
+        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d ":" -f1)
         NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${NEW_SERVER_HOST}" ]; then
           NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
         fi
       fi
       if [[ ${CURRENT_IP_METHORD} == *"["* ]]; then
-        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | cut -d "[" -f2 | cut -d "]" -f1)
+        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d "[" -f2 | cut -d "]" -f1)
         NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${NEW_SERVER_HOST}" ]; then
           NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
@@ -1450,7 +1450,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     13) # Change the wireguard interface's port number.
-      OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | awk '{print $4}' | awk -F: '{print $2}')
+      OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d ":" -f2)
       until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
         read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
       done
@@ -1463,13 +1463,13 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     14) # All wireguard peers should be removed from your interface
-      COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | awk '{print $2}')
+      COMPLETE_CLIENT_LIST=$(grep start ${WIREGUARD_CONFIG} | cut -d " " -f2)
       for CLIENT_LIST_ARRAY in ${COMPLETE_CLIENT_LIST}; do
         USER_LIST[${ADD_CONTENT}]=${CLIENT_LIST_ARRAY}
         ADD_CONTENT=$(("${ADD_CONTENT}" + 1))
       done
       for CLIENT_NAME in "${USER_LIST[@]}"; do
-        CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | awk '{print $3}')
+        CLIENTKEY=$(sed -n "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/p" ${WIREGUARD_CONFIG} | grep PublicKey | cut -d " " -f3)
         wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
         sed --in-place "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/d" ${WIREGUARD_CONFIG}
         if [ -f "${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf" ]; then
@@ -1481,7 +1481,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     15) # Generate QR code.
       echo "Which WireGuard peer would you like to generate a QR code for?"
-      grep start ${WIREGUARD_CONFIG} | awk '{print $2}'
+      grep start ${WIREGUARD_CONFIG} | cut -d " " -f2
       read -rp "Peer's name:" VIEW_CLIENT_INFO
       if [ -f "${WIREGUARD_CLIENT_PATH}/${VIEW_CLIENT_INFO}-${WIREGUARD_PUB_NIC}.conf" ]; then
         qrencode -t ansiutf8 <${WIREGUARD_CLIENT_PATH}/"${VIEW_CLIENT_INFO}"-${WIREGUARD_PUB_NIC}.conf
