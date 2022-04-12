@@ -1450,7 +1450,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       ;;
     13) # Change the wireguard interface's port number.
-      OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | awk -F: '{print $2}')
+      OLD_SERVER_PORT=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d ":" -f2)
       until [[ "${NEW_SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${NEW_SERVER_PORT}" -ge 1 ] && [ "${NEW_SERVER_PORT}" -le 65535 ]; do
         read -rp "Custom port [1-65535]: " -e -i 51820 NEW_SERVER_PORT
       done
