@@ -1122,15 +1122,15 @@ else
       if [ -z "${NEW_CLIENT_NAME}" ]; then
         NEW_CLIENT_NAME="$(openssl rand -hex 50)"
       fi
-      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d '/' -f1 | cut -d '.' -f4 | tail -n1)
-      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | tail -n1)
+      LASTIPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | tail -n1)
+      LASTIPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | tail -n1)
       if { [ -z "${LASTIPV4}" ] && [ -z "${LASTIPV6}" ]; }; then
         LASTIPV4=1
         LASTIPV6=1
       fi
-      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d '/' -f1 | cut -d '.' -f4 | sort -n | head -n1)
-      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d '/' -f1 | cut -d '.' -f4 | sort -n | tail -n1)
-      USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d '/' -f1 | cut -d '.' -f4 | sort -n)
+      SMALLEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n | head -n1)
+      LARGEST_USED_IPV4=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n | tail -n1)
+      USED_IPV4_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "/" -f1 | cut -d "." -f4 | sort -n)
       while [ "${SMALLEST_USED_IPV4}" -le "${LARGEST_USED_IPV4}" ]; do
         if [[ ! ${USED_IPV4_LIST[*]} =~ ${SMALLEST_USED_IPV4} ]]; then
           FIND_UNUSED_IPV4=${SMALLEST_USED_IPV4}
@@ -1138,9 +1138,9 @@ else
         fi
         SMALLEST_USED_IPV4=$((SMALLEST_USED_IPV4 + 1))
       done
-      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n | head -n1)
-      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n | tail -n1)
-      USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d ',' -f2 | cut -d '/' -f1 | cut -d ':' -f5 | sort -n)
+      SMALLEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n | head -n1)
+      LARGEST_USED_IPV6=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n | tail -n1)
+      USED_IPV6_LIST=$(grep "AllowedIPs" ${WIREGUARD_CONFIG} | cut -d " " -f3 | cut -d "," -f2 | cut -d "/" -f1 | cut -d ":" -f5 | sort -n)
       while [ "${SMALLEST_USED_IPV6}" -le "${LARGEST_USED_IPV6}" ]; do
         if [[ ! ${USED_IPV6_LIST[*]} =~ ${SMALLEST_USED_IPV6} ]]; then
           FIND_UNUSED_IPV6=${SMALLEST_USED_IPV6}
@@ -1432,7 +1432,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
     12) # Change the IP address of your wireguard interface.
       CURRENT_IP_METHORD=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4)
       if [[ ${CURRENT_IP_METHORD} != *"["* ]]; then
-        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d ':' -f1)
+        OLD_SERVER_HOST=$(head -n1 ${WIREGUARD_CONFIG} | cut -d " " -f4 | cut -d ":" -f1)
         NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
         if [ -z "${NEW_SERVER_HOST}" ]; then
           NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
