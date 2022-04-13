@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Check out code into the directory
         uses: actions/checkout@v3
-      - name: Curl example.net
-        run: curl -I https://www.example.net
+      - name: Curl api.ipengine.dev
+        run: curl -I https://api.ipengine.dev
       - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
       - name: Stop WireGuard service
@@ -51,8 +51,8 @@ jobs:
         run: sudo crontab -l
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
-      - name: Curl example.com
-        run: curl -I https://www.example.com
+      - name: Curl api.ipengine.dev
+        run: curl -I https://api.ipengine.dev
       - name: Test wireguard-manager purge.
         run: sudo ./wireguard-manager.sh --purge
       - name: View WireGuard peers.
@@ -65,8 +65,8 @@ jobs:
         run: sudo ./wireguard-manager.sh --uninstall
       - name: View crontab rules
         run: sudo crontab -l
-      - name: Curl example.org
-        run: curl -I https://www.example.org
+      - name: Curl api.ipengine.dev
+        run: curl -I https://api.ipengine.dev
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
       - name: View crontab rules
