@@ -102,7 +102,7 @@ function kernel-check() {
 
 kernel-check
 
-# Check the current init system.
+# Only allow certain init systems
 function check-current-init-system() {
   CURRENT_INIT_SYSTEM=$(ps --no-headers -o comm 1)
   case ${CURRENT_INIT_SYSTEM} in
