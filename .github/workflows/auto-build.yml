@@ -10,11 +10,14 @@ jobs:
   build:
     name: Build on ubuntu
     runs-on: ubuntu-latest
+    env:
+      API_IPENGINE: api.ipengine.dev
+      API_IPENGINE_URL: https://api.ipengine.dev
     steps:
       - name: Check out code into the directory
         uses: actions/checkout@v3
-      - name: Curl api.ipengine.dev
-        run: curl -I https://api.ipengine.dev
+      - name: Test the network using "${{ env.API_IPENGINE }}"
+        run: curl "${{ env.API_IPENGINE_URL }}"
       - name: Install wireguard via wireguard-manager
         run: sudo ./wireguard-manager.sh --install
       - name: Stop WireGuard service
@@ -51,8 +54,8 @@ jobs:
         run: sudo crontab -l
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
-      - name: Curl api.ipengine.dev
-        run: curl -I https://api.ipengine.dev
+      - name: Test the network using "${{ env.API_IPENGINE }}"
+        run: curl "${{ env.API_IPENGINE_URL }}"
       - name: Test wireguard-manager purge.
         run: sudo ./wireguard-manager.sh --purge
       - name: View WireGuard peers.
@@ -65,8 +68,8 @@ jobs:
         run: sudo ./wireguard-manager.sh --uninstall
       - name: View crontab rules
         run: sudo crontab -l
-      - name: Curl api.ipengine.dev
-        run: curl -I https://api.ipengine.dev
+      - name: Test the network using "${{ env.API_IPENGINE }}"
+        run: curl "${{ env.API_IPENGINE_URL }}"
       - name: View the resolv.conf
         run: sudo cat /etc/resolv.conf
       - name: View crontab rules
