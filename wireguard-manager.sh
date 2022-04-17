@@ -440,7 +440,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_PUB_NIC_SETTINGS} in
     1)
-      SERVER_PUB_NIC="$(ip route | grep default | head -1 | cut --delimiter=" " --fields=5)"
+      SERVER_PUB_NIC="$(ip route | grep default | head --lines=1 | cut --delimiter=" " --fields=5)"
       if [ -z "${SERVER_PUB_NIC}" ]; then
         echo "Error: Your server's public network interface could not be found."
         exit
@@ -449,7 +449,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     2)
       read -rp "Custom NAT:" SERVER_PUB_NIC
       if [ -z "${SERVER_PUB_NIC}" ]; then
-        SERVER_PUB_NIC="$(ip route | grep default | head -1 | cut --delimiter=" " --fields=5)"
+        SERVER_PUB_NIC="$(ip route | grep default | head --lines=1 | cut --delimiter=" " --fields=5)"
       fi
       ;;
     esac
