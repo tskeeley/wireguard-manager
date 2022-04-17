@@ -1149,8 +1149,8 @@ else
         SMALLEST_USED_IPV6=$((SMALLEST_USED_IPV6 + 1))
       done
       if { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
-        LASTIPV4=$(echo "${FIND_UNUSED_IPV4}" | head --lines= 1)
-        LASTIPV6=$(echo "${FIND_UNUSED_IPV6}" | head --lines= 1)
+        LASTIPV4=$(echo "${FIND_UNUSED_IPV4}" | head --lines=1)
+        LASTIPV6=$(echo "${FIND_UNUSED_IPV6}" | head --lines=1)
       fi
       if { [ "${LASTIPV4}" -ge 255 ] && [ "${LASTIPV6}" -ge 255 ]; }; then
         CURRENT_IPV4_RANGE=$(head --lines=1 ${WIREGUARD_CONFIG} | cut --delimiter=" " --fields=2)
