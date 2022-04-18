@@ -478,6 +478,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       until [[ "${SERVER_PORT}" =~ ^[0-9]+$ ]] && [ "${SERVER_PORT}" -ge 1 ] && [ "${SERVER_PORT}" -le 65535 ]; do
         read -rp "Custom port [1-65535]:" SERVER_PORT
       done
+      if [ -z "${SERVER_PORT}" ]; then
+        SERVER_PORT="51820"
+      fi
       if [ "$(lsof -i UDP:"${SERVER_PORT}")" ]; then
         echo "Error: The port ${SERVER_PORT} is already used by a different application, please use a different port."
         exit
@@ -505,6 +508,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       until [[ "${NAT_CHOICE}" =~ ^[0-9]+$ ]] && [ "${NAT_CHOICE}" -ge 1 ] && [ "${NAT_CHOICE}" -le 65535 ]; do
         read -rp "Custom NAT [1-65535]:" NAT_CHOICE
       done
+      if [ -z "${NAT_CHOICE}" ]; then
+        NAT_CHOICE="25"
+      fi
       ;;
     esac
   }
@@ -529,9 +535,15 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       until [[ "${INTERFACE_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${INTERFACE_MTU_CHOICE}" -ge 1 ] && [ "${INTERFACE_MTU_CHOICE}" -le 65535 ]; do
         read -rp "Custom Interface MTU [1-65535]:" INTERFACE_MTU_CHOICE
       done
+      if [ -z "${INTERFACE_MTU_CHOICE}" ]; then
+        INTERFACE_MTU_CHOICE="1420"
+      fi
       until [[ "${PEER_MTU_CHOICE}" =~ ^[0-9]+$ ]] && [ "${PEER_MTU_CHOICE}" -ge 1 ] && [ "${PEER_MTU_CHOICE}" -le 65535 ]; do
         read -rp "Custom Peer MTU [1-65535]:" PEER_MTU_CHOICE
       done
+      if [ -z "${PEER_MTU_CHOICE}" ]; then
+        PEER_MTU_CHOICE="1280"
+      fi
       ;;
     esac
   }
