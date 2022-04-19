@@ -984,7 +984,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 \tprefetch-key: yes"
       echo -e "${UNBOUND_TEMP_INTERFACE_INFO}" | awk '!seen[$0]++' >${UNBOUND_CONFIG}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
-        rm -f ${RESOLV_CONFIG_OLD}
+        rm --force ${RESOLV_CONFIG_OLD}
       fi
       if [ -f "${RESOLV_CONFIG}" ]; then
         chattr -i ${RESOLV_CONFIG}
@@ -997,7 +997,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       if [ "${INSTALL_BLOCK_LIST}" == true ]; then
         echo -e "\tinclude: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
         if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
-          mkdir -p "${UNBOUND_CONFIG_DIRECTORY}"
+          mkdir --parents "${UNBOUND_CONFIG_DIRECTORY}"
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
@@ -1019,7 +1019,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     CLIENT_ADDRESS_V6=$(echo "${PRIVATE_SUBNET_V6}" | cut --delimiter=":" --fields=1-4):2
     PRESHARED_KEY=$(wg genpsk)
     PEER_PORT=$(shuf --input-range=1024-65535 --head-count=1)
-    mkdir -p ${WIREGUARD_CLIENT_PATH}
+    mkdir --parents ${WIREGUARD_CLIENT_PATH}
     if [ "${INSTALL_UNBOUND}" == true ]; then
       NFTABLES_POSTUP="sysctl --write net.ipv4.ip_forward=1; sysctl --write net.ipv6.conf.all.forwarding=1; nft add table inet wireguard-${WIREGUARD_PUB_NIC}; nft add chain inet wireguard-${WIREGUARD_PUB_NIC} wireguard_chain {type nat hook postrouting priority srcnat\;}; nft add rule inet wireguard-${WIREGUARD_PUB_NIC} wireguard_chain oifname ${SERVER_PUB_NIC} masquerade"
       NFTABLES_POSTDOWN="sysctl --write net.ipv4.ip_forward=0; sysctl --write net.ipv6.conf.all.forwarding=0; nft delete table inet wireguard-${WIREGUARD_PUB_NIC}"
@@ -1234,7 +1234,7 @@ AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
         TEMP_WRITE_LINE=$((LASTIPV4 - 2))
         sed --in-place $((TEMP_WRITE_LINE * 6 + 11))i"${WIREGUARD_TEMPORARY_PEER_DATA}" ${WIREGUARD_CONFIG}
       fi
-      rm -f ${WIREGUARD_ADD_PEER_CONFIG}
+      rm --force ${WIREGUARD_ADD_PEER_CONFIG}
       echo "# ${WIREGUARD_WEBSITE_URL}
 [Interface]
 Address = ${CLIENT_ADDRESS_V4}/${PRIVATE_SUBNET_MASK_V4},${CLIENT_ADDRESS_V6}/${PRIVATE_SUBNET_MASK_V6}
@@ -1267,10 +1267,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
       sed --in-place "/\# ${REMOVECLIENT} start/,/\# ${REMOVECLIENT} end/d" ${WIREGUARD_CONFIG}
       if [ -f "${WIREGUARD_CLIENT_PATH}/${REMOVECLIENT}-${WIREGUARD_PUB_NIC}.conf" ]; then
-        rm -f ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
+        rm --force ${WIREGUARD_CLIENT_PATH}/"${REMOVECLIENT}"-${WIREGUARD_PUB_NIC}.conf
       fi
       wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-      crontab -l | grep -v "${REMOVECLIENT}" | crontab -
+      crontab -l | grep --invert-match "${REMOVECLIENT}" | crontab -
       ;;
     7) # Reinstall WireGuard
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
@@ -1315,7 +1315,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get remove --purge wireguard qrencode --yes
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
-          rm -f /etc/apt/sources.list.d/backports.list
+          rm --force /etc/apt/sources.list.d/backports.list
           apt-key del 648ACFD622F3D138
           apt-key del 0E98404D386FA1D9
         fi
@@ -1324,12 +1324,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
         dnf remove wireguard qrencode --yes
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          rm -f /etc/yum.repos.d/wireguard.repo
+          rm --force /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
         yum remove wireguard qrencode --yes
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
-          rm -f /etc/yum.repos.d/wireguard.repo
+          rm --force /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk del wireguard-tools libqrencode
@@ -1340,9 +1340,9 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       fi
       # Delete WireGuard backup
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-        rm -f ${WIREGUARD_CONFIG_BACKUP}
+        rm --force ${WIREGUARD_CONFIG_BACKUP}
         if [ -f "${WIREGUARD_BACKUP_PASSWORD_PATH}" ]; then
-          rm -f "${WIREGUARD_BACKUP_PASSWORD_PATH}"
+          rm --force "${WIREGUARD_BACKUP_PASSWORD_PATH}"
         fi
       fi
       # Uninstall unbound
@@ -1354,7 +1354,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         fi
         if [ -f "${RESOLV_CONFIG_OLD}" ]; then
           chattr -i ${RESOLV_CONFIG}
-          rm -f ${RESOLV_CONFIG}
+          rm --force ${RESOLV_CONFIG}
           mv ${RESOLV_CONFIG_OLD} ${RESOLV_CONFIG}
           chattr +i ${RESOLV_CONFIG}
         fi
@@ -1382,11 +1382,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           rm -rf ${UNBOUND_ROOT}
         fi
         if [ -f "${UNBOUND_ANCHOR}" ]; then
-          rm -f ${UNBOUND_ANCHOR}
+          rm --force ${UNBOUND_ANCHOR}
         fi
       fi
       # If any cronjobs are identified, they should be removed.
-      crontab -l | grep -v "${CURRENT_FILE_PATH}" | crontab -
+      crontab -l | grep --invert-match "${CURRENT_FILE_PATH}" | crontab -
       ;;
     9) # Update the script
       CURRENT_WIREGUARD_MANAGER_HASH=$(openssl dgst -sha3-512 "${CURRENT_FILE_PATH}" | cut --delimiter=" " --fields=2)
@@ -1421,7 +1421,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     10) # Backup WireGuard Config
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
-        rm -f ${WIREGUARD_CONFIG_BACKUP}
+        rm --force ${WIREGUARD_CONFIG_BACKUP}
       fi
       if [ -d "${WIREGUARD_PATH}" ]; then
         BACKUP_PASSWORD="$(openssl rand -hex 50)"
@@ -1485,10 +1485,10 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         wg set ${WIREGUARD_PUB_NIC} peer "${CLIENTKEY}" remove
         sed --in-place "/\# ${CLIENT_NAME} start/,/\# ${CLIENT_NAME} end/d" ${WIREGUARD_CONFIG}
         if [ -f "${WIREGUARD_CLIENT_PATH}/${CLIENT_NAME}-${WIREGUARD_PUB_NIC}.conf" ]; then
-          rm -f ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
+          rm --force ${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
         fi
         wg addconf ${WIREGUARD_PUB_NIC} <(wg-quick strip ${WIREGUARD_PUB_NIC})
-        crontab -l | grep -v "${CLIENT_NAME}" | crontab -
+        crontab -l | grep --invert-match "${CLIENT_NAME}" | crontab -
       done
       ;;
     15) # Generate QR code.
