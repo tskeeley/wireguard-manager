@@ -1230,7 +1230,7 @@ AllowedIPs = ${CLIENT_ADDRESS_V4}/32,${CLIENT_ADDRESS_V6}/128
       elif { [ -n "${FIND_UNUSED_IPV4}" ] && [ -n "${FIND_UNUSED_IPV6}" ]; }; then
         sed --in-place "s|$|\\\n|" "${WIREGUARD_ADD_PEER_CONFIG}"
         sed --in-place "6s|\\\n||" "${WIREGUARD_ADD_PEER_CONFIG}"
-        WIREGUARD_TEMPORARY_PEER_DATA=$(tr -d "\n" <"${WIREGUARD_ADD_PEER_CONFIG}")
+        WIREGUARD_TEMPORARY_PEER_DATA=$(tr --delete "\n" <"${WIREGUARD_ADD_PEER_CONFIG}")
         TEMP_WRITE_LINE=$((LASTIPV4 - 2))
         sed --in-place $((TEMP_WRITE_LINE * 6 + 11))i"${WIREGUARD_TEMPORARY_PEER_DATA}" ${WIREGUARD_CONFIG}
       fi
