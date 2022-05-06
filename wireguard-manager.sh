@@ -1308,7 +1308,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       wg-quick down ${WIREGUARD_PUB_NIC}
       # Removing Wireguard Files
       if [ -d "${WIREGUARD_PATH}" ]; then
-        rm -rf ${WIREGUARD_PATH}
+        rm --recursive --force ${WIREGUARD_PATH}
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum remove wireguard qrencode --yes
@@ -1379,7 +1379,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           pkg delete unbound
         fi
         if [ -d "${UNBOUND_ROOT}" ]; then
-          rm -rf ${UNBOUND_ROOT}
+          rm --recursive --force ${UNBOUND_ROOT}
         fi
         if [ -f "${UNBOUND_ANCHOR}" ]; then
           rm --force ${UNBOUND_ANCHOR}
@@ -1431,7 +1431,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       ;;
     11) # Restore WireGuard Config
       if [ -d "${WIREGUARD_PATH}" ]; then
-        rm -rf ${WIREGUARD_PATH}
+        rm --recursive --force ${WIREGUARD_PATH}
       fi
       unzip ${WIREGUARD_CONFIG_BACKUP} -d ${WIREGUARD_PATH}
       # Restart WireGuard
