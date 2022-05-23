@@ -36,12 +36,12 @@ function installing-system-requirements() {
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
         if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" -ge 7 ]; then
-          yum install epel-release elrepo-release --yes
+          yum install -y epel-release elrepo-release
         fi
         if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
-          yum install yum-plugin-elrepo --yes
+          yum install -y yum-plugin-elrepo
         fi
-        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd --yes
+        yum install -y curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Sy
         pacman -S --noconfirm --needed curl coreutils jq iproute2 lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
@@ -53,7 +53,7 @@ function installing-system-requirements() {
         pkg install curl coreutils jq iproute2 lsof cronie gawk procps grep qrencode sed zip unzip openssl nftables ifupdown e2fsprogs gnupg systemd
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         yum check-update
-        yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd --yes
+        yum install -y curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd
       fi
     fi
   else
@@ -830,10 +830,10 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pacman -S --noconfirm --needed linux-headers
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
         yum check-update
-        yum install kernel-headers-"$(uname --kernel-release)" kernel-devel-"$(uname --kernel-release)" --yes
+        yum install -y kernel-headers-"$(uname --kernel-release)" kernel-devel-"$(uname --kernel-release)"
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
-        yum install kernel-headers-"$(uname --kernel-release)" kernel-devel-"$(uname --kernel-release)" --yes
+        yum install -y kernel-headers-"$(uname --kernel-release)" kernel-devel-"$(uname --kernel-release)"
       fi
     fi
   }
@@ -848,11 +848,11 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apt-get install resolvconf --yes
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         if [ "${CURRENT_DISTRO}" == "centos" ] && [ "${CURRENT_DISTRO_MAJOR_VERSION}" == 7 ]; then
-          yum copr enable macieks/openresolv --yes
+          yum copr enable -y macieks/openresolv
         fi
-        yum install openresolv --yes
+        yum install -y openresolv
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-        yum install openresolv --yes
+        yum install -y openresolv
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm --needed resolvconf
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -883,16 +883,16 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pacman -S --noconfirm --needed wireguard-tools
       elif [ "${CURRENT_DISTRO}" = "fedora" ]; then
         dnf check-update
-        dnf copr enable jdoss/wireguard --yes
-        dnf install wireguard-tools --yes
+        dnf copr enable -y jdoss/wireguard 
+        dnf install -y wireguard-tools 
       elif [ "${CURRENT_DISTRO}" == "centos" ]; then
         yum check-update
-        yum install kmod-wireguard wireguard-tools --yes
+        yum install -y kmod-wireguard wireguard-tools
       elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
         yum check-update
         yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${CURRENT_DISTRO_MAJOR_VERSION}".noarch.rpm https://www.elrepo.org/elrepo-release-"${CURRENT_DISTRO_MAJOR_VERSION}".el"${CURRENT_DISTRO_MAJOR_VERSION}".elrepo.noarch.rpm
         yum check-update
-        yum install kmod-wireguard wireguard-tools --yes
+        yum install -y kmod-wireguard wireguard-tools
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
         apk update
         apk add wireguard-tools
@@ -901,14 +901,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         pkg install wireguard
       elif { [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
-        yum install kmod-wireguard wireguard-tools --yes
+        yum install -y kmod-wireguard wireguard-tools
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         yum check-update
-        yum install oraclelinux-developer-release-el"${CURRENT_DISTRO_MAJOR_VERSION}" --yes
+        yum install -y oraclelinux-developer-release-el"${CURRENT_DISTRO_MAJOR_VERSION}"
         yum config-manager --disable ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer
         yum config-manager --enable ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6
         yum config-manager --save --setopt=ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6.includepkgs='wireguard-tools*'
-        yum install wireguard-tools --yes
+        yum install -y wireguard-tools
       fi
     fi
   }
@@ -930,9 +930,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
             fi
           fi
         elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum install unbound --yes
+          yum install -y unbound
         elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-          dnf install unbound --yes
+          dnf install -y unbound
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -S --noconfirm --needed unbound
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -940,7 +940,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg install unbound
         elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-          yum install unbound --yes
+          yum install -y unbound
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
@@ -1283,7 +1283,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         dpkg-reconfigure wireguard-dkms
         modprobe wireguard
       elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum reinstall wireguard-tools --yes
+        yum reinstall -y wireguard-tools
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -S --noconfirm wireguard-tools
       elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
@@ -1291,7 +1291,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg check wireguard
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        yum reinstall wireguard-tools --yes
+        yum reinstall -y wireguard-tools
       fi
       if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
         systemctl enable --now wg-quick@${WIREGUARD_PUB_NIC}
@@ -1311,7 +1311,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         rm --recursive --force ${WIREGUARD_PATH}
       fi
       if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-        yum remove wireguard qrencode --yes
+        yum remove -y wireguard qrencode
       elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get remove --purge wireguard qrencode --yes
         if [ -f "/etc/apt/sources.list.d/backports.list" ]; then
@@ -1322,12 +1322,12 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
         pacman -Rs --noconfirm wireguard-tools qrencode
       elif [ "${CURRENT_DISTRO}" == "fedora" ]; then
-        dnf remove wireguard qrencode --yes
+        dnf remove -y wireguard qrencode
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm --force /etc/yum.repos.d/wireguard.repo
         fi
       elif [ "${CURRENT_DISTRO}" == "rhel" ]; then
-        yum remove wireguard qrencode --yes
+        yum remove -y wireguard qrencode
         if [ -f "/etc/yum.repos.d/wireguard.repo" ]; then
           rm --force /etc/yum.repos.d/wireguard.repo
         fi
@@ -1336,7 +1336,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg delete wireguard libqrencode
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
-        yum remove wireguard qrencode --yes
+        yum remove -y wireguard qrencode
       fi
       # Delete WireGuard backup
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
@@ -1359,7 +1359,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           chattr +i ${RESOLV_CONFIG}
         fi
         if { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
-          yum remove unbound --yes
+          yum remove -y unbound
         elif { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
           if [ "${CURRENT_DISTRO}" == "ubuntu" ]; then
             if [[ "${CURRENT_INIT_SYSTEM}" == *"systemd"* ]]; then
@@ -1372,7 +1372,7 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ]; }; then
           pacman -Rs --noconfirm unbound
         elif { [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
-          yum remove unbound --yes
+          yum remove -y unbound
         elif [ "${CURRENT_DISTRO}" == "alpine" ]; then
           apk del unbound
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
