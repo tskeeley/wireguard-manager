@@ -990,7 +990,7 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         fi
         curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
       fi
-      chown -R root:root ${UNBOUND_ROOT}
+      chown --recursive root:root ${UNBOUND_ROOT}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
         rm --force ${RESOLV_CONFIG_OLD}
       fi
@@ -1057,7 +1057,7 @@ Endpoint = ${SERVER_HOST}:${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
-    chown -R root:root ${WIREGUARD_PATH}
+    chown --recursive root:root ${WIREGUARD_PATH}
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
