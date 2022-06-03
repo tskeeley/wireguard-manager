@@ -983,6 +983,14 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
 \tqname-minimisation: yes
 \tprefetch-key: yes"
       echo -e "${UNBOUND_TEMP_INTERFACE_INFO}" | awk '!seen[$0]++' >${UNBOUND_CONFIG}
+      if [ "${INSTALL_BLOCK_LIST}" == true ]; then
+        echo -e "\tinclude: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
+        if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
+          mkdir --parents "${UNBOUND_CONFIG_DIRECTORY}"
+        fi
+        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
+      fi
+      chown --recursive root:root ${UNBOUND_ROOT}
       if [ -f "${RESOLV_CONFIG_OLD}" ]; then
         rm --force ${RESOLV_CONFIG_OLD}
       fi
@@ -994,14 +1002,6 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       echo "nameserver ::1" >>${RESOLV_CONFIG}
       chattr +i ${RESOLV_CONFIG}
       echo "Unbound: true" >${UNBOUND_MANAGER}
-      if [ "${INSTALL_BLOCK_LIST}" == true ]; then
-        echo -e "\tinclude: ${UNBOUND_CONFIG_HOST}" >>${UNBOUND_CONFIG}
-        if [ ! -d "${UNBOUND_CONFIG_DIRECTORY}" ]; then
-          mkdir --parents "${UNBOUND_CONFIG_DIRECTORY}"
-        fi
-        curl "${UNBOUND_CONFIG_HOST_URL}" | awk '{print "local-zone: \""$1"\" always_refuse"}' >${UNBOUND_CONFIG_HOST}
-      fi
-      chown -R root:root ${UNBOUND_ROOT}
       CLIENT_DNS="${GATEWAY_ADDRESS_V4},${GATEWAY_ADDRESS_V6}"
     fi
   }
@@ -1057,7 +1057,7 @@ Endpoint = ${SERVER_HOST}:${SERVER_PORT}
 PersistentKeepalive = ${NAT_CHOICE}
 PresharedKey = ${PRESHARED_KEY}
 PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${CLIENT_NAME}"-${WIREGUARD_PUB_NIC}.conf
-    chown -R root:root ${WIREGUARD_PATH}
+    chown --recursive root:root ${WIREGUARD_PATH}
     if [ ${AUTOMATIC_WIREGUARD_EXPIRATION} == true ]; then
       crontab -l | {
         cat
