@@ -28,7 +28,7 @@ system-information
 
 # Pre-Checks system requirements
 function installing-system-requirements() {
-  if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ] || [ "${CURRENT_DISTRO}" == "ol" ]; }; then
+  if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ] || [ "${CURRENT_DISTRO}" == "fedora" ] || [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ] || [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ] || [ "${CURRENT_DISTRO}" == "manjaro" ] || [ "${CURRENT_DISTRO}" == "alpine" ] || [ "${CURRENT_DISTRO}" == "freebsd" ] || [ "${CURRENT_DISTRO}" == "ol" ] || [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; }; then
     if { [ ! -x "$(command -v curl)" ] || [ ! -x "$(command -v cut)" ] || [ ! -x "$(command -v jq)" ] || [ ! -x "$(command -v ip)" ] || [ ! -x "$(command -v lsof)" ] || [ ! -x "$(command -v cron)" ] || [ ! -x "$(command -v awk)" ] || [ ! -x "$(command -v ps)" ] || [ ! -x "$(command -v grep)" ] || [ ! -x "$(command -v qrencode)" ] || [ ! -x "$(command -v sed)" ] || [ ! -x "$(command -v zip)" ] || [ ! -x "$(command -v unzip)" ] || [ ! -x "$(command -v openssl)" ] || [ ! -x "$(command -v nft)" ] || [ ! -x "$(command -v ifup)" ] || [ ! -x "$(command -v chattr)" ] || [ ! -x "$(command -v gpg)" ] || [ ! -x "$(command -v systemd-detect-virt)" ]; }; then
       if { [ "${CURRENT_DISTRO}" == "ubuntu" ] || [ "${CURRENT_DISTRO}" == "debian" ] || [ "${CURRENT_DISTRO}" == "raspbian" ] || [ "${CURRENT_DISTRO}" == "pop" ] || [ "${CURRENT_DISTRO}" == "kali" ] || [ "${CURRENT_DISTRO}" == "linuxmint" ] || [ "${CURRENT_DISTRO}" == "neon" ]; }; then
         apt-get update
@@ -54,6 +54,9 @@ function installing-system-requirements() {
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         yum check-update
         yum install curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd -y
+      elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+        zypper refresh
+        zypper install -y curl coreutils jq iproute lsof cronie gawk procps-ng grep qrencode sed zip unzip openssl nftables NetworkManager e2fsprogs gnupg systemd
       fi
     fi
   else
@@ -834,6 +837,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
       elif { [ "${CURRENT_DISTRO}" == "centos" ] || [ "${CURRENT_DISTRO}" == "rhel" ] || [ "${CURRENT_DISTRO}" == "almalinux" ] || [ "${CURRENT_DISTRO}" == "rocky" ]; }; then
         yum check-update
         yum install kernel-headers-"$(uname --kernel-release)" kernel-devel-"$(uname --kernel-release)" -y
+      elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+        zypper refresh
+        zypper install -y kernel-devel
       fi
     fi
   }
@@ -859,6 +865,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         apk add resolvconf
       elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
         pkg install resolvconf
+      elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+        zypper install -y openresolv
       fi
     fi
   }
@@ -909,6 +917,9 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
         yum config-manager --enable ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6
         yum config-manager --save --setopt=ol"${CURRENT_DISTRO_MAJOR_VERSION}"_developer_UEKR6.includepkgs='wireguard-tools*'
         yum install wireguard-tools -y
+      elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+        zypper refresh
+        zypper install -y wireguard-tools
       fi
     fi
   }
@@ -941,6 +952,8 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
           pkg install unbound
         elif [ "${CURRENT_DISTRO}" == "ol" ]; then
           yum install unbound -y
+        elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+          zypper install -y unbound
         fi
       fi
       unbound-anchor -a ${UNBOUND_ANCHOR}
@@ -1337,6 +1350,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
         pkg delete wireguard libqrencode
       elif [ "${CURRENT_DISTRO}" == "ol" ]; then
         yum remove wireguard qrencode -y
+      elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+        zypper remove -y wireguard-tools qrencode
       fi
       # Delete WireGuard backup
       if [ -f "${WIREGUARD_CONFIG_BACKUP}" ]; then
@@ -1377,6 +1392,8 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
           apk del unbound
         elif [ "${CURRENT_DISTRO}" == "freebsd" ]; then
           pkg delete unbound
+        elif [ "${CURRENT_DISTRO}" == "opensuse-leap" ]; then
+          zypper remove -y unbound
         fi
         if [ -d "${UNBOUND_ROOT}" ]; then
           rm --recursive --force ${UNBOUND_ROOT}

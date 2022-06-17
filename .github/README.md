@@ -37,7 +37,7 @@ WireGuard is a straightforward yet fast and modern VPN that utilizes state-of-th
 
 ---
 ### 🌲 Prerequisite
-- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky, Oracle, openSUSE/SUSE
+- CentOS, Debian, Ubuntu, Arch, Fedora, Redhat, Raspbian, PopOS, Manjaro, Kali, Alpine, Mint, FreeBSD, Neon, Alma, Rocky, Oracle, openSUSE-Leap
 - Linux `Kernel 3.1` or newer
 - You will need superuser access or a user account with `sudo` privilege.
 
@@ -151,7 +151,7 @@ usage: ./wireguard-manager.sh <command>
 | Neon            |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Rocky           |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
 | Oracle          |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |:heavy_check_mark:  |
-| openSUSE/SUSE   |:x:                 |:heavy_check_mark:  |:x:                 |:x:                 |
+| openSUSE-Leap   |:x:                 |:heavy_check_mark:  |:x:                 |:x:                 |
 
 ### ☁️ Compatibility with Cloud Providers
 | Cloud           | Supported          |
