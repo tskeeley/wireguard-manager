@@ -189,6 +189,14 @@ elif { [ "${CURRENT_DISTRO}" == "arch" ] || [ "${CURRENT_DISTRO}" == "archarm" ]
 else
   SYSTEM_CRON_NAME="cron"
 fi
+SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
+if [ -z "${SERVER_HOST_V4}" ]; then
+  SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
+fi
+SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
+if [ -z "${SERVER_HOST_V6}" ]; then
+  SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
+fi
 
 # Usage Guide of the application
 function usage-guide() {
@@ -380,18 +388,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V4_SETTINGS} in
     1)
-      SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-      if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
-      fi
+      SERVER_HOST_V4=${SERVER_HOST_V4}
       ;;
     2)
       read -rp "Custom IPv4:" SERVER_HOST_V4
       if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-      fi
-      if [ -z "${SERVER_HOST_V4}" ]; then
-        SERVER_HOST_V4="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
+        SERVER_HOST_V4=${SERVER_HOST_V4}
       fi
       ;;
     esac
@@ -410,18 +412,12 @@ if [ ! -f "${WIREGUARD_CONFIG}" ]; then
     done
     case ${SERVER_HOST_V6_SETTINGS} in
     1)
-      SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-      if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
-      fi
+      SERVER_HOST_V6=${SERVER_HOST_V6}
       ;;
     2)
       read -rp "Custom IPv6:" SERVER_HOST_V6
       if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-      fi
-      if [ -z "${SERVER_HOST_V6}" ]; then
-        SERVER_HOST_V6="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
+        SERVER_HOST_V6=${SERVER_HOST_V6}
       fi
       ;;
     esac
@@ -1445,17 +1441,11 @@ PublicKey = ${SERVER_PUBKEY}" >>${WIREGUARD_CLIENT_PATH}/"${NEW_CLIENT_NAME}"-${
       CURRENT_IP_METHORD=$(head --lines=1 ${WIREGUARD_CONFIG} | cut --delimiter=" " --fields=4)
       if [[ ${CURRENT_IP_METHORD} != *"["* ]]; then
         OLD_SERVER_HOST=$(head --lines=1 ${WIREGUARD_CONFIG} | cut --delimiter=" " --fields=4 | cut --delimiter=":" --fields=1)
-        NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        if [ -z "${NEW_SERVER_HOST}" ]; then
-          NEW_SERVER_HOST="$(curl --ipv4 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
-        fi
+        NEW_SERVER_HOST=${SERVER_HOST_V4}
       fi
       if [[ ${CURRENT_IP_METHORD} == *"["* ]]; then
         OLD_SERVER_HOST=$(head --lines=1 ${WIREGUARD_CONFIG} | cut --delimiter=" " --fields=4 | cut --delimiter="[" --fields=2 | cut --delimiter="]" --fields=1)
-        NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://api.ipengine.dev' | jq -r '.network.ip')"
-        if [ -z "${NEW_SERVER_HOST}" ]; then
-          NEW_SERVER_HOST="$(curl --ipv6 --connect-timeout 5 --tlsv1.3 --silent 'https://icanhazip.com')"
-        fi
+        NEW_SERVER_HOST=${SERVER_HOST_V6}
       fi
       if [ "${OLD_SERVER_HOST}" != "${NEW_SERVER_HOST}" ]; then
         sed --in-place "1s/${OLD_SERVER_HOST}/${NEW_SERVER_HOST}/" ${WIREGUARD_CONFIG}
