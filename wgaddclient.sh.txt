@@ -1,0 +1,73 @@
+ 
+#! /usr/bin/env bash
+
+# Simple script to add WG Clients
+# 2023 - Thomas Keeley
+
+umask 077
+
+# Get the client number
+target="jump1.convergence-con.org:51010"
+prefixV4="10.252.190."
+prefixV6="fd08:4799::"
+allowedNetworks="172.31.0.0/16"
+confDir="/etc/wireguard"
+wgConf="${confDir}/wg0.conf"
+name="$1"
+clientConf="${confDir}/${name}.conf"
+clientNum=$(( $(grep -e '- Client Number:' ${wgConf} | cut -d':' -f2 | sort -nr | head -1) + 1 ))
+
+if [ ${clientNum} -lt 2 ]; then
+  clientNum=2
+fi
+
+ipv4="${prefixV4}${clientNum}"
+ipv6="${prefixV6}${clientNum}"
+serv4="${prefixV4}1"
+serv6="${prefixV6}1"
+
+if [ "${name}" == "" -o "${name}" == "--help" ]; then
+  echo "Usage: $0 <Name of client profile - EG: ThomasPhone"
+  echo ""
+  echo "Profiles already setup:"
+  ls ${confDir} | grep conf | grep -v wg0.conf
+  exit
+elif [ ! -d "${confDir}" ]; then
+  echo "The configuration directory, ${confDir}, doesn't exit.  Aborting."
+  exit 2
+elif [ ! -f "${wgConf}" ]; then
+  echo "The WireGuard configuration file, ${wgConf}, doesn't exist.  Aborting."
+  exit 2
+elif [ -f "{clientConf}" ]; then
+  echo "A profile for ${name} already exists.  Aborting."
+  exit 10
+fi
+
+wg genkey | tee "${name}.key" | wg pubkey > "${name}.pub"
+wg genpsk > "${name}.psk"
+
+echo "# ${name} - Client Number: ${clientNum}" >> ${wgConf}
+echo "[Peer]" >> ${wgConf}
+echo "PublicKey = $(cat "${name}.pub")" >> ${wgConf}
+echo "PresharedKey = $(cat "${name}.psk")" >> ${wgConf}
+echo "AllowedIPs = $ipv4/32, $ipv6/128" >> ${wgConf}
+echo "" >> ${wgConf}
+
+echo "[Interface]" > "${name}.conf"
+echo "Address = $ipv4/32, $ipv6/128" >> "${name}.conf"
+echo "PrivateKey = $(cat "${name}.key")" >> "${name}.conf"
+echo "" >> "${name}.conf"
+echo "[Peer]" >> "${name}.conf"
+echo "PublicKey = $(cat /etc/wireguard/server.pub)" >> "${name}.conf"
+echo "PresharedKey = $(cat "${name}.psk")" >> "${name}.conf"
+echo "Endpoint = $target" >> "${name}.conf"
+echo "AllowedIPs = ${allowedNetworks}" >> "${name}.conf"
+echo "PersistentKeepalive = 25" >> "${name}.conf"
+
+rm -f "${name}.key" "${name}.pub" "${name}.psk"
+
+# Print QR code scanable by the Wireguard mobile app on screen
+qrencode -o ${name}.png < "${name}.conf"
+qrencode -t ansiutf8 < "${name}.conf"
+
+wg syncconf wg0 <(wg-quick strip wg0)

@@ -1,0 +1,513 @@
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_networking/assembly_setting-up-a-wireguard-vpn_configuring-and-managing-networking#proc_configuring-firewalld-on-a-wireguard-server-by-using-the-command-line_assembly_setting-up-a-wireguard-vpn
+
+Screw the rest
+
+
+apt-get install wireguard wireguard-tools
+
+cd /etc/wireguard/
+    8  ls -la
+    9  umask 077
+   10  ls -la
+   11  wg genkey | tee server.key | wg pubkey > server.pub
+   12  ls
+   13  ls -la
+   14  cat server.key 
+   15  cat server.pub 
+   16  vi /etc/wireguard/wg0.conf
+   17  echo "PrivateKey = $(cat server.key)" >> wg0.conf 
+   18  ls
+   19  cat wg0.conf 
+   20  ls -la
+   21  cat wg0.conf 
+   22  systemcrl enable wg-quick@wg0.service
+   23  systemctl enable wg-quick@wg0.service
+   24  systemctl daemon-reload
+   25  systemctl start wg-quick@wg0.service
+   26  wg
+
+https://docs.pi-hole.net/guides/vpn/wireguard/overview/
+
+Remote accessing Pi-hole using WireGuard¶
+WireGuard is an extremely simple yet fast and modern VPN that utilizes state-of-the-art cryptography. Comparing to other solutions, such as OpenVPN or IPsec, it aims to be faster, simpler, and leaner while avoiding the massive overhead involved with other VPN solutions. A combination of extremely high-speed cryptographic primitives and the fact that WireGuard lives inside the Linux kernel means that secure networking can be very high-speed. It intends to be considerably more performant than OpenVPN.
+
+WireGuard is designed as a general-purpose VPN for running on embedded interfaces and super computers alike, fit for many circumstances.
+
+There is no need to manage connections, be concerned about state, manage daemons, or worry about what's under the hood. WireGuard presents an extremely basic yet powerful interface.
+
+Using WireGuard is a modern and safe way to access your Pi-hole's capabilities remotely. Setting up a DNS server has become a simple task with Pi-hole's automated installer, which has resulted in many people knowingly--or unknowingly--creating an open resolver, which aids in DNS Amplification Attacks.
+
+WireGuard has been designed with ease-of-implementation and simplicity in mind. It is meant to be easily implemented in very few lines of code, and easily auditable for security vulnerabilities.
+
+This article aims to provide a step-by-step walk-through on setting up a server running Pi-hole and WireGuard so you can securely connect to your Pi-hole's DNS (and optionally your entire internal network) from anywhere.
+
+This tutorial walks you through the installation of a WireGuard server on your Pi-hole.
+
+Via this VPN, you can:
+
+use the full filtering capabilities of your Pi-hole
+access your Pi-hole dashboard remotely
+access all your internal devices (optional)
+reroute your entire Internet traffic through your Pi-hole (optional)
+from everywhere around the globe.
+
+Conceptual overview¶
+
+Before we get started with installing a wireguard server, we'll quickly give a general conceptual overview of what WireGuard is about. You can skip this section if you already know what is going on under the hood or don't care (and just want to have it running).
+
+WireGuard securely encapsulates IP packets over UDP. You add a WireGuard interface, configure it with your private key and your peers' public keys, and then you send packets across it.
+
+WireGuard works by adding a network interface, like eth0 or wlan0, called wg0 (or wg1, wg2, wg3, etc). This interface acts as a tunnel interface. Routes for this network interface will be added automatically based on the configuration file you will learn about below. All aspects of this virtual interface will be configured automatically by the wg-tools.
+
+WireGuard associates tunnel IP addresses with public keys and remote endpoints. When the interface sends a packet to a peer, it does the following:
+
+This packet is meant for 192.168.30.8. Is this peer configured?
+
+Yes: peer adams-laptop. Continue with step 2.
+No: Not for any configured peer, drop the packet and end here.
+Encrypt the IP packet using peer adams-laptop's public key.
+
+What is the remote endpoint of peer adams-laptop? Let me look... Okay, the endpoint is host 216.58.211.110:53133 (UDP).
+Send encrypted data over the Internet to this host.
+When the interface receives a packet from a peer, this happens:
+
+Received a packet from host 98.139.183.24:7361. Let's decrypt it!
+It decrypted and authenticated properly for peer evas-android. Okay, let's remember that peer evas-android's most recent Internet endpoint is 98.139.183.24:7361 (UDP).
+Once decrypted, the plain-text packet is from 192.168.43.89. Is peer evas-android allowed to be sending us packets as 192.168.43.89?
+Yes: accept the packet on the interface and process it (forwarding to further local client, into the Internet, etc.)
+No: drop it.
+Behind the scenes there is much happening to provide proper privacy, authenticity, and perfect forward secrecy, using state-of-the-art cryptography.
+
+If you're interested in the internal inner workings, you might be interested in reading through the various articles on their official website www.wireguard.com which is also where we took the vast majority of content in this guide from.
+
+
+Installing the WireGuard server¶
+The terms "server" and "client"
+
+Usage of the terms server and client were purposefully chosen in this guide specifically to help both new users and existing OpenVPN users become familiar with the construction of WireGuard's configuration files.
+
+WireGuard itself simply refers to all connected devices as peers. It constitutes a connection between computers.
+
+Installing the server components¶
+Installing everything we will need for a wireguard connections is as simple as running:
+
+
+sudo apt-get install wireguard wireguard-tools
+For Ubuntu 18.04 and lower, you need to do some extra steps:
+
+
+sudo add-apt-repository ppa:wireguard/wireguard
+sudo apt update
+sudo apt install wireguard wireguard-tools
+If you're running a kernel older than 5.6 (check with uname -r), you will also need to install wireguard-dkms
+
+If there is no wireguard package available for your system, you can follow the instructions below to compile WireGuard from source.
+
+Compile WireGuard from source
+Initial configuration¶
+Each network interface has a private key and a list of peers. Each peer has a public key. Public keys are short and simple, and are used by peers to authenticate each other. They can be passed around for use in configuration files by any out-of-band method, similar to how one might send their SSH public key to a friend for access to a shell server.
+
+First, we create the folder containing our wireguard configuration:
+
+
+sudo -i
+cd /etc/wireguard
+umask 077
+Key generation¶
+Inhere, we generate a key-pair for the server:
+
+
+wg genkey | tee server.key | wg pubkey > server.pub
+Creating the WireGuard configuration¶
+Create a config file
+
+
+sudo nano /etc/wireguard/wg0.conf
+and put the following into it:
+
+
+[Interface]
+Address = 10.100.0.1/24, fd08:4711::1/64
+ListenPort = 47111
+Then run
+
+
+echo "PrivateKey = $(cat server.key)" >> /etc/wireguard/wg0.conf
+exit # Exit the sudo session
+to copy the server's private key into your config file.
+
+Forward port on your router¶
+If the server is behind a device, e.g., a router that is doing NAT, be sure to forward the specified port on which WireGuard will be running (for this example, 47111/UDP) from the router to the WireGuard server.
+
+NAT: Network address translation
+Set up a domain name for your router¶
+When connecting from outside your network, you'll need to know the public IP address of your router to connect. However, as most households are getting dynamically-assigned public IP addresses (these addresses change periodically), you need to note down the address every day before leaving the house. Since this is very uncomfortable, we strongly suggest registering a dynamic host record (often called "DynDNS" record).
+
+The public IP address is checked at regular intervals. As soon as it changes, the router (or a DynDNS tool) sends a corresponding message to a URL of the service provider, who then updates the record.
+
+There are many excellent guides and a lot of services offer this for free (with more or less comfort). We suggest a few providers below, however, this list is neither absolute nor exhaustive:
+
+DynDNS providers
+You can either use the methods the corresponding providers recommend or use existing DynDNS solutions inbuilt in your router (if available). Most providers are compatible with, e.g., the popular Fritz!Box routers (EN / DE).
+
+Start the server¶
+Register your server wg0 as:
+
+
+sudo systemctl enable wg-quick@wg0.service
+sudo systemctl daemon-reload
+sudo systemctl start wg-quick@wg0
+If successful, you should not see any output.
+
+Error: RTNETLINK answers: Operation not supported
+Error: RTNETLINK answers: File exists
+Check everything is running¶
+With the following command, you can check if your wireguard server is running:
+
+
+sudo wg
+The output should look like the following:
+
+
+interface: wg0
+  public key: XYZ123456ABC=   ⬅ Your public key will be different
+  private key: (hidden)
+  listening port: 47111
+Your public key will be different from ours. This is expected (you just created your own key above).
+
+Set your Pi-hole to listen on all interfaces¶
+On your Settings page (tab DNS), ensure you set the listing mode of your Pi-hole to one of the Listen of all interfaces settings. The top one is preferred as it adds a bit of additional safety. Your WireGuard peers/clients will be correctly recognized as being only one hop away.
+
+You can now continue to add clients.
+
+
+Adding a WireGuard client¶
+Adding clients is really simple and easy. The process for setting up a client is similar to setting up the server. This is expected as WireGuard's concept is more of the type Peer-to-Peer than server-client as mentioned at the very beginning of the Server configuration.
+
+For each new client, the following steps must be taken. For the sake of simplicity, we will create the config file on the server itself. This, however, means that you need to transfer the config file securely to your server as it contains the private key of your client. An alternative way of doing this is to generate the configuration locally on your client and add the necessary lines to your server's configuration.
+
+Script to generate clients automatically
+Key generation¶
+We generate a key-pair for the client NAME (replace accordingly everywhere below):
+
+
+sudo -i
+cd /etc/wireguard
+umask 077
+name="client_name"
+wg genkey | tee "${name}.key" | wg pubkey > "${name}.pub"
+PSK Key generation¶
+We furthermore recommend generating a pre-shared key (PSK) in addition to the keys above. This adds an additional layer of symmetric-key cryptography to be mixed into the already existing public-key cryptography and is mainly for post-quantum resistance. A pre-shared key should be generated for each peer pair and should not be reused.
+
+
+wg genpsk > "${name}.psk"
+Add client to server configuration¶
+Add the new client by running the command:
+
+
+echo "[Peer]" >> /etc/wireguard/wg0.conf
+echo "PublicKey = $(cat "${name}.pub")" >> /etc/wireguard/wg0.conf
+echo "PresharedKey = $(cat "${name}.psk")" >> /etc/wireguard/wg0.conf
+echo "AllowedIPs = 10.100.0.2/32, fd08:4711::2/128" >> /etc/wireguard/wg0.conf
+Client IP address
+
+Make sure to increment the IP address for any further client! We add the first client with the IP addresses 10.100.0.2 and fd08:4711::2/128 in this example (10.100.0.1 and fd08:4711::1/128 are the server)
+
+Restart your server to load the new client config:
+
+
+systemctl restart wg-quick@wg0
+After a restart, the server file should look like:
+
+
+[Interface]
+Address = 10.100.0.1/24, fd08:4711::1/128
+ListenPort = 47111
+PrivateKey = XYZ123456ABC=                   # PrivateKey will be different
+
+[Peer]
+PublicKey = F+80gbmHVlOrU+es13S18oMEX2g=     # PublicKey will be different
+PresharedKey = 8cLaY8Bkd7PiUs0izYBQYVTEFlA=  # PresharedKey will be different
+AllowedIPs = 10.100.0.2/32, fd08:4711::2/128
+
+# Possibly further [Peer] lines
+The command
+
+
+wg
+should tell you about your new client:
+
+
+interface: wg0
+  public key: XYZ123456ABC=          ⬅ Your server's public key will be different
+  private key: (hidden)
+  listening port: 47111
+
+peer: F+80gbmHVlOrU+es13S18oMEX2g=   ⬅ Your peer's public key will be different
+  preshared key: (hidden)
+  allowed ips: 10.100.0.2/32, fd08:4711::2/128
+Create client configuration¶
+Create a dedicated config file for your new client:
+
+
+echo "[Interface]" > "${name}.conf"
+echo "Address = 10.100.0.2/32, fd08:4711::2/128" >> "${name}.conf" # May need editing
+echo "DNS = 10.100.0.1" >> "${name}.conf"                          # Your Pi-hole's IP
+and add the private key of this client
+
+
+echo "PrivateKey = $(cat "${name}.key")" >> "${name}.conf"
+Next, add your server as peer for this client:
+
+
+[Peer]
+AllowedIPs = 10.100.0.1/32, fd08:4711::1/128
+Endpoint = [your public IP or domain]:47111
+PersistentKeepalive = 25
+Then add the public key of the server as well as the PSK for this connection:
+
+
+echo "PublicKey = $(cat server.pub)" >> "${name}.conf"
+echo "PresharedKey = $(cat "${name}.psk")" >> "${name}.conf"
+exit
+That's it.
+
+About the PersistentKeepalive setting
+Copy config file to client¶
+You can now copy the configuration file to your client (if you created the config on the server). If the client is a mobile device such as a phone, qrencode can be used to generate a scanable QR code:
+
+
+sudo qrencode -t ansiutf8 < "/etc/wireguard/${name}.conf"
+(you may need to install qrencode using sudo apt-get install qrencode)
+
+You can directly scan this QR code with the official WireGuard app after clicking on the blue plus symbol in the lower right corner.
+
+Connect to your WireGuard VPN¶
+After creating/copying the connection information over to your client, you may use the client you prefer to connect to your system. Mind that setting up auto-start of the WireGuard connection may lead to issues if you are doing this too early (when the system cannot resolve DNS). See our FAQ for further hints.
+
+You can check if your client successfully connected by, once again, running
+
+
+sudo wg
+on the server. It should show some traffic for your client if everything works:
+
+
+interface: wg0
+  public key: XYZ123456ABC=          ⬅ Your server's public key will be different
+  private key: (hidden)
+  listening port: 47111
+
+peer: F+80gbmHVlOrU+es13S18oMEX2g=   ⬅ Your peer's public key will be different
+  preshared key: (hidden)
+  allowed ips: 10.100.0.2/32
+  latest handshake: 32 seconds ago
+  transfer: 3.43 KiB received, 188 B sent
+Test for DNS leaks¶
+You should run a DNS leak test on www.dnsleaktest.com to ensure your WireGuard tunnel does not leak DNS requests (so all are processed by your Pi-hole). The expected outcome is that you should only see DNS servers belonging to the upstream DNS destination you selected in Pi-hole. If you configured Pi-hole as All-Around DNS Solution, you should only see the public IP address of your WireGuard server and no other DNS server.
+
+See also What is a DNS leak and why should I care? (external link).
+
+Access internal devices through the WireGuard tunnel¶
+Enable IP forwarding on the server¶
+Enable IP forwarding on your server by removing the comments in front of
+
+
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+in the file /etc/sysctl.d/99-sysctl.conf
+
+Then apply the new option with the command below.
+
+
+sudo sysctl -p
+If you see the options repeated like
+
+
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+they were enabled successfully.
+
+A properly configured firewall is highly recommended for any Internet-facing device. Configuring a firewall (iptables, ufw, etc.) is not part of this guide.
+
+Enable NAT on the server¶
+On your server, add the following to the [INTERFACE] section of your /etc/wireguard/wg0.conf:
+
+
+PostUp = iptables -w -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -w -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -w -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -w -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+Important: Substitute interface
+
+Without the correct interface name, this will not work!
+
+Substitute eth0 in the preceding lines to match the Internet-facing interface. This may be enp2s0 or similar on more recent Ubuntu versions (check, e.g., ip a for details about your local interfaces).
+
+Important: Debian Bullseye (Debian 11) and Raspian 11
+
+Debian Bullseye doesn't include iptables per default and uses nftables. (you may need to install nftables using sudo apt-get install nftables)
+
+We have to set following rules for PostUP and PostDown:
+
+
+PostUp = nft add table ip wireguard; nft add chain ip wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip wireguard wireguard_chain oifname "eth0" counter packets 0 bytes 0 masquerade; nft add table ip6 wireguard; nft add chain ip6 wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip6 wireguard wireguard_chain oifname "eth0" counter packets 0 bytes 0 masquerade
+PostDown = nft delete table ip wireguard; nft delete table ip6 wireguard
+PostUp and PostDown defines steps to be run after the interface is turned on or off, respectively. In this case, iptables is used to set Linux IP masquerade rules to allow all the clients to share the server’s IPv4 and IPv6 address. The rules will then be cleared once the tunnel is down.
+
+Exemplary server config file with this change
+
+[Interface]
+PrivateKey = [your server's private key]
+Address = [Wireguard-internal IPs of the server, e.g. 10.100.0.1/24, fd08:4711::1/64]
+ListenPort = 47111
+
+PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o enp2s0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o enp2s0 -j MASQUERADE
+
+# Android phone
+[Peer]
+PublicKey = [public key of this client]
+PresharedKey = [pre-shared key of this client]
+AllowedIPs = [Wireguard-internal IP of this client, e.g., 10.100.0.2/32, fd08:4711::2/128]
+
+# maybe more [Peer] sections for more clients
+
+
+Allow clients to access other devices¶
+In our standard configuration, we have configured the clients in such a way that they can only speak to the server. Add the network range of your local network in CIDR notation (e.g., 192.168.2.1 - 192.168.2.254 -> 192.168.2.0/24) in the [Peers] section of all clients you want to have this feature:
+
+
+[Peer]
+AllowedIPs = 10.0.0.0/24, fd08:4711::/64, 192.168.2.0/24
+It is possible to add this only for a few clients, leaving the others isolated to only the Pi-hole server itself.
+
+Exemplary client config file with this change
+
+[Interface]
+PrivateKey = [your client's private key]
+Address = [Wireguard-internal IPs of your client, e.g. 10.100.0.2/32, fd08:4711::2/128]
+DNS = 10.100.0.1
+
+[Peer]
+AllowedIPs = 10.100.0.0/24, fd08:4711::/64, 192.168.2.0/24
+Endpoint = [your server's public IP or domain]:47111
+PublicKey = [public key of the server]
+PresharedKey = [pre-shared key of this client]
+PersistentKeepalive = 25
+The important change is the extra 192.168.2.0/24 at the end of the [Peer] -> AllowedIPs entry.
+
+Route the entire Internet traffic through the WireGuard tunnel¶
+Routing your entire Internet traffic is optional, however, it can be advantageous in cases where you are expecting eavesdropping on the network. This may not only happen in insecure open Wi-Fi networks (airports, hotels, trains, etc.) but also in encrypted Wi-Fi networks where the creator of the network can monitor client activity.
+
+Rerouting the Internet traffic through your Pi-hole will furthermore cause all of your Internet traffic to reach the Internet from the place where your WireGuard server is located. This can be used to obfuscate your real location as well as to be allowed to access geo-blocked content, e.g., when your Pi-hole is located in Germany but you are traveling in the United States. If you want to access a page only accessible from within Germany (like the live-broadcast of Tagesschau, etc.), this will typically not work. However, if you route your entire Internet through your Pi-hole, your network traffic will originate from Germany, allowing you to watch the content.
+
+Create a second profile
+
+Instead of editing your existing configuration, you can easily add a new one with the modified AllowedIPs line as above. This will give you two tunnel variants and you decide - at any time from mobile - which variant you want. The one with only the DNS traffic being safely forwarded to your Pi-hole or the variant where your entire Internet traffic is encrypted and sent through your Pi-hole. You can choose at any time which is the best solution in your current situation (e.g., trusted network, unencrypted airport Wi-Fi, etc.).
+
+Ensure you're already forwarding traffic
+
+The following assumes you have already prepared your Pi-hole for IP forwarding and enabled NAT. If this is not the case, follow the steps over there before continuing here.
+
+If you haven't done this, your clients will apparently have no Internet connection whilst local connections may still work. This is a hard to debug situation so please ensure you have everything set up to avoid hours of troubleshooting.
+
+To route all traffic through the tunnel to a specific peer, add the default route (0.0.0.0/0 for IPv4 and ::/0for IPv6) to AllowedIPs in the [Peer] section of your clients's WireGuard config files:
+
+
+AllowedIPs = 0.0.0.0/0, ::/0
+Exemplary client config file with this change
+
+[Interface]
+PrivateKey = [your client's private key]
+Address = [Wireguard-internal IPs of your client, e.g. 10.100.0.2/32, fd08:4711::2/128]
+DNS = 10.100.0.1
+
+[Peer]
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = [your server's public IP or domain]:47111
+PublicKey = [public key of the server]
+PresharedKey = [pre-shared key of this client]
+PersistentKeepalive = 25
+The important change is setting the [Peer] -> AllowedIPs entry to 0.0.0.0/0, ::/0
+
+Change this setting only on your clients
+
+Do not set this on the server in the [Interface] section. WireGuard will automatically take care of setting up correct routing so that networking still functions on all your clients.
+
+That's all you need to do. You should use an online check (e.g. www.wieistmeineip.de) to check if your IP changed to the public IP address of your WireGuard server after this change. It is possible to add this change only for a few clients, leaving the others without a full tunnel for all traffic (e.g., where this is not necessary or not desired).
+
+
+Frequently asked questions¶
+Issues with dynamic server IP¶
+Hostnames cannot be resolved during startup. This may lead to a five minutes delay during boot. A solution to this is to disable the automatic start of the wg interface during start and connect only later (manually) when you are sure that you can resolve hostnames.
+
+Disable auto wg0 in /etc/network/interfaces (put # in front, like #auto wg0)
+Start wireguard manually using sudo ifup wg0
+If the IP changes while the connection is running, resolving the new IP address fails often. Reconnect using
+
+
+sudo ifdown wg0 && sudo ifup wg0
+To achieve a permanent solution, one can install a cron job which restarts the connection automatically whenever a change is detected. This avoids excessive restarts of the interface. Example script (taken from Ubuntuusers Wiki):
+
+
+#!/bin/bash
+# Check state of wg0 interface
+wgstatus=$(wg)
+if [ "$wgstatus" == "interface: wg0" ]; then
+    ip link delete wg0 && ifup wg0
+elif [ "$wgstatus" == "interface: wg0" ]; then
+    ifup wg0
+else
+    file="/tmp/digIP.txt"
+    digIP=$(dig +short beispiel2.domain.de) # Change this to your domain !
+    if [ -e "$file" ]; then
+        fileTXT=$(cat "$file")
+        if [ "$digIP" != "$fileTXT" ]; then
+            #echo "Daten sind gleich"
+            /sbin/ifdown wg0
+            /sbin/ifup wg0
+            echo "$digIP" > "$file"
+        fi
+    else
+        echo "$digIP" > "$file"
+    fi
+fi
+Store this file as /home/[user name]/wg-restart.sh and add it to your crontab:
+
+
+sudo crontab -e
+
+*/10 * * * * bash /home/[user name]/wg-restart.sh    # Runs the script every 10 minutes
+Routes are periodically reset¶
+Users of NetworkManager should make sure that it is not managing the WireGuard interface(s). For example, create the configuration file /etc/NetworkManager/conf.d/unmanaged.conf with content
+
+
+[keyfile]
+unmanaged-devices=interface-name:wg*
+source
+
+Broken DNS resolution¶
+When tunneling all traffic through a WireGuard interface, the connection can become seemingly lost after a while or upon a new connection. This could be caused by a network manager or DHCP client overwriting /etc/resolv.conf. By default, wg-quick uses resolvconf to register new DNS entries (from the DNS keyword in the configuration file). This will cause issues with network managers and DHCP clients that do not use resolvconf, as they will overwrite /etc/resolv.conf thus removing the DNS servers added by wg-quick.
+
+The solution is to use networking software that supports resolvconf.
+
+Hint for Ubuntu users
+
+Users of systemd-resolved should make sure that systemd-resolvconf is installed.
+
+source
+
+Low MTU¶
+Due to too low MTU (lower than 1280), wg-quick may fail to create the WireGuard interface. This can be solved by setting the MTU value in WireGuard configuration in the Interface section on the client:
+
+
+[Interface]
+MTU = 1500
+source
+
+Pi-hole not listening on wg0 after reboot¶
+If, e.g., after reboot, the wg0 interface isn't up before Pi-hole is ready (more precisely, the pihole-FTL service is started), you may experience that Pi-hole doesn't listen on the Wireguard interface. This can be mitigated by artificially delaying the start of Pi-hole using, e.g., the config option
+
+
+DELAY_STARTUP=5
+in /etc/pihole/pihole-FTL.conf to have Pi-hole delay the start of the DNS server by 5 seconds.
+
+
